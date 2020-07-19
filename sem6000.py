@@ -270,12 +270,38 @@ class SEM6000():
 
         return notification
 
+    def request_scheduler(self):
+        command = RequestSchedulerCommand(page_number=0)
+        self._send_command(command)
+        notification = self._delegate.consume_notification()
+
+        if not isinstance(notification, SchedulerRequestedNotification):
+            raise Exception('Request scheduler 1st page failed')
+
+        max_page_number = notification.number_of_schedulers // 4
+        for page_number in range(1, max_page_number+1):
+            command = RequestSchedulerCommand(page_number=page_number)
+            self._send_command(command)
+            further_notification = self._delegate.consume_notification()
+
+            if not isinstance(further_notification, SchedulerRequestedNotification):
+                raise Exception('Request scheduler 2nd page failed')
+
+            notification.schedulers.extend(further_notification.schedulers)
+
+        return notification
+
 
 def _format_minutes_as_time(minutes):
     hour = minutes // 60
     minute = minutes - hour*60
 
     return "{:02}:{:02}".format(hour, minute)
+
+
+def _format_hour_and_minute_as_time(hour, minute):
+    return "{:02}:{:02}".format(hour, minute)
+
 
 def _parse_boolean(boolean_string):
     boolean_value = False
@@ -353,13 +379,13 @@ if __name__ == '__main__':
             response = sem6000.request_timer_status()
             assert isinstance(response, RequestedTimerStatusNotification)
 
-            now = datetime.datetime.now()
-            now = datetime.datetime(now.year % 100, now.month, now.day, now.hour, now.minute, now.second)
-
             original_timer_length = datetime.timedelta(seconds=response.original_timer_length_in_seconds)
 
             print("Timer Status:")
             if response.is_timer_running:
+                now = datetime.datetime.now()
+                now = datetime.datetime(now.year % 100, now.month, now.day, now.hour, now.minute, now.second)
+
                 dt = datetime.datetime(response.target_year, response.target_month, response.target_day, response.target_hour, response.target_minute, response.target_second)
                 time_left = (dt - now)
 
@@ -377,3 +403,28 @@ if __name__ == '__main__':
             sem6000.set_timer(False, sys.argv[4], sys.argv[5])
         if cmd == 'reset_timer':
             sem6000.set_timer(True, False, "00:00")
+        if cmd == 'request_scheduler':
+            response = sem6000.request_scheduler()
+
+            print("Schedulers:")
+            for i in range(len(response.schedulers)):
+                scheduler = response.schedulers[i]
+
+                print("\t#" + str(i+1))
+                
+                if scheduler.is_active:
+                    print("\tActive:\tOn")
+                else:
+                    print("\tActive:\tOff")
+
+                if scheduler.is_action_turn_on:
+                    print("\tAction:\tTurn On")
+                else:
+                    print("\tAction:\tTurn Off")
+                
+                print("\tYear:\t" + str(scheduler.year))
+                print("\tMonth:\t" + str(scheduler.month))
+                print("\tDay:\t" + str(scheduler.day))
+                print("\tTime:\t" + _format_hour_and_minute_as_time(scheduler.hour, scheduler.minute))
+                print("")
+

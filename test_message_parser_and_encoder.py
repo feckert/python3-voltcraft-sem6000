@@ -105,3 +105,25 @@ class MessagesTest(unittest.TestCase):
 
         self.assertEqual(True, parsed_message.was_successful, 'was_successful value differs')
 
+    def test_SchedulerRequestedNotification(self):
+        schedulers=[]
+        for i in range(12):
+            schedulers.append(Scheduler(is_active=True, is_action_turn_on=True, repeat_on_weekdays=[1,2,3,4,5,6,7], year=20, month=12, day=3, hour=12, minute=34))
+
+        message = SchedulerRequestedNotification(number_of_schedulers=12, schedulers=schedulers)
+
+        encoded_message = MessageEncoder().encode(message)
+        parsed_message = MessageParser().parse(encoded_message)
+
+        self.assertEqual(12, parsed_message.number_of_schedulers)
+        self.assertEqual(12, len(parsed_message.schedulers))
+        for i in range(12):
+            self.assertEqual(True, parsed_message.schedulers[i].is_active, 'is_active value differs on scheduler ' + str(i))
+            self.assertEqual(True, parsed_message.schedulers[i].is_action_turn_on, 'is_action_turn_on value differs on scheduler ' + str(i))
+            self.assertEqual([1,2,3,4,5,6,7], parsed_message.schedulers[i].repeat_on_weekdays, 'repeat_on_weekdays value differs on scheduler ' + str(i))
+            self.assertEqual(20, parsed_message.schedulers[i].year, 'year value differs on scheduler ' + str(i))
+            self.assertEqual(12, parsed_message.schedulers[i].month, 'month value differs on scheduler ' + str(i))
+            self.assertEqual(3, parsed_message.schedulers[i].day, 'day value differs on scheduler ' + str(i))
+            self.assertEqual(12, parsed_message.schedulers[i].hour, 'hour value differs on scheduler ' + str(i))
+            self.assertEqual(34, parsed_message.schedulers[i].minute, 'minute value differs on scheduler ' + str(i))
+

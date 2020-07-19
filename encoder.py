@@ -98,6 +98,11 @@ class MessageEncoder():
 
             return self._encode_message(b'\x08\x00' + timer_action + target_second + target_minute + target_hour + target_day + target_month + target_year + b'\x00\x00')
 
+        if isinstance(message, RequestSchedulerCommand):
+            page_number = message.page_number.to_bytes(1, 'big')
+
+            return self._encode_message(b'\x14\x00' + page_number + b'\x00\x00')
+
         if isinstance(message, AuthorizationNotification):
             was_successful = b'\x01'
             if message.was_successful:
@@ -184,6 +189,44 @@ class MessageEncoder():
 
         if isinstance(message, TimerSetNotification):
             return self._encode_message(b'\x08\x00\x00')
+
+        if isinstance(message, SchedulerRequestedNotification):
+            schedulers_data = b''
+
+            number_of_schedulers = len(message.schedulers)
+            for i in range(number_of_schedulers):
+                scheduler = message.schedulers[i]
+
+                slot_id = int(i+1).to_bytes(1, 'big')
+
+                is_active = b'\x00'
+                if scheduler.is_active:
+                    is_active = b'\x01'
+
+                is_action_turn_on = b'\x00'
+                if scheduler.is_action_turn_on:
+                    is_action_turn_on = b'\x01'
+
+                repeat_on_weekdays = 0
+                for weekday in scheduler.repeat_on_weekdays:
+                    repeat_on_weekdays |= 2**(weekday-1)
+                repeat_on_weekdays = repeat_on_weekdays.to_bytes(1, 'big')
+
+                year = scheduler.year.to_bytes(1, 'big')
+                month = scheduler.month.to_bytes(1, 'big')
+                day = scheduler.day.to_bytes(1, 'big')
+                hour = scheduler.hour.to_bytes(1, 'big')
+                minute = scheduler.minute.to_bytes(1, 'big')
+
+                scheduler_data = slot_id + is_active + is_action_turn_on + repeat_on_weekdays + year + month + day + hour + minute + b'\x00\x00' 
+                # TODO: how to calculate the checksum of a single scheduler?
+                checksum = (0).to_bytes(1, 'big')
+
+                schedulers_data += scheduler_data + checksum
+
+            number_of_schedulers = number_of_schedulers.to_bytes(1, 'big')
+
+            return self._encode_message(b'\x14\x00' + number_of_schedulers + schedulers_data)
 
         raise Exception('Unsupported message ' + str(message))
 

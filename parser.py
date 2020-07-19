@@ -157,4 +157,45 @@ class MessageParser:
 
             return TimerSetNotification(was_successful=True)
 
+        if payload[0:2] == b'\x14\x00':
+            if len(payload) < 3:
+                raise InvalidPayloadLengthException(message_class=SchedulerRequestedNotification, expected_payload_length=3, actual_payload_length=len(payload))
+            if (len(payload)-3) % 12 != 0:
+                expected = len(payload) + 12 - (len(payload)-3) % 12
+                raise InvalidPayloadLengthException(message_class=SchedulerRequestedNotification, expected_payload_length=expected, actual_payload_length=len(payload))
+
+            number_of_schedulers = int.from_bytes(payload[2:3], 'big')
+            number_of_schedulers_in_message = (len(payload)-3)//12
+
+            schedulers = []
+            for i in range(number_of_schedulers_in_message):
+                slot_id = int.from_bytes(payload[3 + i*12:4 + i*12], 'big')
+                
+                is_active = False
+                if payload[4 + i*12:5 + i*12] == b'\x01':
+                    is_active = True
+
+                is_action_turn_on = False
+                if payload[5 + i*12:6 + i*12] == b'\x01':
+                    is_action_turn_on = True
+
+                repeat_on_weekdays_mask = int.from_bytes(payload[6 + i*12:7 + i*12], 'big')
+                repeat_on_weekdays = []
+                for w in range(8):
+                    if repeat_on_weekdays_mask & 2**w:
+                        repeat_on_weekdays.append(w+1)
+
+                year = int.from_bytes(payload[7 + i*12:8 + i*12], 'big')
+                month = int.from_bytes(payload[8 + i*12:9 + i*12], 'big')
+                day  = int.from_bytes(payload[9 + i*12:10 + i*12], 'big')
+                hour = int.from_bytes(payload[10 + i*12:11 + i*12], 'big')
+                minute = int.from_bytes(payload[11 + i*12:12 + i*12], 'big')
+
+                # TODO: How to check if the checksum is valid?
+                checksum = int.from_bytes(payload[14 + i*12:15 + i*12], 'big')
+
+                schedulers.append(Scheduler(is_active=is_active, is_action_turn_on=is_action_turn_on, repeat_on_weekdays=repeat_on_weekdays, year=year, month=month, day=day, hour=hour, minute=minute))
+
+            return SchedulerRequestedNotification(number_of_schedulers=number_of_schedulers, schedulers=schedulers)
+
         raise Exception('Unsupported message')
