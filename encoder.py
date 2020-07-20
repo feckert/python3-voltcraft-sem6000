@@ -219,8 +219,8 @@ class MessageEncoder():
                 minute = scheduler.minute.to_bytes(1, 'big')
 
                 scheduler_data = slot_id + is_active + is_action_turn_on + repeat_on_weekdays + year + month + day + hour + minute + b'\x00\x00' 
-                # TODO: how to calculate the checksum of a single scheduler?
-                checksum = (0).to_bytes(1, 'big')
+                checksum = (sum(scheduler_data)+0x15) & 0xff
+                checksum = checksum.to_bytes(1, 'big')
 
                 schedulers_data += scheduler_data + checksum
 

@@ -22,7 +22,7 @@ class MessageParser:
         checksum = (1+sum(payload)) & 0xff
 
         if checksum_received != checksum:
-            raise Exception("Invalid checksum " + str(checksum) + ", expected=" + str(checksum_received))
+            raise Exception("Invalid checksum: actual=" + str(checksum) + ", received=" + str(checksum_received))
 
         if len(data) > 2+length_of_payload:
             # if suffix exists it must be b'\xff\xff'
@@ -191,8 +191,11 @@ class MessageParser:
                 hour = int.from_bytes(payload[10 + i*12:11 + i*12], 'big')
                 minute = int.from_bytes(payload[11 + i*12:12 + i*12], 'big')
 
-                # TODO: How to check if the checksum is valid?
-                checksum = int.from_bytes(payload[14 + i*12:15 + i*12], 'big')
+                checksum_received = int.from_bytes(payload[14 + i*12:15 + i*12], 'big')
+                checksum = (sum(payload[3 + i*12:14 + i*12])+0x15) & 0xff
+
+                if checksum_received != checksum:
+                    raise Exception("Invalid checksum for scheduler " + str(slot_id) + ": actual=" + str(checksum) + ", received=" + str(checksum_received))
 
                 schedulers.append(Scheduler(is_active=is_active, is_action_turn_on=is_action_turn_on, repeat_on_weekdays=repeat_on_weekdays, year=year, month=month, day=day, hour=hour, minute=minute))
 
