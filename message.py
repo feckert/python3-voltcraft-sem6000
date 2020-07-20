@@ -1,4 +1,5 @@
 import datetime
+import enum
 
 class AbstractCommand:
     def __str__(self):
@@ -207,8 +208,26 @@ class TimerSetNotification(AbstractCommandConfirmationNotification):
     pass
 
 
+class SchedulerWeekday(enum.Enum):
+    SUNDAY = 0
+    MONDAY = 1
+    TUESDAY = 2
+    WEDNESDAY = 3
+    THURSDAY = 4
+    FRIDAY = 5
+    SATURDAY = 6
+
+
 class Scheduler:
     def __init__(self, is_active, is_action_turn_on, repeat_on_weekdays, year, month, day, hour, minute):
+        for i in range(len(repeat_on_weekdays)):
+            weekday = repeat_on_weekdays[i]
+            if isinstance(weekday, int):
+                repeat_on_weekdays[i] = SchedulerWeekday(weekday)
+
+        for weekday in repeat_on_weekdays:
+            assert isinstance(weekday, SchedulerWeekday)
+
         self.is_active = is_active
         self.is_action_turn_on = is_action_turn_on
         self.repeat_on_weekdays = repeat_on_weekdays
@@ -220,7 +239,17 @@ class Scheduler:
 
     def __str__(self):
         name = self.__class__.__name__
-        return name + "(is_active=" + str(self.is_active) + ", is_action_turn_on=" + str(self.is_action_turn_on) + ", repeat_on_weekdays=" + str(self.repeat_on_weekdays) + ", year=" + str(self.year) + ", month=" + str(self.month) + ", day=" + str(self.day) + ", hour=" + str(self.hour) + ", minute=" + str(self.minute) + ")"
+
+        repeat_on_weekdays = "["
+        is_first_value = True
+        for weekday in self.repeat_on_weekdays:
+            if not is_first_value:
+                repeat_on_weekdays += ", "
+            repeat_on_weekdays += weekday.name
+            is_first_value = False
+        repeat_on_weekdays += "]"
+
+        return name + "(is_active=" + str(self.is_active) + ", is_action_turn_on=" + str(self.is_action_turn_on) + ", repeat_on_weekdays=" + repeat_on_weekdays + ", year=" + str(self.year) + ", month=" + str(self.month) + ", day=" + str(self.day) + ", hour=" + str(self.hour) + ", minute=" + str(self.minute) + ")"
 
 
 class SchedulerRequestedNotification:

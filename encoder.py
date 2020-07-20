@@ -209,7 +209,7 @@ class MessageEncoder():
 
                 repeat_on_weekdays = 0
                 for weekday in scheduler.repeat_on_weekdays:
-                    repeat_on_weekdays |= 2**(weekday-1)
+                    repeat_on_weekdays |= 2**weekday
                 repeat_on_weekdays = repeat_on_weekdays.to_bytes(1, 'big')
 
                 year = scheduler.year.to_bytes(1, 'big')

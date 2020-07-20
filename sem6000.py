@@ -422,9 +422,20 @@ if __name__ == '__main__':
                 else:
                     print("\tAction:\tTurn Off")
                 
-                print("\tYear:\t" + str(scheduler.year))
-                print("\tMonth:\t" + str(scheduler.month))
-                print("\tDay:\t" + str(scheduler.day))
+                if scheduler.repeat_on_weekdays:
+                    repeat_on_weekdays = ""
+                    is_first_value = True
+                    for weekday in scheduler.repeat_on_weekdays:
+                        if not is_first_value:
+                            repeat_on_weekdays += ", "
+                        repeat_on_weekdays += weekday.name
+                        is_first_value = False
+
+                    print("\tRepeat on:\t" + repeat_on_weekdays)
+                else:
+                    date = datetime.date(year=scheduler.year, month=scheduler.month, day=scheduler.day)
+                    print("\tDate:\t" + str(date))
+
                 print("\tTime:\t" + _format_hour_and_minute_as_time(scheduler.hour, scheduler.minute))
                 print("")
 

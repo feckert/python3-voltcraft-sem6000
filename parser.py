@@ -181,9 +181,9 @@ class MessageParser:
 
                 repeat_on_weekdays_mask = int.from_bytes(payload[6 + i*12:7 + i*12], 'big')
                 repeat_on_weekdays = []
-                for w in range(8):
+                for w in range(7):
                     if repeat_on_weekdays_mask & 2**w:
-                        repeat_on_weekdays.append(w+1)
+                        repeat_on_weekdays.append(w)
 
                 year = int.from_bytes(payload[7 + i*12:8 + i*12], 'big')
                 month = int.from_bytes(payload[8 + i*12:9 + i*12], 'big')
