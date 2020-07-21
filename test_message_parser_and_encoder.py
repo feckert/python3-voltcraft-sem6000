@@ -108,7 +108,16 @@ class MessagesTest(unittest.TestCase):
     def test_SchedulerRequestedNotification(self):
         schedulers=[]
         for i in range(12):
-            schedulers.append(Scheduler(is_active=True, is_action_turn_on=True, repeat_on_weekdays=[1,2,3,4,5,6,7], year=20, month=12, day=3, hour=12, minute=34))
+            repeat_on_weekdays = []
+            repeat_on_weekdays.append(SchedulerWeekday.SUNDAY)
+            repeat_on_weekdays.append(SchedulerWeekday.MONDAY)
+            repeat_on_weekdays.append(SchedulerWeekday.TUESDAY)
+            repeat_on_weekdays.append(SchedulerWeekday.WEDNESDAY)
+            repeat_on_weekdays.append(SchedulerWeekday.THURSDAY)
+            repeat_on_weekdays.append(SchedulerWeekday.FRIDAY)
+            repeat_on_weekdays.append(SchedulerWeekday.SATURDAY)
+
+            schedulers.append(Scheduler(is_active=True, is_action_turn_on=True, repeat_on_weekdays=repeat_on_weekdays, year=20, month=12, day=3, hour=12, minute=34))
 
         message = SchedulerRequestedNotification(number_of_schedulers=12, schedulers=schedulers)
 
@@ -118,9 +127,18 @@ class MessagesTest(unittest.TestCase):
         self.assertEqual(12, parsed_message.number_of_schedulers)
         self.assertEqual(12, len(parsed_message.schedulers))
         for i in range(12):
+            repeat_on_weekday_expected = []
+            repeat_on_weekday_expected.append(SchedulerWeekday.SUNDAY)
+            repeat_on_weekday_expected.append(SchedulerWeekday.MONDAY)
+            repeat_on_weekday_expected.append(SchedulerWeekday.TUESDAY)
+            repeat_on_weekday_expected.append(SchedulerWeekday.WEDNESDAY)
+            repeat_on_weekday_expected.append(SchedulerWeekday.THURSDAY)
+            repeat_on_weekday_expected.append(SchedulerWeekday.FRIDAY)
+            repeat_on_weekday_expected.append(SchedulerWeekday.SATURDAY)
+
             self.assertEqual(True, parsed_message.schedulers[i].is_active, 'is_active value differs on scheduler ' + str(i))
             self.assertEqual(True, parsed_message.schedulers[i].is_action_turn_on, 'is_action_turn_on value differs on scheduler ' + str(i))
-            self.assertEqual([1,2,3,4,5,6,7], parsed_message.schedulers[i].repeat_on_weekdays, 'repeat_on_weekdays value differs on scheduler ' + str(i))
+            self.assertEqual(repeat_on_weekday_expected, parsed_message.schedulers[i].repeat_on_weekdays, 'repeat_on_weekdays value differs on scheduler ' + str(i))
             self.assertEqual(20, parsed_message.schedulers[i].year, 'year value differs on scheduler ' + str(i))
             self.assertEqual(12, parsed_message.schedulers[i].month, 'month value differs on scheduler ' + str(i))
             self.assertEqual(3, parsed_message.schedulers[i].day, 'day value differs on scheduler ' + str(i))
