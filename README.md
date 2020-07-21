@@ -5,7 +5,7 @@ _"A Python library to manage bluetooth switch, scheduler and smart energy meter 
 
 ## Work in progress
 
-- [x| Authorize with PIN
+- [x] Authorize with PIN
 - [x] Change PIN
 - [x] Reset PIN
 - [x] Synchronize Date/Time
