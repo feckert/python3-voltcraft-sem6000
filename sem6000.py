@@ -285,7 +285,7 @@ class SEM6000():
             if not isinstance(further_notification, SchedulerRequestedNotification):
                 raise Exception('Request scheduler 2nd page failed')
 
-            notification.schedulers.extend(further_notification.schedulers)
+            notification.scheduler_entries.extend(further_notification.scheduler_entries)
 
         return notification
 

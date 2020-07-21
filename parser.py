@@ -167,7 +167,7 @@ class MessageParser:
             number_of_schedulers = int.from_bytes(payload[2:3], 'big')
             number_of_schedulers_in_message = (len(payload)-3)//12
 
-            schedulers = []
+            scheduler_entries = []
             for i in range(number_of_schedulers_in_message):
                 slot_id = int.from_bytes(payload[3 + i*12:4 + i*12], 'big')
                 
@@ -197,8 +197,10 @@ class MessageParser:
                 if checksum_received != checksum:
                     raise Exception("Invalid checksum for scheduler " + str(slot_id) + ": actual=" + str(checksum) + ", received=" + str(checksum_received))
 
-                schedulers.append(Scheduler(is_active=is_active, is_action_turn_on=is_action_turn_on, repeat_on_weekdays=repeat_on_weekdays, year=year, month=month, day=day, hour=hour, minute=minute))
+                scheduler = Scheduler(is_active=is_active, is_action_turn_on=is_action_turn_on, repeat_on_weekdays=repeat_on_weekdays, year=year, month=month, day=day, hour=hour, minute=minute)
 
-            return SchedulerRequestedNotification(number_of_schedulers=number_of_schedulers, schedulers=schedulers)
+                scheduler_entries.append(SchedulerEntry(slot_id=slot_id, scheduler=scheduler))
+
+            return SchedulerRequestedNotification(number_of_schedulers=number_of_schedulers, scheduler_entries=scheduler_entries)
 
         raise Exception('Unsupported message')

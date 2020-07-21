@@ -252,25 +252,37 @@ class Scheduler:
         return name + "(is_active=" + str(self.is_active) + ", is_action_turn_on=" + str(self.is_action_turn_on) + ", repeat_on_weekdays=" + repeat_on_weekdays + ", year=" + str(self.year) + ", month=" + str(self.month) + ", day=" + str(self.day) + ", hour=" + str(self.hour) + ", minute=" + str(self.minute) + ")"
 
 
-class SchedulerRequestedNotification:
-    def __init__(self, number_of_schedulers, schedulers):
-        for scheduler in schedulers:
-            assert isinstance(scheduler, Scheduler)
+class SchedulerEntry:
+    def __init__(self, slot_id, scheduler):
+        assert isinstance(scheduler, Scheduler)
 
-        self.number_of_schedulers = number_of_schedulers
-        self.schedulers = schedulers
+        self.slot_id = slot_id
+        self.scheduler = scheduler
 
     def __str__(self):
         name = self.__class__.__name__
-        schedulers = "["
+        return name + "(slot_id=" + str(self.slot_id) + ", scheduler=" + str(self.scheduler) + ")"
+
+
+class SchedulerRequestedNotification:
+    def __init__(self, number_of_schedulers, scheduler_entries):
+        for scheduler_entry in scheduler_entries:
+            assert isinstance(scheduler_entry, SchedulerEntry)
+
+        self.number_of_schedulers = number_of_schedulers
+        self.scheduler_entries = scheduler_entries
+
+    def __str__(self):
+        name = self.__class__.__name__
+        scheduler_entries = "["
         is_first = True
-        for s in self.schedulers:
+        for s in self.scheduler_entries:
             if not is_first:
-                schedulers += ", "
+                scheduler_entries += ", "
 
-            schedulers += str(s)
+            scheduler_entries += str(s)
             is_first = False
-        schedulers += "]"
+        scheduler_entries += "]"
 
-        return name + "(number_of_schedulers=" + str(self.number_of_schedulers) + ", schedulers=" + schedulers + ")"
+        return name + "(number_of_schedulers=" + str(self.number_of_schedulers) + ", scheduler_entries=" + scheduler_entries + ")"
 

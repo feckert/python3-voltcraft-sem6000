@@ -193,11 +193,12 @@ class MessageEncoder():
         if isinstance(message, SchedulerRequestedNotification):
             schedulers_data = b''
 
-            number_of_schedulers = len(message.schedulers)
+            number_of_schedulers = len(message.scheduler_entries)
             for i in range(number_of_schedulers):
-                scheduler = message.schedulers[i]
+                scheduler_entry = message.scheduler_entries[i]
+                scheduler = scheduler_entry.scheduler
 
-                slot_id = int(i+1).to_bytes(1, 'big')
+                slot_id = scheduler_entry.slot_id.to_bytes(1, 'big')
 
                 is_active = b'\x00'
                 if scheduler.is_active:

@@ -120,10 +120,11 @@ if __name__ == '__main__':
             response = sem6000.request_scheduler()
 
             print("Schedulers:")
-            for i in range(len(response.schedulers)):
-                scheduler = response.schedulers[i]
+            for i in range(len(response.scheduler_entries)):
+                scheduler_entry = response.scheduler_entries[i]
+                scheduler = scheduler_entry.scheduler
 
-                print("\t#" + str(i+1))
+                print("\t#" + str(scheduler_entry.slot_id))
 
                 if scheduler.is_active:
                     print("\tActive:\tOn")

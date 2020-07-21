@@ -106,7 +106,7 @@ class MessagesTest(unittest.TestCase):
         self.assertEqual(True, parsed_message.was_successful, 'was_successful value differs')
 
     def test_SchedulerRequestedNotification(self):
-        schedulers=[]
+        scheduler_entries=[]
         for i in range(12):
             repeat_on_weekdays = []
             repeat_on_weekdays.append(SchedulerWeekday.SUNDAY)
@@ -117,15 +117,16 @@ class MessagesTest(unittest.TestCase):
             repeat_on_weekdays.append(SchedulerWeekday.FRIDAY)
             repeat_on_weekdays.append(SchedulerWeekday.SATURDAY)
 
-            schedulers.append(Scheduler(is_active=True, is_action_turn_on=True, repeat_on_weekdays=repeat_on_weekdays, year=20, month=12, day=3, hour=12, minute=34))
+            scheduler = Scheduler(is_active=True, is_action_turn_on=True, repeat_on_weekdays=repeat_on_weekdays, year=20, month=12, day=3, hour=12, minute=34)
+            scheduler_entries.append(SchedulerEntry(slot_id=i, scheduler=scheduler))
 
-        message = SchedulerRequestedNotification(number_of_schedulers=12, schedulers=schedulers)
+        message = SchedulerRequestedNotification(number_of_schedulers=12, scheduler_entries=scheduler_entries)
 
         encoded_message = MessageEncoder().encode(message)
         parsed_message = MessageParser().parse(encoded_message)
 
         self.assertEqual(12, parsed_message.number_of_schedulers)
-        self.assertEqual(12, len(parsed_message.schedulers))
+        self.assertEqual(12, len(parsed_message.scheduler_entries))
         for i in range(12):
             repeat_on_weekday_expected = []
             repeat_on_weekday_expected.append(SchedulerWeekday.SUNDAY)
@@ -136,12 +137,13 @@ class MessagesTest(unittest.TestCase):
             repeat_on_weekday_expected.append(SchedulerWeekday.FRIDAY)
             repeat_on_weekday_expected.append(SchedulerWeekday.SATURDAY)
 
-            self.assertEqual(True, parsed_message.schedulers[i].is_active, 'is_active value differs on scheduler ' + str(i))
-            self.assertEqual(True, parsed_message.schedulers[i].is_action_turn_on, 'is_action_turn_on value differs on scheduler ' + str(i))
-            self.assertEqual(repeat_on_weekday_expected, parsed_message.schedulers[i].repeat_on_weekdays, 'repeat_on_weekdays value differs on scheduler ' + str(i))
-            self.assertEqual(20, parsed_message.schedulers[i].year, 'year value differs on scheduler ' + str(i))
-            self.assertEqual(12, parsed_message.schedulers[i].month, 'month value differs on scheduler ' + str(i))
-            self.assertEqual(3, parsed_message.schedulers[i].day, 'day value differs on scheduler ' + str(i))
-            self.assertEqual(12, parsed_message.schedulers[i].hour, 'hour value differs on scheduler ' + str(i))
-            self.assertEqual(34, parsed_message.schedulers[i].minute, 'minute value differs on scheduler ' + str(i))
+            self.assertEqual(i, parsed_message.scheduler_entries[i].slot_id, 'slot_id value differs on scheduler ' + str(i))
+            self.assertEqual(True, parsed_message.scheduler_entries[i].scheduler.is_active, 'is_active value differs on scheduler ' + str(i))
+            self.assertEqual(True, parsed_message.scheduler_entries[i].scheduler.is_action_turn_on, 'is_action_turn_on value differs on scheduler ' + str(i))
+            self.assertEqual(repeat_on_weekday_expected, parsed_message.scheduler_entries[i].scheduler.repeat_on_weekdays, 'repeat_on_weekdays value differs on scheduler ' + str(i))
+            self.assertEqual(20, parsed_message.scheduler_entries[i].scheduler.year, 'year value differs on scheduler ' + str(i))
+            self.assertEqual(12, parsed_message.scheduler_entries[i].scheduler.month, 'month value differs on scheduler ' + str(i))
+            self.assertEqual(3, parsed_message.scheduler_entries[i].scheduler.day, 'day value differs on scheduler ' + str(i))
+            self.assertEqual(12, parsed_message.scheduler_entries[i].scheduler.hour, 'hour value differs on scheduler ' + str(i))
+            self.assertEqual(34, parsed_message.scheduler_entries[i].scheduler.minute, 'minute value differs on scheduler ' + str(i))
 
