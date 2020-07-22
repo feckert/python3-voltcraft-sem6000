@@ -32,6 +32,29 @@ class MessageParser:
 
         return payload
 
+    def _parse_scheduler(self, data):
+        is_active = False
+        if data[0:1] == b'\x01':
+            is_active = True
+
+        is_action_turn_on = False
+        if data[1:2] == b'\x01':
+            is_action_turn_on = True
+
+        repeat_on_weekdays_mask = int.from_bytes(data[2:3], 'big')
+        repeat_on_weekdays = []
+        for w in range(7):
+            if repeat_on_weekdays_mask & 2**w:
+                repeat_on_weekdays.append(w)
+
+        year = int.from_bytes(data[3:4], 'big')
+        month = int.from_bytes(data[4:5], 'big')
+        day  = int.from_bytes(data[5:6], 'big')
+        hour = int.from_bytes(data[6:7], 'big')
+        minute = int.from_bytes(data[7:8], 'big')
+
+        return Scheduler(is_active=is_active, is_action_turn_on=is_action_turn_on, repeat_on_weekdays=repeat_on_weekdays, year=year, month=month, day=day, hour=hour, minute=minute)
+
     def parse(self, data):
         payload = self._parse_payload(data)
 
@@ -170,34 +193,14 @@ class MessageParser:
             scheduler_entries = []
             for i in range(number_of_schedulers_in_message):
                 slot_id = int.from_bytes(payload[3 + i*12:4 + i*12], 'big')
-                
-                is_active = False
-                if payload[4 + i*12:5 + i*12] == b'\x01':
-                    is_active = True
-
-                is_action_turn_on = False
-                if payload[5 + i*12:6 + i*12] == b'\x01':
-                    is_action_turn_on = True
-
-                repeat_on_weekdays_mask = int.from_bytes(payload[6 + i*12:7 + i*12], 'big')
-                repeat_on_weekdays = []
-                for w in range(7):
-                    if repeat_on_weekdays_mask & 2**w:
-                        repeat_on_weekdays.append(w)
-
-                year = int.from_bytes(payload[7 + i*12:8 + i*12], 'big')
-                month = int.from_bytes(payload[8 + i*12:9 + i*12], 'big')
-                day  = int.from_bytes(payload[9 + i*12:10 + i*12], 'big')
-                hour = int.from_bytes(payload[10 + i*12:11 + i*12], 'big')
-                minute = int.from_bytes(payload[11 + i*12:12 + i*12], 'big')
 
                 checksum_received = int.from_bytes(payload[14 + i*12:15 + i*12], 'big')
-                checksum = (sum(payload[3 + i*12:14 + i*12])+0x15) & 0xff
+                checksum = (sum(payload[4 + i*12:14 + i*12])+0x14) & 0xff
 
                 if checksum_received != checksum:
                     raise Exception("Invalid checksum for scheduler " + str(slot_id) + ": actual=" + str(checksum) + ", received=" + str(checksum_received))
 
-                scheduler = Scheduler(is_active=is_active, is_action_turn_on=is_action_turn_on, repeat_on_weekdays=repeat_on_weekdays, year=year, month=month, day=day, hour=hour, minute=minute)
+                scheduler = self._parse_scheduler(payload[4 + i*12:12 + i*12])
 
                 scheduler_entries.append(SchedulerEntry(slot_id=slot_id, scheduler=scheduler))
 

@@ -19,6 +19,28 @@ class MessageEncoder():
             
             return pin_bytes
 
+    def _encode_scheduler(self, scheduler):
+            is_active = b'\x00'
+            if scheduler.is_active:
+                is_active = b'\x01'
+
+            is_action_turn_on = b'\x00'
+            if scheduler.is_action_turn_on:
+                is_action_turn_on = b'\x01'
+
+            repeat_on_weekdays = 0
+            for weekday in scheduler.repeat_on_weekdays:
+                repeat_on_weekdays += 2**weekday.value
+            repeat_on_weekdays = repeat_on_weekdays.to_bytes(1, 'big')
+
+            year = scheduler.year.to_bytes(1, 'big')
+            month = scheduler.month.to_bytes(1, 'big')
+            day = scheduler.day.to_bytes(1, 'big')
+            hour = scheduler.hour.to_bytes(1, 'big')
+            minute = scheduler.minute.to_bytes(1, 'big')
+
+            return is_active + is_action_turn_on + repeat_on_weekdays + year + month + day + hour + minute
+
     def encode(self, message):
         if isinstance(message, AuthorizeCommand):
             pin = self._encode_pin(message.pin)
@@ -200,30 +222,11 @@ class MessageEncoder():
 
                 slot_id = scheduler_entry.slot_id.to_bytes(1, 'big')
 
-                is_active = b'\x00'
-                if scheduler.is_active:
-                    is_active = b'\x01'
-
-                is_action_turn_on = b'\x00'
-                if scheduler.is_action_turn_on:
-                    is_action_turn_on = b'\x01'
-
-                repeat_on_weekdays = 0
-                for weekday in scheduler.repeat_on_weekdays:
-                    repeat_on_weekdays |= 2**weekday.value
-                repeat_on_weekdays = repeat_on_weekdays.to_bytes(1, 'big')
-
-                year = scheduler.year.to_bytes(1, 'big')
-                month = scheduler.month.to_bytes(1, 'big')
-                day = scheduler.day.to_bytes(1, 'big')
-                hour = scheduler.hour.to_bytes(1, 'big')
-                minute = scheduler.minute.to_bytes(1, 'big')
-
-                scheduler_data = slot_id + is_active + is_action_turn_on + repeat_on_weekdays + year + month + day + hour + minute + b'\x00\x00' 
-                checksum = (sum(scheduler_data)+0x15) & 0xff
+                scheduler_data = self._encode_scheduler(scheduler) + b'\x00\x00' 
+                checksum = (sum(scheduler_data)+0x14) & 0xff
                 checksum = checksum.to_bytes(1, 'big')
 
-                schedulers_data += scheduler_data + checksum
+                schedulers_data += slot_id + scheduler_data + checksum
 
             number_of_schedulers = number_of_schedulers.to_bytes(1, 'big')
 
