@@ -94,6 +94,58 @@ class SEM6000():
             if self._delegate.has_final_raw_notification():
                 break 
 
+    def _parse_boolean(self, boolean_string):
+        boolean_value = False
+    
+        if str(boolean_string).lower() == "true":
+            boolean_value = True
+        if str(boolean_string).lower() == "on":
+            boolean_value = True
+        if str(boolean_string).lower() == "1":
+            boolean_value = True
+    
+        return boolean_value
+
+    def _parse_list(self, list_input):
+        if type(list_input) == list:
+            list_value = list_input
+        if type(list_input) == str:
+            list_value = list_input.split(",")
+
+        for i in range(len(list_value)):
+            list_value[i] = list_value[i].strip()
+
+        return list_value
+
+    def _parse_weekday(self, weekday):
+        if isinstance(weekday, SchedulerWeekday):
+            return weekday
+
+        if type(weekday) == int:
+            return SchedulerWeekday(weekday)
+
+        weekday = weekday.lower()
+
+        weekday_num = 0
+        for weekday_str in ["sun", "mon", "tue", "wed", "thu", "fri", "sat"]:
+            if weekday_str in weekday or weekday == str(weekday_num):
+                return SchedulerWeekday(weekday_num)
+            weekday_num += 1
+
+        return None
+
+    def _parse_weekdays_list(self, weekdays_list):
+        weekdays=[]
+
+        weekday_strings_list = self._parse_list(weekdays_list)
+        for weekday_str in weekday_strings_list:
+            weekday = self._parse_weekday(weekday_str)
+            if weekday is None:
+                continue
+            weekdays.append(weekday)
+
+        return weekdays
+
     def discover(timeout=10):
         result = []
 
@@ -234,7 +286,7 @@ class SEM6000():
         start_time_in_minutes = start_time.hour*60 + start_time.minute
         end_time_in_minutes = end_time.hour*60 + end_time.minute
 
-        command = SetReducedPeriodCommand(is_active=_parse_boolean(is_active), start_time_in_minutes=start_time_in_minutes, end_time_in_minutes=end_time_in_minutes)
+        command = SetReducedPeriodCommand(is_active=self._parse_boolean(is_active), start_time_in_minutes=start_time_in_minutes, end_time_in_minutes=end_time_in_minutes)
         self._send_command(command)
         notification = self._delegate.consume_notification()
 
@@ -259,7 +311,7 @@ class SEM6000():
         dt = datetime.datetime.now() + timedelta
         dt = datetime.datetime(dt.year % 100, dt.month, dt.day, dt.hour, dt.minute, dt.second)
 
-        command = SetTimerCommand(is_reset_timer=_parse_boolean(is_reset_timer), is_action_turn_on=_parse_boolean(is_action_turn_on), target_second=dt.second, target_minute=dt.minute, target_hour=dt.hour, target_day=dt.day, target_month=dt.month, target_year=dt.year)
+        command = SetTimerCommand(is_reset_timer=self._parse_boolean(is_reset_timer), is_action_turn_on=self._parse_boolean(is_action_turn_on), target_second=dt.second, target_minute=dt.minute, target_hour=dt.hour, target_day=dt.day, target_month=dt.month, target_year=dt.year)
         self._send_command(command)
         notification = self._delegate.consume_notification()
 
@@ -289,4 +341,39 @@ class SEM6000():
 
         return notification
 
+    def add_scheduler(self, is_active, is_action_turn_on, repeat_on_weekdays, isodatetime):
+        date_time = datetime.datetime.fromisoformat(isodatetime)
+        date_time = datetime.datetime(year=date_time.year % 100, month=date_time.month, day=date_time.day, hour=date_time.hour, minute=date_time.minute)
+
+        command = AddSchedulerCommand(Scheduler(is_active=self._parse_boolean(is_active), is_action_turn_on=self._parse_boolean(is_action_turn_on), repeat_on_weekdays=self._parse_weekdays_list(repeat_on_weekdays), year=date_time.year, month=date_time.month, day=date_time.day, hour=date_time.hour, minute=date_time.minute))
+        self._send_command(command)
+        notification = self._delegate.consume_notification()
+
+        if not isinstance(notification, SchedulerSetNotification):
+            raise Exception("Add scheduler failed")
+
+        return notification
+
+    def edit_scheduler(self, slot_id, is_active, is_action_turn_on, repeat_on_weekdays, isodatetime):
+        date_time = datetime.datetime.fromisoformat(isodatetime)
+        date_time = datetime.datetime(year=date_time.year % 100, month=date_time.month, day=date_time.day, hour=date_time.hour, minute=date_time.minute)
+
+        command = EditSchedulerCommand(slot_id=int(slot_id), scheduler=Scheduler(is_active=self._parse_boolean(is_active), is_action_turn_on=self._parse_boolean(is_action_turn_on), repeat_on_weekdays=self._parse_weekdays_list(repeat_on_weekdays), year=date_time.year, month=date_time.month, day=date_time.day, hour=date_time.hour, minute=date_time.minute))
+        self._send_command(command)
+        notification = self._delegate.consume_notification()
+
+        if not isinstance(notification, SchedulerSetNotification):
+            raise Exception("Edit scheduler failed")
+
+        return notification
+
+    def remove_scheduler(self, slot_id):
+        command = RemoveSchedulerCommand(slot_id=int(slot_id))
+        self._send_command(command)
+        notification = self._delegate.consume_notification()
+
+        if not isinstance(notification, SchedulerSetNotification):
+            raise Exception("Remove scheduler failed")
+
+        return notification
 

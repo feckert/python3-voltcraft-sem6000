@@ -125,6 +125,19 @@ class MessageEncoder():
 
             return self._encode_message(b'\x14\x00' + page_number + b'\x00\x00')
 
+        if isinstance(message, AddSchedulerCommand):
+            return self._encode_message(b'\x13\x00' + b'\x00\x00' + self._encode_scheduler(message.scheduler) + b'\x00\x00')
+
+        if isinstance(message, EditSchedulerCommand):
+            slot_id = message.slot_id.to_bytes(1, 'big')
+
+            return self._encode_message(b'\x13\x00' + b'\x01' + slot_id + self._encode_scheduler(message.scheduler) + b'\x00\x00')
+
+        if isinstance(message, RemoveSchedulerCommand):
+            slot_id = message.slot_id.to_bytes(1, 'big')
+
+            return self._encode_message(b'\x13\x00' + b'\x02' + slot_id + b'\x00\x00\x00\x00\x00\x00\x00\x00' + b'\x00\x00')
+
         if isinstance(message, AuthorizationNotification):
             was_successful = b'\x01'
             if message.was_successful:
@@ -231,6 +244,13 @@ class MessageEncoder():
             number_of_schedulers = number_of_schedulers.to_bytes(1, 'big')
 
             return self._encode_message(b'\x14\x00' + number_of_schedulers + schedulers_data)
+
+        if isinstance(message, SchedulerSetNotification):
+            was_successful = b'\x01'
+            if message.was_successful:
+                was_successful = b'\x00'
+
+            return self._encode_message(b'\x13\x00' + was_successful + b'\x00\x00')
 
         raise Exception('Unsupported message ' + str(message))
 

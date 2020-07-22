@@ -81,7 +81,6 @@ class MessagesTest(unittest.TestCase):
 
         self.assertEqual(True, parsed_message.was_successful, 'was_successful value differs')
 
-
     def test_RequestedTimerStatusNotification(self):
         message = RequestedTimerStatusNotification(is_timer_running=True, is_action_turn_on=True, target_second=12, target_minute=34, target_hour=12, target_day=12, target_month=3, target_year=4, original_timer_length_in_seconds=42)
         encoded_message = MessageEncoder().encode(message)
@@ -146,4 +145,11 @@ class MessagesTest(unittest.TestCase):
             self.assertEqual(3, parsed_message.scheduler_entries[i].scheduler.day, 'day value differs on scheduler ' + str(i))
             self.assertEqual(12, parsed_message.scheduler_entries[i].scheduler.hour, 'hour value differs on scheduler ' + str(i))
             self.assertEqual(34, parsed_message.scheduler_entries[i].scheduler.minute, 'minute value differs on scheduler ' + str(i))
+
+    def test_SchedulerSetNotification(self):
+        message = SchedulerSetNotification(was_successful=True)
+        encoded_message = MessageEncoder().encode(message)
+        parsed_message = MessageParser().parse(encoded_message)
+
+        self.assertEqual(True, parsed_message.was_successful, 'was_successful value differs')
 

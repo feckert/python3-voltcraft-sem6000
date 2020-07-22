@@ -136,6 +136,38 @@ class RequestSchedulerCommand:
         return name + "(page_number=" + str(self.page_number) + ")"
 
 
+class AddSchedulerCommand:
+    def __init__(self, scheduler):
+        assert isinstance(scheduler, Scheduler)
+
+        self.scheduler = scheduler
+
+    def __str__(self):
+        name = self.__class__.__name__
+        return name + "(scheduler=" + str(self.scheduler) + ")"
+
+
+class EditSchedulerCommand:
+    def __init__(self, slot_id, scheduler):
+        assert isinstance(scheduler, Scheduler)
+
+        self.slot_id = slot_id
+        self.scheduler = scheduler
+
+    def __str__(self):
+        name = self.__class__.__name__
+        return name + "(slot_id=" + str(self.slot_id) + ", scheduler=" + str(self.scheduler) + ")"
+
+
+class RemoveSchedulerCommand:
+    def __init__(self, slot_id):
+        self.slot_id = slot_id
+
+    def __str__(self):
+        name = self.__class__.__name__
+        return name + "(slot_id=" + str(self.slot_id) + ")"
+
+
 class AuthorizationNotification(AbstractCommandConfirmationNotification):
     pass
 
@@ -285,4 +317,8 @@ class SchedulerRequestedNotification:
         scheduler_entries += "]"
 
         return name + "(number_of_schedulers=" + str(self.number_of_schedulers) + ", scheduler_entries=" + scheduler_entries + ")"
+
+
+class SchedulerSetNotification(AbstractCommandConfirmationNotification):
+    pass
 

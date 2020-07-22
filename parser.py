@@ -210,4 +210,11 @@ class MessageParser:
 
             return SchedulerRequestedNotification(number_of_schedulers=number_of_schedulers, scheduler_entries=scheduler_entries)
 
+        if payload[0:2] == b'\x13\x00':
+            was_successful = False
+            if payload[2:3] == b'\x00':
+                was_successful = True
+
+            return SchedulerSetNotification(was_successful=was_successful)
+
         raise Exception('Unsupported message')

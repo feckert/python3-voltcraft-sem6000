@@ -16,19 +16,6 @@ def _format_hour_and_minute_as_time(hour, minute):
     return "{:02}:{:02}".format(hour, minute)
 
 
-def _parse_boolean(boolean_string):
-    boolean_value = False
-
-    if str(boolean_string).lower() == "true":
-        boolean_value = True
-    if str(boolean_string).lower() == "on":
-        boolean_value = True
-    if str(boolean_string).lower() == "1":
-        boolean_value = True
-
-    return boolean_value
-
-
 if __name__ == '__main__':
     if len(sys.argv) == 1:
         devices = sem6000.SEM6000.discover()
@@ -152,5 +139,23 @@ if __name__ == '__main__':
 
                 print("\tTime:\t" + _format_hour_and_minute_as_time(scheduler.hour, scheduler.minute))
                 print("")
+        if cmd == 'add_scheduler':
+            is_active = sys.argv[4]
+            is_action_turn_on = sys.argv[5]
+            repeat_on_weekdays=sys.argv[6]
+            isodatetime = sys.argv[7]
 
+            response = sem6000.add_scheduler(is_active=is_active, is_action_turn_on=is_action_turn_on, repeat_on_weekdays=repeat_on_weekdays, isodatetime=isodatetime)
+        if cmd == 'edit_scheduler':
+            slot_id = sys.argv[4]
+            is_active = sys.argv[5]
+            is_action_turn_on = sys.argv[6]
+            repeat_on_weekdays=sys.argv[7]
+            isodatetime = sys.argv[8]
+
+            response = sem6000.edit_scheduler(slot_id=slot_id, is_active=is_active, is_action_turn_on=is_action_turn_on, repeat_on_weekdays=repeat_on_weekdays, isodatetime=isodatetime)
+        if cmd == 'remove_scheduler':
+            slot_id = sys.argv[4]
+
+            response = sem6000.remove_scheduler(slot_id=slot_id)
 
