@@ -190,4 +190,9 @@ class MessagesTest(unittest.TestCase):
 
         self.assertEqual(True, parsed_message.was_successful, 'was_successful value differs')
 
+    def test_DeviceNameSetNotification(self):
+        message = DeviceNameSetNotification(was_successful=True)
+        encoded_message = MessageEncoder().encode(message)
+        parsed_message = MessageParser().parse(encoded_message)
 
+        self.assertEqual(True, parsed_message.was_successful, 'was_successful value differs')

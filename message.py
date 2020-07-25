@@ -210,6 +210,15 @@ class SetRandomModeCommand:
         return name + "(is_active=" + str(self.is_active) + ", active_on_weekdays=" + active_on_weekdays + ", start_hour=" + str(self.start_hour) + ", start_minute=" + str(self.start_minute) + ", end_hour=" + str(self.end_hour) + ", end_minute=" + str(self.end_minute) + ")"
 
 
+class SetDeviceNameCommand:
+        def __init__(self, new_name):
+            self.new_name = new_name
+
+        def __str__(self):
+            command = self.__class__.__name__
+            return command + "(new_name=" + str(self.new_name) + ")"
+
+
 class AuthorizationNotification(AbstractCommandConfirmationNotification):
     pass
 
@@ -366,4 +375,8 @@ class RandomModeStatusRequestedNotification:
 
 
 class RandomModeSetNotification(AbstractCommandConfirmationNotification):
+    pass
+
+
+class DeviceNameSetNotification(AbstractCommandConfirmationNotification):
     pass

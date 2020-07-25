@@ -242,4 +242,7 @@ class MessageParser:
 
             return RandomModeSetNotification(was_successful=was_successful)
 
+        if payload[0:2] == b'\x02\x00':
+            return DeviceNameSetNotification(was_successful=True)
+
         raise Exception('Unsupported message')

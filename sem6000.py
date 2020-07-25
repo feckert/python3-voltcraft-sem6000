@@ -64,6 +64,7 @@ class SEM6000Delegate(btle.DefaultDelegate):
 
 class SEM6000():
     SERVICECLASS_UUID='0000fff0-0000-1000-8000-00805f9b34fb'
+    CHARACTERISTICS_UUID_NAME='00002a00-0000-1000-8000-00805f9b34fb'
     CHARACTERISTICS_UUID_CONTROL='0000fff3-0000-1000-8000-00805f9b34fb'
 
     def __init__(self, deviceAddr=None, pin=None, iface=None, debug=False):
@@ -79,14 +80,15 @@ class SEM6000():
         self._delegate = SEM6000Delegate(self.debug)
         self._peripheral = btle.Peripheral(deviceAddr=deviceAddr, addrType=btle.ADDR_TYPE_PUBLIC, iface=iface).withDelegate(self._delegate)
         self._control_characteristics = self._peripheral.getCharacteristics(uuid=SEM6000.CHARACTERISTICS_UUID_CONTROL)[0]
+        self._name_characteristics = self._peripheral.getCharacteristics(uuid=SEM6000.CHARACTERISTICS_UUID_NAME)[0]
 
-    def _send_command(self, command):
+    def _send_command(self, command, with_response=False):
         encoded_command = self._encoder.encode(command)
 
         if self.debug:
             print("sent data: " + str(binascii.hexlify(encoded_command)) + " (" + str(command) + ")", file=sys.stderr)
 
-        self._characteristics.write(encoded_command)
+        self._control_characteristics.write(encoded_command, with_response)
         self._wait_for_notifications()
 
     def _wait_for_notifications(self):
@@ -169,6 +171,14 @@ class SEM6000():
             result.append({'address': address, 'name': complete_local_name})
 
         return result
+
+    def request_device_name(self):
+        data = self._name_characteristics.read()
+
+        if self.debug:
+            print("received data: characteristics_uuid=" + SEM6000.CHARACTERISTICS_UUID_NAME + ", data=" + str(binascii.hexlify(data)), file=sys.stderr)
+
+        return data.decode(encoding='utf-8')
 
     def authorize(self):
         command = AuthorizeCommand(self.pin)
@@ -397,5 +407,16 @@ class SEM6000():
 
         if not isinstance(notification, RandomModeSetNotification):
             raise Exception("Set random mode failed")
+
+        return notification
+
+    def set_device_name(self, new_name):
+        command = SetDeviceNameCommand(new_name=new_name)
+        # for some reason this command does only work if send with btle_characteristics.write(..., withResponse=True)
+        self._send_command(command, with_response=True)
+        notification = self._delegate.consume_notification()
+
+        if not isinstance(notification, DeviceNameSetNotification):
+            raise Exception("Set device name failed")
 
         return notification

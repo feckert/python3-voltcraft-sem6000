@@ -29,7 +29,7 @@ if __name__ == '__main__':
 
         sem6000 = sem6000.SEM6000(deviceAddr, pin, debug=True)
 
-        if cmd != 'reset_pin':
+        if cmd != 'reset_pin' and cmd != 'get_device_name':
             sem6000.authorize()
 
         if cmd == 'change_pin':
@@ -174,4 +174,11 @@ if __name__ == '__main__':
             end_minute = sys.argv[9]
 
             response = sem6000.set_random_mode(is_active=is_active, active_on_weekdays=active_on_weekdays, start_hour=start_hour, start_minute=start_minute, end_hour=end_hour, end_minute=end_minute)
- 
+        if cmd == 'request_device_name':
+            device_name = sem6000.request_device_name()
+
+            print("Device-Name:\t" + device_name)
+        if cmd == 'set_device_name':
+            new_name = sys.argv[4]
+
+            sem6000.set_device_name(new_name=new_name)

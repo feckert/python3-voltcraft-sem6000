@@ -158,6 +158,19 @@ class MessageEncoder():
 
             return self._encode_message(b'\x15\x00' + is_active + active_on_weekdays + start_hour + start_minute + end_hour + end_minute + b'\x00\x00')
 
+        if isinstance(message, SetDeviceNameCommand):
+            new_name = message.new_name
+            if isinstance(new_name, str):
+                new_name = new_name.encode()
+
+            if len(new_name) > 18:
+                raise Exception('name is too long - actual number of character: ' + str(len(new_name)) + ', maximum characters possible: 18')
+
+            while len(new_name) < 18:
+                new_name += b'\x00'
+
+            return self._encode_message(b'\x02\x00' + new_name + b'\x00\x00')
+
         if isinstance(message, AuthorizationNotification):
             was_successful = b'\x01'
             if message.was_successful:
@@ -295,6 +308,9 @@ class MessageEncoder():
                 was_successful = b'\x00'
 
             return self._encode_message(b'\x15\x00' + was_successful + b'\x00')
+
+        if isinstance(message, DeviceNameSetNotification):
+            return self._encode_message(b'\x02\x00' + b'\x00')
 
         raise Exception('Unsupported message ' + str(message))
 
