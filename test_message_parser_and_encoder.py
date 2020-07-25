@@ -108,13 +108,13 @@ class MessagesTest(unittest.TestCase):
         scheduler_entries=[]
         for i in range(12):
             repeat_on_weekdays = []
-            repeat_on_weekdays.append(SchedulerWeekday.SUNDAY)
-            repeat_on_weekdays.append(SchedulerWeekday.MONDAY)
-            repeat_on_weekdays.append(SchedulerWeekday.TUESDAY)
-            repeat_on_weekdays.append(SchedulerWeekday.WEDNESDAY)
-            repeat_on_weekdays.append(SchedulerWeekday.THURSDAY)
-            repeat_on_weekdays.append(SchedulerWeekday.FRIDAY)
-            repeat_on_weekdays.append(SchedulerWeekday.SATURDAY)
+            repeat_on_weekdays.append(Weekday.SUNDAY)
+            repeat_on_weekdays.append(Weekday.MONDAY)
+            repeat_on_weekdays.append(Weekday.TUESDAY)
+            repeat_on_weekdays.append(Weekday.WEDNESDAY)
+            repeat_on_weekdays.append(Weekday.THURSDAY)
+            repeat_on_weekdays.append(Weekday.FRIDAY)
+            repeat_on_weekdays.append(Weekday.SATURDAY)
 
             scheduler = Scheduler(is_active=True, is_action_turn_on=True, repeat_on_weekdays=repeat_on_weekdays, year=20, month=12, day=3, hour=12, minute=34)
             scheduler_entries.append(SchedulerEntry(slot_id=i, scheduler=scheduler))
@@ -128,13 +128,13 @@ class MessagesTest(unittest.TestCase):
         self.assertEqual(12, len(parsed_message.scheduler_entries))
         for i in range(12):
             repeat_on_weekday_expected = []
-            repeat_on_weekday_expected.append(SchedulerWeekday.SUNDAY)
-            repeat_on_weekday_expected.append(SchedulerWeekday.MONDAY)
-            repeat_on_weekday_expected.append(SchedulerWeekday.TUESDAY)
-            repeat_on_weekday_expected.append(SchedulerWeekday.WEDNESDAY)
-            repeat_on_weekday_expected.append(SchedulerWeekday.THURSDAY)
-            repeat_on_weekday_expected.append(SchedulerWeekday.FRIDAY)
-            repeat_on_weekday_expected.append(SchedulerWeekday.SATURDAY)
+            repeat_on_weekday_expected.append(Weekday.SUNDAY)
+            repeat_on_weekday_expected.append(Weekday.MONDAY)
+            repeat_on_weekday_expected.append(Weekday.TUESDAY)
+            repeat_on_weekday_expected.append(Weekday.WEDNESDAY)
+            repeat_on_weekday_expected.append(Weekday.THURSDAY)
+            repeat_on_weekday_expected.append(Weekday.FRIDAY)
+            repeat_on_weekday_expected.append(Weekday.SATURDAY)
 
             self.assertEqual(i, parsed_message.scheduler_entries[i].slot_id, 'slot_id value differs on scheduler ' + str(i))
             self.assertEqual(True, parsed_message.scheduler_entries[i].scheduler.is_active, 'is_active value differs on scheduler ' + str(i))
@@ -152,4 +152,42 @@ class MessagesTest(unittest.TestCase):
         parsed_message = MessageParser().parse(encoded_message)
 
         self.assertEqual(True, parsed_message.was_successful, 'was_successful value differs')
+
+    def test_RandomModeStatusRequestedNotification(self):
+        active_on_weekdays=[]
+        active_on_weekdays.append(Weekday.SUNDAY)
+        active_on_weekdays.append(Weekday.MONDAY)
+        active_on_weekdays.append(Weekday.TUESDAY)
+        active_on_weekdays.append(Weekday.WEDNESDAY)
+        active_on_weekdays.append(Weekday.THURSDAY)
+        active_on_weekdays.append(Weekday.FRIDAY)
+        active_on_weekdays.append(Weekday.SATURDAY)
+
+        message = RandomModeStatusRequestedNotification(is_active=True, active_on_weekdays=active_on_weekdays, start_hour=10, start_minute=30, end_hour=18, end_minute=45)
+        encoded_message = MessageEncoder().encode(message)
+        parsed_message = MessageParser().parse(encoded_message)
+
+        active_on_weekdays_expected=[]
+        active_on_weekdays_expected.append(Weekday.SUNDAY)
+        active_on_weekdays_expected.append(Weekday.MONDAY)
+        active_on_weekdays_expected.append(Weekday.TUESDAY)
+        active_on_weekdays_expected.append(Weekday.WEDNESDAY)
+        active_on_weekdays_expected.append(Weekday.THURSDAY)
+        active_on_weekdays_expected.append(Weekday.FRIDAY)
+        active_on_weekdays_expected.append(Weekday.SATURDAY)
+
+        self.assertEqual(True, parsed_message.is_active, 'is_active value differs')
+        self.assertEqual(active_on_weekdays_expected, parsed_message.active_on_weekdays, 'active_on_weekdays value differs')
+        self.assertEqual(10, parsed_message.start_hour, 'start_hour value differs')
+        self.assertEqual(30, parsed_message.start_minute, 'start_minute value differs')
+        self.assertEqual(18, parsed_message.end_hour, 'end_hour value differs')
+        self.assertEqual(45, parsed_message.end_minute, 'end_minute value differs')
+
+    def test_RandomModeSetNotification(self):
+        message = RandomModeSetNotification(was_successful=True)
+        encoded_message = MessageEncoder().encode(message)
+        parsed_message = MessageParser().parse(encoded_message)
+
+        self.assertEqual(True, parsed_message.was_successful, 'was_successful value differs')
+
 

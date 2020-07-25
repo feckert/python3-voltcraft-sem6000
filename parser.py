@@ -217,4 +217,29 @@ class MessageParser:
 
             return SchedulerSetNotification(was_successful=was_successful)
 
+        if payload[0:2] == b'\x16\x00':
+            is_active = False
+            if payload[2:3] == b'\x01':
+                is_active = True
+
+            active_on_weekdays_mask = int.from_bytes(payload[3:4], 'big')
+            active_on_weekdays = []
+            for w in range(7):
+                if active_on_weekdays_mask & 2**w:
+                    active_on_weekdays.append(w)
+
+            start_hour = int.from_bytes(payload[4:5], 'big')
+            start_minute = int.from_bytes(payload[5:6], 'big')
+            end_hour = int.from_bytes(payload[6:7], 'big')
+            end_minute = int.from_bytes(payload[7:8], 'big')
+
+            return RandomModeStatusRequestedNotification(is_active=is_active, active_on_weekdays=active_on_weekdays, start_hour=start_hour, start_minute=start_minute, end_hour=end_hour, end_minute=end_minute)
+
+        if payload[0:2] == b'\x15\x00':
+            was_successful = False
+            if payload[2:3] == b'\x00':
+                was_successful = True
+
+            return RandomModeSetNotification(was_successful=was_successful)
+
         raise Exception('Unsupported message')

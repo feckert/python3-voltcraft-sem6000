@@ -1,6 +1,25 @@
 import datetime
 import enum
 
+def _list_values_to_enum(enum_class, list_of_values):
+    list_of_enums = []
+    for v in list_of_values:
+        list_of_enums.append(enum_class(v))
+    return list_of_enums
+
+def _format_list_of_objects(format_object_lambda, list_of_objects):
+    is_first = True
+    formatted_string = "["
+    for o in list_of_objects:
+        if not is_first:
+            formatted_string += ", "
+        formatted_string += format_object_lambda(o)
+        is_first = False
+    formatted_string += "]"
+
+    return formatted_string
+
+
 class AbstractCommand:
     def __str__(self):
         name = self.__class__.__name__
@@ -168,6 +187,29 @@ class RemoveSchedulerCommand:
         return name + "(slot_id=" + str(self.slot_id) + ")"
 
 
+class RequestRandomModeStatusCommand(AbstractCommand):
+    pass 
+
+
+class SetRandomModeCommand:
+    def __init__(self, is_active, active_on_weekdays, start_hour, start_minute, end_hour, end_minute):
+        active_on_weekdays = _list_values_to_enum(Weekday, active_on_weekdays)
+
+        self.is_active = is_active
+        self.active_on_weekdays = active_on_weekdays
+        self.start_hour = start_hour
+        self.start_minute = start_minute
+        self.end_hour = end_hour
+        self.end_minute = end_minute
+
+    def __str__(self):
+        weekday_formatter = lambda w: w.name
+        active_on_weekdays = _format_list_of_objects(weekday_formatter, self.active_on_weekdays)
+
+        name = self.__class__.__name__
+        return name + "(is_active=" + str(self.is_active) + ", active_on_weekdays=" + active_on_weekdays + ", start_hour=" + str(self.start_hour) + ", start_minute=" + str(self.start_minute) + ", end_hour=" + str(self.end_hour) + ", end_minute=" + str(self.end_minute) + ")"
+
+
 class AuthorizationNotification(AbstractCommandConfirmationNotification):
     pass
 
@@ -240,7 +282,7 @@ class TimerSetNotification(AbstractCommandConfirmationNotification):
     pass
 
 
-class SchedulerWeekday(enum.Enum):
+class Weekday(enum.Enum):
     SUNDAY = 0
     MONDAY = 1
     TUESDAY = 2
@@ -252,13 +294,7 @@ class SchedulerWeekday(enum.Enum):
 
 class Scheduler:
     def __init__(self, is_active, is_action_turn_on, repeat_on_weekdays, year, month, day, hour, minute):
-        for i in range(len(repeat_on_weekdays)):
-            weekday = repeat_on_weekdays[i]
-            if isinstance(weekday, int):
-                repeat_on_weekdays[i] = SchedulerWeekday(weekday)
-
-        for weekday in repeat_on_weekdays:
-            assert isinstance(weekday, SchedulerWeekday)
+        repeat_on_weekdays = _list_values_to_enum(Weekday, repeat_on_weekdays)
 
         self.is_active = is_active
         self.is_action_turn_on = is_action_turn_on
@@ -272,14 +308,8 @@ class Scheduler:
     def __str__(self):
         name = self.__class__.__name__
 
-        repeat_on_weekdays = "["
-        is_first_value = True
-        for weekday in self.repeat_on_weekdays:
-            if not is_first_value:
-                repeat_on_weekdays += ", "
-            repeat_on_weekdays += weekday.name
-            is_first_value = False
-        repeat_on_weekdays += "]"
+        weekday_formatter = lambda w: w.name
+        repeat_on_weekdays = _format_list_of_objects(weekday_formatter, self.repeat_on_weekdays)
 
         return name + "(is_active=" + str(self.is_active) + ", is_action_turn_on=" + str(self.is_action_turn_on) + ", repeat_on_weekdays=" + repeat_on_weekdays + ", year=" + str(self.year) + ", month=" + str(self.month) + ", day=" + str(self.day) + ", hour=" + str(self.hour) + ", minute=" + str(self.minute) + ")"
 
@@ -306,15 +336,8 @@ class SchedulerRequestedNotification:
 
     def __str__(self):
         name = self.__class__.__name__
-        scheduler_entries = "["
-        is_first = True
-        for s in self.scheduler_entries:
-            if not is_first:
-                scheduler_entries += ", "
 
-            scheduler_entries += str(s)
-            is_first = False
-        scheduler_entries += "]"
+        scheduler_entries = _format_list_of_objects(str, self.scheduler_entries)
 
         return name + "(number_of_schedulers=" + str(self.number_of_schedulers) + ", scheduler_entries=" + scheduler_entries + ")"
 
@@ -322,3 +345,25 @@ class SchedulerRequestedNotification:
 class SchedulerSetNotification(AbstractCommandConfirmationNotification):
     pass
 
+
+class RandomModeStatusRequestedNotification:
+    def __init__(self, is_active, active_on_weekdays, start_hour, start_minute, end_hour, end_minute):
+        active_on_weekdays = _list_values_to_enum(Weekday, active_on_weekdays)
+
+        self.is_active = is_active
+        self.active_on_weekdays = active_on_weekdays
+        self.start_hour = start_hour
+        self.start_minute = start_minute
+        self.end_hour = end_hour
+        self.end_minute = end_minute
+
+    def __str__(self):
+        weekday_formatter = lambda w: w.name
+        active_on_weekdays = _format_list_of_objects(weekday_formatter, self.active_on_weekdays)
+
+        name = self.__class__.__name__
+        return name + "(is_active=" + str(self.is_active) + ", active_on_weekdays=" + active_on_weekdays + ", start_hour=" + str(self.start_hour) + ", start_minute=" + str(self.start_minute) + ", end_hour=" + str(self.end_hour) + ", end_minute=" + str(self.end_minute) + ")"
+
+
+class RandomModeSetNotification(AbstractCommandConfirmationNotification):
+    pass

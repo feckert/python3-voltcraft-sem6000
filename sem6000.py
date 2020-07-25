@@ -118,18 +118,18 @@ class SEM6000():
         return list_value
 
     def _parse_weekday(self, weekday):
-        if isinstance(weekday, SchedulerWeekday):
+        if isinstance(weekday, Weekday):
             return weekday
 
         if type(weekday) == int:
-            return SchedulerWeekday(weekday)
+            return Weekday(weekday)
 
         weekday = weekday.lower()
 
         weekday_num = 0
         for weekday_str in ["sun", "mon", "tue", "wed", "thu", "fri", "sat"]:
             if weekday_str in weekday or weekday == str(weekday_num):
-                return SchedulerWeekday(weekday_num)
+                return Weekday(weekday_num)
             weekday_num += 1
 
         return None
@@ -377,3 +377,22 @@ class SEM6000():
 
         return notification
 
+    def request_random_mode_status(self):
+        command = RequestRandomModeStatusCommand()
+        self._send_command(command)
+        notification = self._delegate.consume_notification()
+
+        if not isinstance(notification, RandomModeStatusRequestedNotification):
+            raise Exception("Request random mode status failed")
+
+        return notification
+
+    def set_random_mode(self, is_active, active_on_weekdays, start_hour, start_minute, end_hour, end_minute):
+        command = SetRandomModeCommand(is_active=self._parse_boolean(is_active), active_on_weekdays=self._parse_weekdays_list(active_on_weekdays), start_hour=int(start_hour), start_minute=int(start_minute), end_hour=int(end_hour), end_minute=int(end_minute))
+        self._send_command(command)
+        notification = self._delegate.consume_notification()
+
+        if not isinstance(notification, RandomModeSetNotification):
+            raise Exception("Set random mode failed")
+
+        return notification

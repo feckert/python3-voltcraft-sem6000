@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import sem6000
+from message import _format_list_of_objects
 
 import datetime
 import sys
@@ -114,30 +115,24 @@ if __name__ == '__main__':
                 print("\t#" + str(scheduler_entry.slot_id))
 
                 if scheduler.is_active:
-                    print("\tActive:\tOn")
+                    print("\tActive:\t\t\tOn")
                 else:
-                    print("\tActive:\tOff")
+                    print("\tActive:\t\t\tOff")
 
                 if scheduler.is_action_turn_on:
-                    print("\tAction:\tTurn On")
+                    print("\tAction:\t\t\tTurn On")
                 else:
-                    print("\tAction:\tTurn Off")
+                    print("\tAction:\t\t\tTurn Off")
 
                 if scheduler.repeat_on_weekdays:
-                    repeat_on_weekdays = ""
-                    is_first_value = True
-                    for weekday in scheduler.repeat_on_weekdays:
-                        if not is_first_value:
-                            repeat_on_weekdays += ", "
-                        repeat_on_weekdays += weekday.name
-                        is_first_value = False
-
-                    print("\tRepeat on:\t" + repeat_on_weekdays)
+                    weekday_formatter = lambda w: w.name
+                    repeat_on_weekdays = _format_list_of_objects(weekday_formatter, scheduler.repeat_on_weekdays)
+                    print("\tRepeat on weekdays:\t" + repeat_on_weekdays)
                 else:
                     date = datetime.date(year=scheduler.year, month=scheduler.month, day=scheduler.day)
-                    print("\tDate:\t" + str(date))
+                    print("\tDate:\t\t\t" + str(date))
 
-                print("\tTime:\t" + _format_hour_and_minute_as_time(scheduler.hour, scheduler.minute))
+                print("\tTime:\t\t\t" + _format_hour_and_minute_as_time(scheduler.hour, scheduler.minute))
                 print("")
         if cmd == 'add_scheduler':
             is_active = sys.argv[4]
@@ -158,4 +153,25 @@ if __name__ == '__main__':
             slot_id = sys.argv[4]
 
             response = sem6000.remove_scheduler(slot_id=slot_id)
+        if cmd == 'request_random_mode_status':
+            response = sem6000.request_random_mode_status()
 
+            if response.is_active:
+                print("\tActive:\t\t\tOn")
+            else:
+                print("\tActive:\t\t\tOff")
+
+            weekday_formatter = lambda w: w.name
+            active_on_weekdays = _format_list_of_objects(weekday_formatter, response.active_on_weekdays)
+            print("\tActive on weekdays:\t" + active_on_weekdays)
+            print("")
+        if cmd == 'set_random_mode':
+            is_active = sys.argv[4]
+            active_on_weekdays = sys.argv[5]
+            start_hour = sys.argv[6]
+            start_minute = sys.argv[7]
+            end_hour = sys.argv[8]
+            end_minute = sys.argv[9]
+
+            response = sem6000.set_random_mode(is_active=is_active, active_on_weekdays=active_on_weekdays, start_hour=start_hour, start_minute=start_minute, end_hour=end_hour, end_minute=end_minute)
+ 

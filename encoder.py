@@ -138,6 +138,26 @@ class MessageEncoder():
 
             return self._encode_message(b'\x13\x00' + b'\x02' + slot_id + b'\x00\x00\x00\x00\x00\x00\x00\x00' + b'\x00\x00')
 
+        if isinstance(message, RequestRandomModeStatusCommand):
+            return self._encode_message(b'\x16\x00' + b'\x00\x00')
+
+        if isinstance(message, SetRandomModeCommand):
+            is_active = b'\x00'
+            if message.is_active:
+                is_active = b'\x01'
+
+            active_on_weekdays = 0
+            for weekday in message.active_on_weekdays:
+                active_on_weekdays += 2**weekday.value
+            active_on_weekdays = active_on_weekdays.to_bytes(1, 'big')
+
+            start_hour = message.start_hour.to_bytes(1, 'big')
+            start_minute = message.start_minute.to_bytes(1, 'big')
+            end_hour = message.end_hour.to_bytes(1, 'big')
+            end_minute = message.end_minute.to_bytes(1, 'big')
+
+            return self._encode_message(b'\x15\x00' + is_active + active_on_weekdays + start_hour + start_minute + end_hour + end_minute + b'\x00\x00')
+
         if isinstance(message, AuthorizationNotification):
             was_successful = b'\x01'
             if message.was_successful:
@@ -251,6 +271,30 @@ class MessageEncoder():
                 was_successful = b'\x00'
 
             return self._encode_message(b'\x13\x00' + was_successful + b'\x00\x00')
+
+        if isinstance(message, RandomModeStatusRequestedNotification):
+            is_active = b'\x00'
+            if message.is_active:
+                is_active = b'\x01'
+
+            active_on_weekdays = 0
+            for weekday in message.active_on_weekdays:
+                active_on_weekdays += 2**weekday.value
+            active_on_weekdays = active_on_weekdays.to_bytes(1, 'big')
+
+            start_hour = message.start_hour.to_bytes(1, 'big')
+            start_minute = message.start_minute.to_bytes(1, 'big')
+            end_hour = message.end_hour.to_bytes(1, 'big')
+            end_minute = message.end_minute.to_bytes(1, 'big')
+
+            return self._encode_message(b'\x16\x00' + is_active + active_on_weekdays + start_hour + start_minute + end_hour + end_minute + b'\x00\x00')
+
+        if isinstance(message, RandomModeSetNotification):
+            was_successful = b'\x01'
+            if message.was_successful:
+                was_successful = b'\x00'
+
+            return self._encode_message(b'\x15\x00' + was_successful + b'\x00')
 
         raise Exception('Unsupported message ' + str(message))
 
