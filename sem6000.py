@@ -149,7 +149,7 @@ class SEM6000():
 
         return weekdays
 
-    def discover(timeout=10):
+    def discover(timeout=5):
         result = []
 
         scanner = btle.Scanner()
