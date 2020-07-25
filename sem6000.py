@@ -409,8 +409,11 @@ class SEM6000():
 
         return notification
 
-    def set_random_mode(self, is_active, active_on_weekdays, start_hour, start_minute, end_hour, end_minute):
-        command = SetRandomModeCommand(is_active=self._parse_boolean(is_active), active_on_weekdays=self._parse_weekdays_list(active_on_weekdays), start_hour=int(start_hour), start_minute=int(start_minute), end_hour=int(end_hour), end_minute=int(end_minute))
+    def set_random_mode(self, is_active, active_on_weekdays, start_isotime, end_isotime):
+        start_time = datetime.time.fromisoformat(start_isotime)
+        end_time = datetime.time.fromisoformat(end_isotime)
+
+        command = SetRandomModeCommand(is_active=self._parse_boolean(is_active), active_on_weekdays=self._parse_weekdays_list(active_on_weekdays), start_hour=start_time.hour, start_minute=start_time.minute, end_hour=end_time.hour, end_minute=end_time.minute)
         self._send_command(command)
         notification = self._consume_notification()
 

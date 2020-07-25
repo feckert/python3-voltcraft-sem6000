@@ -164,17 +164,20 @@ if __name__ == '__main__':
 
             weekday_formatter = lambda w: w.name
             active_on_weekdays = _format_list_of_objects(weekday_formatter, response.active_on_weekdays)
+            start_time = _format_hour_and_minute_as_time(response.start_hour, response.start_minute)
+            end_time = _format_hour_and_minute_as_time(response.end_hour, response.end_minute)
+
             print("\tActive on weekdays:\t" + active_on_weekdays)
+            print("\tStart time:\t\t" + str(start_time))
+            print("\tEnd time:\t\t" + str(end_time))
             print("")
         if cmd == 'set_random_mode':
             is_active = sys.argv[4]
             active_on_weekdays = sys.argv[5]
-            start_hour = sys.argv[6]
-            start_minute = sys.argv[7]
-            end_hour = sys.argv[8]
-            end_minute = sys.argv[9]
+            start_isotime = sys.argv[6]
+            end_isotime = sys.argv[7]
 
-            response = sem6000.set_random_mode(is_active=is_active, active_on_weekdays=active_on_weekdays, start_hour=start_hour, start_minute=start_minute, end_hour=end_hour, end_minute=end_minute)
+            response = sem6000.set_random_mode(is_active=is_active, active_on_weekdays=active_on_weekdays, start_isotime=start_isotime, end_isotime=end_isotime)
         if cmd == 'request_device_name':
             device_name = sem6000.request_device_name()
 
