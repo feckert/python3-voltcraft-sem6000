@@ -35,6 +35,11 @@ class MessageParser:
         return payload
 
     def _parse_scheduler(self, data):
+        # only the last two digits are returned for the year
+        # determine the others from the current date
+        now = datetime.datetime.now()
+        year_diff = now.year - (now.year % 100)
+
         is_active = False
         if data[0:1] == b'\x01':
             is_active = True
@@ -49,7 +54,7 @@ class MessageParser:
             if repeat_on_weekdays_mask & 2**w:
                 repeat_on_weekdays.append(w)
 
-        year = int.from_bytes(data[3:4], 'big')
+        year = int.from_bytes(data[3:4], 'big') + year_diff
         month = int.from_bytes(data[4:5], 'big')
         day  = int.from_bytes(data[5:6], 'big')
         hour = int.from_bytes(data[6:7], 'big')
