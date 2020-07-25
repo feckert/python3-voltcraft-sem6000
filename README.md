@@ -16,8 +16,8 @@ _"A Python library to manage bluetooth switch, scheduler and smart energy meter 
 - [x] Set timer
 - [x] Stop timer
 - [x] Request schedulers
-- [ ] Set scheduler
-- [ ] Reset scheduler
+- [x] Set scheduler
+- [x] Reset scheduler
 - [ ] Request random mode status
 - [ ] Set random mode
 - [ ] Capture measurement
