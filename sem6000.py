@@ -71,9 +71,7 @@ class SEM6000():
         self.timeout = 10
         self.debug = debug
 
-        self.pin = '0000'
-        if not pin is None:
-            self.pin = pin
+        self.pin = None
 
         self._encoder = encoder.MessageEncoder()
 
@@ -81,6 +79,9 @@ class SEM6000():
         self._peripheral = btle.Peripheral(deviceAddr=deviceAddr, addrType=btle.ADDR_TYPE_PUBLIC, iface=iface).withDelegate(self._delegate)
         self._control_characteristics = self._peripheral.getCharacteristics(uuid=SEM6000.CHARACTERISTICS_UUID_CONTROL)[0]
         self._name_characteristics = self._peripheral.getCharacteristics(uuid=SEM6000.CHARACTERISTICS_UUID_NAME)[0]
+
+        if not pin is None:
+            self.authorize(self.pin)
 
     def _send_command(self, command, with_response=False):
         encoded_command = self._encoder.encode(command)
@@ -180,13 +181,18 @@ class SEM6000():
 
         return data.decode(encoding='utf-8')
 
-    def authorize(self):
-        command = AuthorizeCommand(self.pin)
+    def authorize(self, pin):
+        self.pin = None
+
+        command = AuthorizeCommand(pin)
         self._send_command(command)
         notification = self._delegate.consume_notification()
 
         if not isinstance(notification, AuthorizationNotification) or not notification.was_successful:
             raise Exception("Authentication failed")
+
+        if notification.was_successful:
+            self.pin = pin
 
         return notification
 

@@ -27,10 +27,10 @@ if __name__ == '__main__':
         pin = sys.argv[2]
         cmd = sys.argv[3]
 
-        sem6000 = sem6000.SEM6000(deviceAddr, pin, debug=True)
+        sem6000 = sem6000.SEM6000(deviceAddr, debug=True)
 
         if cmd != 'reset_pin' and cmd != 'get_device_name':
-            sem6000.authorize()
+            sem6000.authorize(pin)
 
         if cmd == 'change_pin':
             sem6000.change_pin(sys.argv[4])
