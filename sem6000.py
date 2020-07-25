@@ -63,6 +63,9 @@ class SEM6000Delegate(btle.DefaultDelegate):
 
 
 class SEM6000():
+    SERVICECLASS_UUID='0000fff0-0000-1000-8000-00805f9b34fb'
+    CHARACTERISTICS_UUID_CONTROL='0000fff3-0000-1000-8000-00805f9b34fb'
+
     def __init__(self, deviceAddr=None, pin=None, iface=None, debug=False):
         self.timeout = 10
         self.debug = debug
@@ -75,7 +78,7 @@ class SEM6000():
 
         self._delegate = SEM6000Delegate(self.debug)
         self._peripheral = btle.Peripheral(deviceAddr=deviceAddr, addrType=btle.ADDR_TYPE_PUBLIC, iface=iface).withDelegate(self._delegate)
-        self._characteristics = self._peripheral.getCharacteristics(uuid='0000fff3-0000-1000-8000-00805f9b34fb')[0]
+        self._control_characteristics = self._peripheral.getCharacteristics(uuid=SEM6000.CHARACTERISTICS_UUID_CONTROL)[0]
 
     def _send_command(self, command):
         encoded_command = self._encoder.encode(command)
@@ -159,7 +162,7 @@ class SEM6000():
             # 0x09 - query complete local name
             complete_local_name = device.getValueText(9)
 
-            if not service_class_uuids == "0000fff0-0000-1000-8000-00805f9b34fb":
+            if not service_class_uuids == SEM6000.SERVICECLASS_UUID:
                 # not a sem6000 device
                 continue
 
