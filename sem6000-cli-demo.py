@@ -182,3 +182,7 @@ if __name__ == '__main__':
             new_name = sys.argv[4]
 
             sem6000.set_device_name(new_name=new_name)
+        if cmd == 'request_device_serial':
+            response = sem6000.request_device_serial()
+
+            print("Device-Serial:\t" + str(response.serial))

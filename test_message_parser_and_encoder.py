@@ -196,3 +196,10 @@ class MessagesTest(unittest.TestCase):
         parsed_message = MessageParser().parse(encoded_message)
 
         self.assertEqual(True, parsed_message.was_successful, 'was_successful value differs')
+
+    def test_DeviceSerialRequestedNotification(self):
+        message = DeviceSerialRequestedNotification("ML01D10012000000")
+        encoded_message = MessageEncoder().encode(message)
+        parsed_message = MessageParser().parse(encoded_message)
+
+        self.assertEqual("ML01D10012000000", message.serial, 'serial value differs')

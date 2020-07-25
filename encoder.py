@@ -171,6 +171,9 @@ class MessageEncoder():
 
             return self._encode_message(b'\x02\x00' + new_name + b'\x00\x00')
 
+        if isinstance(message, RequestDeviceSerialCommand):
+            return self._encode_message(b'\x11\x00' + b'\x00\x00')
+
         if isinstance(message, AuthorizationNotification):
             was_successful = b'\x01'
             if message.was_successful:
@@ -311,6 +314,11 @@ class MessageEncoder():
 
         if isinstance(message, DeviceNameSetNotification):
             return self._encode_message(b'\x02\x00' + b'\x00')
+
+        if isinstance(message, DeviceSerialRequestedNotification):
+            serial = message.serial.encode()
+
+            return self._encode_message(b'\x11\x00' + serial + b'\x00\x00')
 
         raise Exception('Unsupported message ' + str(message))
 

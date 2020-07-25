@@ -219,6 +219,10 @@ class SetDeviceNameCommand:
             return command + "(new_name=" + str(self.new_name) + ")"
 
 
+class RequestDeviceSerialCommand(AbstractCommand):
+    pass
+
+
 class AuthorizationNotification(AbstractCommandConfirmationNotification):
     pass
 
@@ -380,3 +384,12 @@ class RandomModeSetNotification(AbstractCommandConfirmationNotification):
 
 class DeviceNameSetNotification(AbstractCommandConfirmationNotification):
     pass
+
+
+class DeviceSerialRequestedNotification:
+    def __init__(self, serial):
+        self.serial = serial
+
+    def __str__(self):
+        name = self.__class__.__name__
+        return name + "(serial=" + str(self.serial) + ")"

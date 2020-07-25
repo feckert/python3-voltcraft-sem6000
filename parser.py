@@ -245,4 +245,9 @@ class MessageParser:
         if payload[0:2] == b'\x02\x00':
             return DeviceNameSetNotification(was_successful=True)
 
+        if payload[0:2] == b'\x11\x00':
+            serial = payload[2:-2].decode('utf-8')
+
+            return DeviceSerialRequestedNotification(serial=serial)
+
         raise Exception('Unsupported message')
