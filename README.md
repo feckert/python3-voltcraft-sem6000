@@ -27,4 +27,4 @@ _"A Python library to manage bluetooth switch, scheduler and smart energy meter 
 - [ ] Reset accumulated measurement data
 - [x] Get device name
 - [x] Set device name
-- [ ] Get device serial
+- [x] Get device serial
