@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import sem6000
+from message import *
 from message import _format_list_of_objects
 
 import datetime
