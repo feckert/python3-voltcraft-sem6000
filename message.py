@@ -106,13 +106,13 @@ class SetPowerLimitCommand():
 
 
 class SetPricesCommand():
-    def __init__(self, normal_price_in_cent, reduced_price_in_cent):
+    def __init__(self, normal_price_in_cent, reduced_period_price_in_cent):
         self.normal_price_in_cent = normal_price_in_cent
-        self.reduced_price_in_cent = reduced_price_in_cent
+        self.reduced_period_price_in_cent = reduced_period_price_in_cent
 
     def __str__(self):
         name = self.__class__.__name__
-        return name + "(normal_price_in_cent=" + str(self.normal_price_in_cent) + ", reduced_price_in_cent=" + str(self.reduced_price_in_cent) + ")"
+        return name + "(normal_price_in_cent=" + str(self.normal_price_in_cent) + ", reduced_period_price_in_cent=" + str(self.reduced_period_price_in_cent) + ")"
 
 
 class SetReducedPeriodCommand():

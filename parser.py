@@ -130,7 +130,7 @@ class MessageParser:
                 is_reduced_mode_active = True
 
             normal_price_in_cent = int.from_bytes(payload[3:4], 'big')
-            reduced_price_in_cent = int.from_bytes(payload[4:5], 'big')
+            reduced_period_price_in_cent = int.from_bytes(payload[4:5], 'big')
 
             reduced_mode_start_time_in_minutes = int.from_bytes(payload[5:7], 'big')
             reduced_mode_end_time_in_minutes = int.from_bytes(payload[7:9], 'big')
@@ -141,7 +141,7 @@ class MessageParser:
 
             power_limit_in_watt = int.from_bytes(payload[11:13], 'big')
 
-            return RequestedSettingsNotification(is_reduced_mode_active=is_reduced_mode_active, normal_price_in_cent=normal_price_in_cent, reduced_price_in_cent=reduced_price_in_cent, reduced_mode_start_time_in_minutes=reduced_mode_start_time_in_minutes, reduced_mode_end_time_in_minutes=reduced_mode_end_time_in_minutes, is_led_active=is_led_active, power_limit_in_watt=power_limit_in_watt)
+            return RequestedSettingsNotification(is_reduced_mode_active=is_reduced_mode_active, normal_price_in_cent=normal_price_in_cent, reduced_period_price_in_cent=reduced_period_price_in_cent, reduced_mode_start_time_in_minutes=reduced_mode_start_time_in_minutes, reduced_mode_end_time_in_minutes=reduced_mode_end_time_in_minutes, is_led_active=is_led_active, power_limit_in_watt=power_limit_in_watt)
 
         if payload[0:3] == b'\x05\x00\x00' and len(payload) == 3:
             return PowerLimitSetNotification(was_successful=True)

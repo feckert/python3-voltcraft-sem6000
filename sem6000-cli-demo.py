@@ -19,10 +19,51 @@ def _format_hour_and_minute_as_time(hour, minute):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) == 1:
+    if len(sys.argv) == 2 and sys.argv[1] == 'discover':    
         devices = sem6000.SEM6000.discover()
         for device in devices:
             print(device['name'] + '\t' + device['address'])
+    elif len(sys.argv) < 2:
+        scriptname = sys.argv[0]
+        print("Usage:" , file=sys.stderr)
+        print("\t" + scriptname + "[<address> <pin>] <command> [...]" , file=sys.stderr)
+        print("\t\taddress:\tAddress of the bluetooth device to connect to, i.e. 00:11:22:33:44:55" , file=sys.stderr)
+        print("\t\tpin:\t\t4-digit PIN of the device, i.e. 0000" , file=sys.stderr)
+        print("\t\tcommand:\tOne of the following commands to execute on the device", file=sys.stderr)
+        print("\t\t\tdiscover\t\t\t\t\t\t\t\t\t\t- Scans for devices in range", file=sys.stderr)
+        print("", file=sys.stderr)
+        print("\t\t\tchange_pin <new_pin>\t\t\t\t\t\t\t\t\t- Changed the PIN", file=sys.stderr)
+        print("\t\t\treset_pin\t\t\t\t\t\t\t\t\t\t- Resets the PIN to 0000", file=sys.stderr)
+        print("", file=sys.stderr)
+        print("\t\t\tpower_on\t\t\t\t\t\t\t\t\t\t- Powers the switch on", file=sys.stderr)
+        print("\t\t\tpower_off\t\t\t\t\t\t\t\t\t\t- Powers the switch off", file=sys.stderr)
+        print("", file=sys.stderr)
+        print("\t\t\tled_on\t\t\t\t\t\t\t\t\t\t\t- Turns the LED on when the switch is turned on", file=sys.stderr)
+        print("\t\t\tled_off\t\t\t\t\t\t\t\t\t\t\t- Turn LED always off", file=sys.stderr)
+        print("", file=sys.stderr)
+        print("\t\t\tset_date_and_time <isodateandtime>\t\t\t\t\t\t\t- Sets date and time which must be provided in iso format, i.e. 2020-01-01T12:00:00", file=sys.stderr)
+        print("\t\t\tsynchronize_date_and_time\t\t\t\t\t\t\t\t- Sets date and time of the device to the current system time", file=sys.stderr)
+        print("", file=sys.stderr)
+        print("\t\t\trequest_settings\t\t\t\t\t\t\t\t\t- Request current settings for power limit, prices and reduced period times", file=sys.stderr)
+        print("\t\t\tset_power_limit <power_limit_in_watt>\t\t\t\t\t\t\t- Sets the power limit in watt when the switch should be automatically turned off", file=sys.stderr)
+        print("\t\t\tset_prices <price_in_cent> <reduced_period_price_in_cent>\t\t\t\t- Set prices for normal and reduced period", file=sys.stderr)
+        print("\t\t\tset_reduced_period <is_active> <start_isotime> <end_isotime>\t\t\t\t- Set begin and end time of the reduced period", file=sys.stderr)
+        print("", file=sys.stderr)
+        print("\t\t\trequest_timer_status\t\t\t\t\t\t\t\t\t- Request the current status of the timer", file=sys.stderr)
+        print("\t\t\tset_timer <turn_on?> <delay_isotime>\t\t\t\t\t\t\t- Sets the switch action and the timer delay", file=sys.stderr)
+        print("\t\t\treset_timer\t\t\t\t\t\t\t\t\t\t- Resets/stops the timer", file=sys.stderr)
+        print("", file=sys.stderr)
+        print("\t\t\trequest_scheduler\t\t\t\t\t\t\t\t\t- Request all scheduler entries", file=sys.stderr)
+        print("\t\t\tadd_scheduler <is_active?> <turn_on?> <repeat_on_weekdays> <isodatetime>\t\t- Add a scheduler entry, i.e. True True Mon,Wed,Sun 2020-01-01T12:00", file=sys.stderr)
+        print("\t\t\tedit_scheduler <slot_id> <is_active?> <turn_on?> <repeat_on_weekdays> <isodatetime>\t- Edit an existing scheduler entry, i.e. 12 True True \"\" 2020-01-01T12:00", file=sys.stderr)
+        print("\t\t\tremove_scheduler <slot_id>\t\t\t\t\t\t\t\t- Removes a scheduler entry", file=sys.stderr)
+        print("", file=sys.stderr)
+        print("\t\t\trequest_random_mode_status\t\t\t\t\t\t\t\t- Requests current status of the random mode", file=sys.stderr)
+        print("\t\t\tset_random_mode <is_active?> <active_on_weekdays> <start_isotime> <end_isotime>\t\t- Sets random mode, i.e. True Mon,Wed,Sun 22:00 04:00", file=sys.stderr)
+        print("", file=sys.stderr)
+        print("\t\t\trequest_device_name\t\t\t\t\t\t\t\t\t- Requests the device name", file=sys.stderr)
+        print("\t\t\tset_device_name <new_name>\t\t\t\t\t\t\t\t- Changes the device name", file=sys.stderr)
+        print("\t\t\trequest_device_serial\t\t\t\t\t\t\t\t\t- Request the serial number of the device", file=sys.stderr)
     else:
         deviceAddr = sys.argv[1]
         pin = sys.argv[2]
@@ -55,22 +96,22 @@ if __name__ == '__main__':
 
             print("Settings:")
             if response.is_reduced_mode_active:
-                print("\tReduced mode:\t\tOn")
+                print("\tReduced mode:\t\t\tOn")
             else:
-                print("\tReduced mode:\t\tOff")
+                print("\tReduced mode:\t\t\tOff")
 
-            print("\tNormal price:\t\t{:.2f} EUR".format(response.normal_price_in_cent/100))
-            print("\tReduced price:\t\t{:.2f} EUR".format(response.reduced_price_in_cent/100))
+            print("\tNormal price:\t\t\t{:.2f} EUR".format(response.normal_price_in_cent/100))
+            print("\tReduced period price:\t\t{:.2f} EUR".format(response.reduced_price_in_cent/100))
 
-            print("\tRecuced mode start:\t{} minutes ({})".format(response.reduced_mode_start_time_in_minutes, _format_minutes_as_time(response.reduced_mode_start_time_in_minutes)))
-            print("\tRecuced mode end:\t{} minutes ({})".format(response.reduced_mode_end_time_in_minutes, _format_minutes_as_time(response.reduced_mode_end_time_in_minutes)))
+            print("\tRecuced mode start:\t\t{} minutes ({})".format(response.reduced_mode_start_time_in_minutes, _format_minutes_as_time(response.reduced_mode_start_time_in_minutes)))
+            print("\tRecuced mode end:\t\t{} minutes ({})".format(response.reduced_mode_end_time_in_minutes, _format_minutes_as_time(response.reduced_mode_end_time_in_minutes)))
 
             if response.is_led_active:
-                print("\tLED state;\t\tOn")
+                print("\tLED state:\t\t\tOn")
             else:
-                print("\tLED state;\t\tOff")
+                print("\tLED state:\t\t\tOff")
 
-            print("\tPower limit:\t\t{} W".format(response.power_limit_in_watt))
+            print("\tPower limit:\t\t\t{} W".format(response.power_limit_in_watt))
         if cmd == 'set_power_limit':
             sem6000.set_power_limit(power_limit_in_watt=sys.argv[4])
         if cmd == 'set_prices':
@@ -102,8 +143,16 @@ if __name__ == '__main__':
 
             print("\tOriginal timer length:\t" + str(original_timer_length))
         if cmd == 'set_timer':
-            sem6000.set_timer(False, sys.argv[4], sys.argv[5])
+            is_reset_timer = False
+            is_action_turn_on = sys.argv[4]
+            delay_isotime = sys.argv[5]
+
+            sem6000.set_timer(is_reset_timer=is_reset_timer, is_action_turn_on=is_action_turn_on, delay_isotime=delay_isotime)
         if cmd == 'reset_timer':
+            is_reset_timer = True
+            is_action_turn_on = False
+            delay_isotime = "00:00"
+
             sem6000.set_timer(True, False, "00:00")
         if cmd == 'request_scheduler':
             response = sem6000.request_scheduler()

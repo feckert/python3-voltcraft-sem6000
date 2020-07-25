@@ -87,9 +87,9 @@ class MessageEncoder():
 
         if isinstance(message, SetPricesCommand):
             normal_price_in_cent = message.normal_price_in_cent.to_bytes(1, 'big')
-            reduced_price_in_cent = message.reduced_price_in_cent.to_bytes(1, 'big')
+            reduced_period_price_in_cent = message.reduced_period_price_in_cent.to_bytes(1, 'big')
 
-            return self._encode_message(b'\x0f\x00\x04' + normal_price_in_cent + reduced_price_in_cent + b'\x00\x00\x00\x00')
+            return self._encode_message(b'\x0f\x00\x04' + normal_price_in_cent + reduced_period_price_in_cent + b'\x00\x00\x00\x00')
 
         if isinstance(message, SetReducedPeriodCommand):
             is_active = b'\x00'
@@ -218,7 +218,7 @@ class MessageEncoder():
                 is_reduced_mode_active = b'\x01'
 
             normal_price_in_cent = message.normal_price_in_cent.to_bytes(1, 'big')
-            reduced_price_in_cent = message.reduced_price_in_cent.to_bytes(1, 'big')
+            reduced_period_price_in_cent = message.reduced_period_price_in_cent.to_bytes(1, 'big')
 
             reduced_mode_start_time_in_minutes = message.reduced_mode_start_time_in_minutes.to_bytes(2, 'big')
             reduced_mode_end_time_in_minutes = message.reduced_mode_end_time_in_minutes.to_bytes(2, 'big')
@@ -229,7 +229,7 @@ class MessageEncoder():
 
             power_limit_in_watt = message.power_limit_in_watt.to_bytes(2, 'big')
 
-            return self._encode_message(b'\x10\x00' + is_reduced_mode_active + normal_price_in_cent + reduced_price_in_cent + reduced_mode_start_time_in_minutes + reduced_mode_end_time_in_minutes + is_led_active + b'\x00' + power_limit_in_watt)
+            return self._encode_message(b'\x10\x00' + is_reduced_mode_active + normal_price_in_cent + reduced_period_price_in_cent + reduced_mode_start_time_in_minutes + reduced_mode_end_time_in_minutes + is_led_active + b'\x00' + power_limit_in_watt)
 
         if isinstance(message, PowerLimitSetNotification):
             return self._encode_message(b'\x05\x00' + b'\x00')
