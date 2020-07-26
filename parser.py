@@ -255,4 +255,17 @@ class MessageParser:
 
             return DeviceSerialRequestedNotification(serial=serial)
 
+        if payload[0:2] == b'\x04\x00':
+            is_power_active = False
+            if payload[2:3] == b'\x01':
+                is_power_active = True
+
+            power_in_milliwatt = int.from_bytes(payload[3:6], 'big')
+            voltage_in_volt = int.from_bytes(payload[6:7], 'big')
+            current_in_milliampere = int.from_bytes(payload[7:9], 'big')
+            frequency_in_hertz = int.from_bytes(payload[9:10], 'big')
+            total_consumption_in_kilowatt_hour = int.from_bytes(payload[12:16], 'big')
+
+            return MeasurementRequestedNotification(is_power_active=is_power_active, power_in_milliwatt=power_in_milliwatt, voltage_in_volt=voltage_in_volt, current_in_milliampere=current_in_milliampere, frequency_in_hertz=frequency_in_hertz, total_consumption_in_kilowatt_hour=total_consumption_in_kilowatt_hour)
+
         raise Exception('Unsupported message')
