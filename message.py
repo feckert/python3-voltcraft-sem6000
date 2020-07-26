@@ -223,6 +223,10 @@ class RequestDeviceSerialCommand(AbstractCommand):
     pass
 
 
+class RequestMeasurementCommand(AbstractCommand):
+    pass
+
+
 class AuthorizationNotification(AbstractCommandConfirmationNotification):
     pass
 
@@ -393,3 +397,18 @@ class DeviceSerialRequestedNotification:
     def __str__(self):
         name = self.__class__.__name__
         return name + "(serial=" + str(self.serial) + ")"
+
+
+class MeasurementRequestedNotification:
+    def __init__(self, is_power_active, power_in_milliwatt, voltage_in_volt, current_in_milliampere, frequency_in_hertz, total_consumption_in_kilowatt_hour):
+        self.is_power_active = is_power_active
+        self.power_in_milliwatt = power_in_milliwatt
+        self.voltage_in_volt = voltage_in_volt
+        self.current_in_milliampere = current_in_milliampere
+        self.frequency_in_hertz = frequency_in_hertz
+        self.total_consumption_in_kilowatt_hour = total_consumption_in_kilowatt_hour
+
+    def __str__(self):
+        name = self.__class__.__name__
+        return name + "(is_power_active=" + str(self.is_power_active) + ", power_in_milliwatt=" + str(self.power_in_milliwatt) + ", voltage_in_volt=" + str(self.voltage_in_volt) + ", current_in_milliampere=" + str(self.current_in_milliampere) + ", frequency_in_hertz=" + str(self.frequency_in_hertz) + ", total_consumption_in_kilowatt_hour=" + str(self.total_consumption_in_kilowatt_hour) + ")"
+

@@ -203,3 +203,16 @@ class MessagesTest(unittest.TestCase):
         parsed_message = MessageParser().parse(encoded_message)
 
         self.assertEqual("ML01D10012000000", message.serial, 'serial value differs')
+
+    def test_MeasurementRequestedNotification(self):
+        message = MeasurementRequestedNotification(is_power_active=True, power_in_milliwatt=80, voltage_in_volt=230, current_in_milliampere=1000, frequency_in_hertz=50, total_consumption_in_kilowatt_hour=1000)
+        encoded_message = MessageEncoder().encode(message)
+        parsed_message = MessageParser().parse(encoded_message)
+
+        self.assertEqual(True, parsed_message.is_power_active, 'is_power_active value differs')
+        self.assertEqual(80, parsed_message.power_in_milliwatt, 'power_in_milliwatt value differs')
+        self.assertEqual(230, parsed_message.voltage_in_volt, 'voltage_in_volt value differs')
+        self.assertEqual(1000, parsed_message.current_in_milliampere, 'current_in_milliampere value differs')
+        self.assertEqual(50, parsed_message.frequency_in_hertz, 'frequency_in_hertz value differs')
+        self.assertEqual(1000, parsed_message.total_consumption_in_kilowatt_hour, 'total_consumption_in_kilowatt_hour value differs')
+

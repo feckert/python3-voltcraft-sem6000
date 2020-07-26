@@ -174,6 +174,9 @@ class MessageEncoder():
         if isinstance(message, RequestDeviceSerialCommand):
             return self._encode_message(b'\x11\x00' + b'\x00\x00')
 
+        if isinstance(message, RequestMeasurementCommand):
+            return self._encode_message(b'\x04\x00' + b'\x00\x00')
+
         if isinstance(message, AuthorizationNotification):
             was_successful = b'\x01'
             if message.was_successful:
@@ -319,6 +322,20 @@ class MessageEncoder():
             serial = message.serial.encode()
 
             return self._encode_message(b'\x11\x00' + serial + b'\x00\x00')
+
+        if isinstance(message, MeasurementRequestedNotification):
+            is_power_active = b'\x00'
+            if message.is_power_active:
+                is_power_active = b'\x01'
+
+            power_in_milliwatt = message.power_in_milliwatt.to_bytes(3, 'big')
+            voltage_in_volt = message.voltage_in_volt.to_bytes(1, 'big')
+            current_in_milliampere = message.current_in_milliampere.to_bytes(2, 'big')
+            frequency_in_hertz = message.frequency_in_hertz.to_bytes(1, 'big')
+            total_consumption_in_kilowatt_hour = message.total_consumption_in_kilowatt_hour.to_bytes(4, 'big')
+
+            # suffix=b'\xff\xff' is missing in this notification
+            return self._encode_message(b'\x04\x00' + is_power_active + power_in_milliwatt + voltage_in_volt + current_in_milliampere + frequency_in_hertz + b'\x00\x00' + total_consumption_in_kilowatt_hour, suffix=b'')
 
         raise Exception('Unsupported message ' + str(message))
 

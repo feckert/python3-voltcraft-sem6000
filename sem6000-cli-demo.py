@@ -61,6 +61,8 @@ if __name__ == '__main__':
         print("\t\t\trequest_random_mode_status\t\t\t\t\t\t\t\t- Requests current status of the random mode", file=sys.stderr)
         print("\t\t\tset_random_mode <is_active?> <active_on_weekdays> <start_isotime> <end_isotime>\t\t- Sets random mode, i.e. True Mon,Wed,Sun 22:00 04:00", file=sys.stderr)
         print("", file=sys.stderr)
+        print("\t\t\trequest_measurement\t\t\t\t\t\t\t\t\t- Request current measurements", file=sys.stderr)
+        print("", file=sys.stderr)
         print("\t\t\trequest_device_name\t\t\t\t\t\t\t\t\t- Requests the device name", file=sys.stderr)
         print("\t\t\tset_device_name <new_name>\t\t\t\t\t\t\t\t- Changes the device name", file=sys.stderr)
         print("\t\t\trequest_device_serial\t\t\t\t\t\t\t\t\t- Request the serial number of the device", file=sys.stderr)
@@ -227,6 +229,25 @@ if __name__ == '__main__':
             end_isotime = sys.argv[7]
 
             response = sem6000.set_random_mode(is_active=is_active, active_on_weekdays=active_on_weekdays, start_isotime=start_isotime, end_isotime=end_isotime)
+        if cmd == 'request_measurement':
+            response = sem6000.request_measurement()
+
+            if response.is_power_active:
+                print("\tPower:\t\t\tOn")
+            else:
+                print("\tPower:\t\t\tOff")
+
+            power_in_milliwatt = response.power_in_milliwatt
+            voltage_in_volt = response.voltage_in_volt
+            current_in_milliampere = response.current_in_milliampere
+            frequency_in_hertz = response.frequency_in_hertz
+            total_consumption_in_kilowatt_hour = response.total_consumption_in_kilowatt_hour
+
+            print("\tPower:\t\t\t" + str(power_in_milliwatt) + " mW")
+            print("\tVoltage:\t\t" + str(voltage_in_volt) + " V")
+            print("\tCurrent:\t\t" + str(current_in_milliampere) + " mA")
+            print("\tFrequency:\t\t" + str(frequency_in_hertz) + " Hz")
+            print("\tTotal consumption:\t" + str(total_consumption_in_kilowatt_hour) + " kWh")
         if cmd == 'request_device_name':
             device_name = sem6000.request_device_name()
 

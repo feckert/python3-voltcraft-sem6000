@@ -32,6 +32,10 @@ class SEM6000Delegate(btle.DefaultDelegate):
         if len(last_notification) < 2:
             return False
 
+        # command b'\x04\x00' lacks suffix b'\xff\xff'
+        if last_notification[2:4] == b'\x04\x00':
+            return True
+
         return ( last_notification[-2:] == b'\xff\xff' )
 
     def consume_notification(self):
@@ -419,6 +423,16 @@ class SEM6000():
 
         if not isinstance(notification, RandomModeSetNotification):
             raise Exception("Set random mode failed")
+
+        return notification
+
+    def request_measurement(self):
+        command = RequestMeasurementCommand()
+        self._send_command(command)
+        notification = self._consume_notification()
+
+        if not isinstance(notification, MeasurementRequestedNotification):
+            raise Exception("Request measurement failed")
 
         return notification
 
