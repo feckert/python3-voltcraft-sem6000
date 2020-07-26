@@ -95,16 +95,16 @@ if __name__ == '__main__':
             assert isinstance(response, RequestedSettingsNotification)
 
             print("Settings:")
-            if response.is_reduced_mode_active:
+            if response.is_reduced_period:
                 print("\tReduced mode:\t\t\tOn")
             else:
                 print("\tReduced mode:\t\t\tOff")
 
             print("\tNormal price:\t\t\t{:.2f} EUR".format(response.normal_price_in_cent/100))
-            print("\tReduced period price:\t\t{:.2f} EUR".format(response.reduced_price_in_cent/100))
+            print("\tReduced period price:\t\t{:.2f} EUR".format(response.reduced_period_price_in_cent/100))
 
-            print("\tRecuced mode start:\t\t{} minutes ({})".format(response.reduced_mode_start_time_in_minutes, _format_minutes_as_time(response.reduced_mode_start_time_in_minutes)))
-            print("\tRecuced mode end:\t\t{} minutes ({})".format(response.reduced_mode_end_time_in_minutes, _format_minutes_as_time(response.reduced_mode_end_time_in_minutes)))
+            print("\tRecuced period start:\t\t{} minutes ({})".format(response.reduced_period_start_time_in_minutes, _format_minutes_as_time(response.reduced_period_start_time_in_minutes)))
+            print("\tRecuced period end:\t\t{} minutes ({})".format(response.reduced_period_end_time_in_minutes, _format_minutes_as_time(response.reduced_period_end_time_in_minutes)))
 
             if response.is_led_active:
                 print("\tLED state:\t\t\tOn")
@@ -115,7 +115,7 @@ if __name__ == '__main__':
         if cmd == 'set_power_limit':
             sem6000.set_power_limit(power_limit_in_watt=sys.argv[4])
         if cmd == 'set_prices':
-            sem6000.set_prices(normal_price_in_cent=sys.argv[4], reduced_price_in_cent=sys.argv[5])
+            sem6000.set_prices(normal_price_in_cent=sys.argv[4], reduced_period_price_in_cent=sys.argv[5])
         if cmd == 'set_reduced_period':
             sem6000.set_reduced_period(is_active=sys.argv[4], start_isotime=sys.argv[5], end_isotime=sys.argv[6])
         if cmd == 'request_timer_status':

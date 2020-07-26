@@ -291,8 +291,8 @@ class SEM6000():
 
         return notification
 
-    def set_prices(self, normal_price_in_cent, reduced_price_in_cent):
-        command = SetPricesCommand(normal_price_in_cent=int(normal_price_in_cent), reduced_price_in_cent=int(reduced_price_in_cent))
+    def set_prices(self, normal_price_in_cent, reduced_period_price_in_cent):
+        command = SetPricesCommand(normal_price_in_cent=int(normal_price_in_cent), reduced_period_price_in_cent=int(reduced_period_price_in_cent))
         self._send_command(command)
         notification = self._consume_notification()
 

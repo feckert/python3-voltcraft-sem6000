@@ -213,15 +213,15 @@ class MessageEncoder():
             return self._encode_message(b'\x01\x00' + was_successful)
 
         if isinstance(message, RequestedSettingsNotification):
-            is_reduced_mode_active = b'\x00'
-            if message.is_reduced_mode_active:
-                is_reduced_mode_active = b'\x01'
+            is_reduced_period = b'\x00'
+            if message.is_reduced_period:
+                is_reduced_period = b'\x01'
 
             normal_price_in_cent = message.normal_price_in_cent.to_bytes(1, 'big')
             reduced_period_price_in_cent = message.reduced_period_price_in_cent.to_bytes(1, 'big')
 
-            reduced_mode_start_time_in_minutes = message.reduced_mode_start_time_in_minutes.to_bytes(2, 'big')
-            reduced_mode_end_time_in_minutes = message.reduced_mode_end_time_in_minutes.to_bytes(2, 'big')
+            reduced_period_start_time_in_minutes = message.reduced_period_start_time_in_minutes.to_bytes(2, 'big')
+            reduced_period_end_time_in_minutes = message.reduced_period_end_time_in_minutes.to_bytes(2, 'big')
 
             is_led_active = b'\x00'
             if message.is_led_active:
@@ -229,7 +229,7 @@ class MessageEncoder():
 
             power_limit_in_watt = message.power_limit_in_watt.to_bytes(2, 'big')
 
-            return self._encode_message(b'\x10\x00' + is_reduced_mode_active + normal_price_in_cent + reduced_period_price_in_cent + reduced_mode_start_time_in_minutes + reduced_mode_end_time_in_minutes + is_led_active + b'\x00' + power_limit_in_watt)
+            return self._encode_message(b'\x10\x00' + is_reduced_period + normal_price_in_cent + reduced_period_price_in_cent + reduced_period_start_time_in_minutes + reduced_period_end_time_in_minutes + is_led_active + b'\x00' + power_limit_in_watt)
 
         if isinstance(message, PowerLimitSetNotification):
             return self._encode_message(b'\x05\x00' + b'\x00')

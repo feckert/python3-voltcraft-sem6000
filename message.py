@@ -248,18 +248,18 @@ class SynchronizeDateAndTimeNotification(AbstractCommandConfirmationNotification
 
 
 class RequestedSettingsNotification:
-    def __init__(self, is_reduced_mode_active, normal_price_in_cent, reduced_price_in_cent, reduced_mode_start_time_in_minutes, reduced_mode_end_time_in_minutes, is_led_active, power_limit_in_watt):
-        self.is_reduced_mode_active = is_reduced_mode_active
+    def __init__(self, is_reduced_period, normal_price_in_cent, reduced_period_price_in_cent, reduced_period_start_time_in_minutes, reduced_period_end_time_in_minutes, is_led_active, power_limit_in_watt):
+        self.is_reduced_period = is_reduced_period
         self.normal_price_in_cent = normal_price_in_cent
-        self.self = self.reduced_price_in_cent = reduced_price_in_cent
-        self.reduced_mode_start_time_in_minutes = reduced_mode_start_time_in_minutes
-        self.reduced_mode_end_time_in_minutes = reduced_mode_end_time_in_minutes
+        self.reduced_period_price_in_cent = reduced_period_price_in_cent
+        self.reduced_period_start_time_in_minutes = reduced_period_start_time_in_minutes
+        self.reduced_period_end_time_in_minutes = reduced_period_end_time_in_minutes
         self.is_led_active = is_led_active
         self.power_limit_in_watt = power_limit_in_watt
 
     def __str__(self):
         name = self.__class__.__name__
-        return name + "(is_reduced_mode_active=" + str(self.is_reduced_mode_active) + ", normal_price_in_cent=" + str(self.normal_price_in_cent) + ", reduced_price_in_cent=" + str(self.reduced_price_in_cent) + ", reduced_mode_start_time_in_minutes=" + str(self.reduced_mode_start_time_in_minutes) + ", reduced_mode_end_time_in_minutes=" + str(self.reduced_mode_end_time_in_minutes) + ", is_led_active=" + str(self.is_led_active) + ", power_limit_in_watt=" + str(self.power_limit_in_watt) + ")"
+        return name + "(is_reduced_period=" + str(self.is_reduced_period) + ", normal_price_in_cent=" + str(self.normal_price_in_cent) + ", reduced_periiod_price_in_cent=" + str(self.reduced_period_price_in_cent) + ", reduced_period_start_time_in_minutes=" + str(self.reduced_period_start_time_in_minutes) + ", reduced_period_end_time_in_minutes=" + str(self.reduced_period_end_time_in_minutes) + ", is_led_active=" + str(self.is_led_active) + ", power_limit_in_watt=" + str(self.power_limit_in_watt) + ")"
 
 
 class PowerLimitSetNotification(AbstractCommandConfirmationNotification):

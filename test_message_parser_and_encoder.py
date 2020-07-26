@@ -48,15 +48,15 @@ class MessagesTest(unittest.TestCase):
         self.assertEqual(True, parsed_message.was_successful, 'was_successful value differs')
 
     def test_RequestedSettingsNotification(self):
-        message = RequestedSettingsNotification(is_reduced_mode_active=True, normal_price_in_cent=100, reduced_price_in_cent=50, reduced_mode_start_time_in_minutes=1320, reduced_mode_end_time_in_minutes=300, is_led_active=True, power_limit_in_watt=500)
+        message = RequestedSettingsNotification(is_reduced_period=True, normal_price_in_cent=100, reduced_period_price_in_cent=50, reduced_period_start_time_in_minutes=1320, reduced_period_end_time_in_minutes=300, is_led_active=True, power_limit_in_watt=500)
         encoded_message = MessageEncoder().encode(message)
         parsed_message = MessageParser().parse(encoded_message)
 
-        self.assertEqual(True, parsed_message.is_reduced_mode_active, 'reduced_mode_is_active value differs')
+        self.assertEqual(True, parsed_message.is_reduced_period, 'reduced_period_is_active value differs')
         self.assertEqual(100, parsed_message.normal_price_in_cent, 'normal_price_in_cent value differs')
-        self.assertEqual(50, parsed_message.reduced_price_in_cent, 'reduced_price value_in_cent differs')
-        self.assertEqual(1320, parsed_message.reduced_mode_start_time_in_minutes, 'reduced_mode_start_time_in_minutes value differs')
-        self.assertEqual(300, parsed_message.reduced_mode_end_time_in_minutes, 'reduced_mode_end_time_in_minutes value differs')
+        self.assertEqual(50, parsed_message.reduced_period_price_in_cent, 'reduced_price value_in_cent differs')
+        self.assertEqual(1320, parsed_message.reduced_period_start_time_in_minutes, 'reduced_period_start_time_in_minutes value differs')
+        self.assertEqual(300, parsed_message.reduced_period_end_time_in_minutes, 'reduced_period_end_time_in_minutes value differs')
         self.assertEqual(True, parsed_message.is_led_active, 'is_led_active value differs')
         self.assertEqual(500, parsed_message.power_limit_in_watt, 'power_limit_in_watt value differs')
 
@@ -140,7 +140,7 @@ class MessagesTest(unittest.TestCase):
             self.assertEqual(True, parsed_message.scheduler_entries[i].scheduler.is_active, 'is_active value differs on scheduler ' + str(i))
             self.assertEqual(True, parsed_message.scheduler_entries[i].scheduler.is_action_turn_on, 'is_action_turn_on value differs on scheduler ' + str(i))
             self.assertEqual(repeat_on_weekday_expected, parsed_message.scheduler_entries[i].scheduler.repeat_on_weekdays, 'repeat_on_weekdays value differs on scheduler ' + str(i))
-            self.assertEqual(20, parsed_message.scheduler_entries[i].scheduler.year, 'year value differs on scheduler ' + str(i))
+            self.assertEqual(2020, parsed_message.scheduler_entries[i].scheduler.year, 'year value differs on scheduler ' + str(i))
             self.assertEqual(12, parsed_message.scheduler_entries[i].scheduler.month, 'month value differs on scheduler ' + str(i))
             self.assertEqual(3, parsed_message.scheduler_entries[i].scheduler.day, 'day value differs on scheduler ' + str(i))
             self.assertEqual(12, parsed_message.scheduler_entries[i].scheduler.hour, 'hour value differs on scheduler ' + str(i))
