@@ -1,4 +1,4 @@
-# voltcraft-sem-6000
+# python3-voltcraft-sem-6000
 _"A Python library to manage bluetooth switch, scheduler and smart energy meter Voltcraft SEM 6000 with Linux"_
 
 ... based on the API described at https://github.com/Heckie75/voltcraft-sem-6000
