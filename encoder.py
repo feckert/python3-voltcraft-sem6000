@@ -177,6 +177,15 @@ class MessageEncoder():
         if isinstance(message, RequestMeasurementCommand):
             return self._encode_message(b'\x04\x00' + b'\x00\x00')
 
+        if isinstance(message, RequestConsumptionOfLast12MonthsCommand):
+            return self._encode_message(b'\x0c\x00' + b'\x00\x00')
+
+        if isinstance(message, RequestConsumptionOfLast30DaysCommand):
+            return self._encode_message(b'\x0b\x00' + b'\x00\x00')
+
+        if isinstance(message, RequestConsumptionOfLast24HoursCommand):
+            return self._encode_message(b'\x0a\x00' + b'\x00\x00')
+
         if isinstance(message, AuthorizationNotification):
             was_successful = b'\x01'
             if message.was_successful:
@@ -336,6 +345,34 @@ class MessageEncoder():
 
             # suffix=b'\xff\xff' is missing in this notification
             return self._encode_message(b'\x04\x00' + is_power_active + power_in_milliwatt + voltage_in_volt + current_in_milliampere + frequency_in_hertz + b'\x00\x00' + total_consumption_in_kilowatt_hour, suffix=b'')
+
+        if isinstance(message, ConsumptionOfLast12MonthsRequestedNotification):
+            consumptions = b''
+
+            # notification does not contain measurements for current months
+            for i in range(1, len(message.consumption_n_months_ago_in_watt_hour)):
+                consumption = message.consumption_n_months_ago_in_watt_hour[i]
+                consumptions = consumption.to_bytes(3, 'big') + b'\x00' + consumptions
+
+            return self._encode_message(b'\x0c\x00' + consumptions)
+
+        if isinstance(message, ConsumptionOfLast30DaysRequestedNotification):
+            consumptions = b''
+
+            # notification does not contain measurements for today
+            for i in range(1, len(message.consumption_n_days_ago_in_watt_hour)):
+                consumption = message.consumption_n_days_ago_in_watt_hour[i]
+                consumptions = consumption.to_bytes(3, 'big') + b'\x00' + consumptions
+
+            return self._encode_message(b'\x0b\x00' + consumptions)
+
+        if isinstance(message, ConsumptionOfLast24HoursRequestedNotification):
+            consumptions = b''
+
+            for consumption in message.consumption_n_hours_ago_in_watt_hour:
+                consumptions = consumption.to_bytes(2, 'big') + consumptions
+
+            return self._encode_message(b'\x0a\x00' + consumptions)
 
         raise Exception('Unsupported message ' + str(message))
 

@@ -436,6 +436,36 @@ class SEM6000():
 
         return notification
 
+    def request_consumption_of_last_12_months(self):
+        command = RequestConsumptionOfLast12MonthsCommand()
+        self._send_command(command)
+        notification = self._consume_notification()
+
+        if not isinstance(notification, ConsumptionOfLast12MonthsRequestedNotification):
+            raise("Request consumption of last 12 months failed")
+
+        return notification
+
+    def request_consumption_of_last_30_days(self):
+        command = RequestConsumptionOfLast30DaysCommand()
+        self._send_command(command)
+        notification = self._consume_notification()
+
+        if not isinstance(notification, ConsumptionOfLast30DaysRequestedNotification):
+            raise("Request consumption of last 30 days failed")
+
+        return notification
+
+    def request_consumption_of_last_24_hours(self):
+        command = RequestConsumptionOfLast24HoursCommand()
+        self._send_command(command)
+        notification = self._consume_notification()
+
+        if not isinstance(notification, ConsumptionOfLast24HoursRequestedNotification):
+            raise("Request consumption of last 24 hours failed")
+
+        return notification
+
     def set_device_name(self, new_name):
         command = SetDeviceNameCommand(new_name=new_name)
         # for some reason this command does only work if send with btle_characteristics.write(..., withResponse=True)

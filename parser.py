@@ -268,4 +268,31 @@ class MessageParser:
 
             return MeasurementRequestedNotification(is_power_active=is_power_active, power_in_milliwatt=power_in_milliwatt, voltage_in_volt=voltage_in_volt, current_in_milliampere=current_in_milliampere, frequency_in_hertz=frequency_in_hertz, total_consumption_in_kilowatt_hour=total_consumption_in_kilowatt_hour)
 
+        if payload[0:2] == b'\x0c\x00':
+            consumptions = []
+            for i in range((len(payload)-2) // 4):
+                consumptions.insert(0, int.from_bytes(payload[2 + 4*i:2 + 4*i + 3], 'big'))
+
+            # notification does not contain measurement for current month
+            consumptions.insert(0, None)
+
+            return ConsumptionOfLast12MonthsRequestedNotification(consumption_n_months_ago_in_watt_hour=consumptions)
+
+        if payload[0:2] == b'\x0b\x00':
+            consumptions = []
+            for i in range((len(payload)-2) // 4):
+                consumptions.insert(0, int.from_bytes(payload[2 + 4*i:2 + 4*i + 3], 'big'))
+
+            # notification does not contain measurement for today
+            consumptions.insert(0, None)
+
+            return ConsumptionOfLast30DaysRequestedNotification(consumption_n_days_ago_in_watt_hour=consumptions)
+
+        if payload[0:2] == b'\x0a\x00':
+            consumptions = []
+            for i in range((len(payload)-2) // 2):
+                consumptions.insert(0, int.from_bytes(payload[2 + 2*i:2 + 2*(i+1)], 'big'))
+
+            return ConsumptionOfLast24HoursRequestedNotification(consumption_n_hours_ago_in_watt_hour=consumptions)
+
         raise Exception('Unsupported message')

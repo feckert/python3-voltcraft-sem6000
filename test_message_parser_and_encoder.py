@@ -216,3 +216,27 @@ class MessagesTest(unittest.TestCase):
         self.assertEqual(50, parsed_message.frequency_in_hertz, 'frequency_in_hertz value differs')
         self.assertEqual(1000, parsed_message.total_consumption_in_kilowatt_hour, 'total_consumption_in_kilowatt_hour value differs')
 
+    def test_ConsumptionOfLast12MonthsRequestedNotification(self):
+        message = ConsumptionOfLast12MonthsRequestedNotification(consumption_n_months_ago_in_watt_hour=[None, 10,20,30,40,50,60,70,80,90,100,110,120])
+        encoded_message = MessageEncoder().encode(message)
+        parsed_message = MessageParser().parse(encoded_message)
+
+        self.assertEqual(13, len(parsed_message.consumption_n_months_ago_in_watt_hour), 'incorrect number of values')
+        self.assertEqual([None, 10,20,30,40,50,60,70,80,90,100,110,120], parsed_message.consumption_n_months_ago_in_watt_hour, 'values for consumption in watt hour differ')
+
+    def test_ConsumptionOfLast30DaysRequestedNotification(self):
+        message = ConsumptionOfLast30DaysRequestedNotification(consumption_n_days_ago_in_watt_hour=[None, 10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,260,270,280,290,300])
+        encoded_message = MessageEncoder().encode(message)
+        parsed_message = MessageParser().parse(encoded_message)
+
+        self.assertEqual(31, len(parsed_message.consumption_n_days_ago_in_watt_hour), 'number of values differ')
+        self.assertEqual([None, 10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,220,230,240,250,260,270,280,290,300], parsed_message.consumption_n_days_ago_in_watt_hour, 'values for consumption in watt hour differ')
+
+    def test_ConsumptionOfLast23HoursRequestedNotification(self):
+        message = ConsumptionOfLast23HoursRequestedNotification(consumption_n_hours_ago_in_watt_hour=[10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240])
+        encoded_message = MessageEncoder().encode(message)
+        parsed_message = MessageParser().parse(encoded_message)
+
+        self.assertEqual(24, len(parsed_message.consumption_n_hours_ago_in_watt_hour), 'number of values differ')
+        self.assertEqual([10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240], parsed_message.consumption_n_hours_ago_in_watt_hour, 'values for consumption in watt hour differ')
+

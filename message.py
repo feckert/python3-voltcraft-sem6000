@@ -227,6 +227,18 @@ class RequestMeasurementCommand(AbstractCommand):
     pass
 
 
+class RequestConsumptionOfLast12MonthsCommand(AbstractCommand):
+    pass
+
+
+class RequestConsumptionOfLast30DaysCommand(AbstractCommand):
+    pass
+
+
+class RequestConsumptionOfLast24HoursCommand(AbstractCommand):
+    pass
+
+
 class AuthorizationNotification(AbstractCommandConfirmationNotification):
     pass
 
@@ -411,4 +423,32 @@ class MeasurementRequestedNotification:
     def __str__(self):
         name = self.__class__.__name__
         return name + "(is_power_active=" + str(self.is_power_active) + ", power_in_milliwatt=" + str(self.power_in_milliwatt) + ", voltage_in_volt=" + str(self.voltage_in_volt) + ", current_in_milliampere=" + str(self.current_in_milliampere) + ", frequency_in_hertz=" + str(self.frequency_in_hertz) + ", total_consumption_in_kilowatt_hour=" + str(self.total_consumption_in_kilowatt_hour) + ")"
+
+
+class ConsumptionOfLast12MonthsRequestedNotification:
+    def __init__(self, consumption_n_months_ago_in_watt_hour):
+        self.consumption_n_months_ago_in_watt_hour = consumption_n_months_ago_in_watt_hour
+
+    def __str__(self):
+        name = self.__class__.__name__
+        return name + "(consumption_n_months_ago_in_watt_hour=" + _format_list_of_objects(str, self.consumption_n_months_ago_in_watt_hour) + ")"
+
+
+class ConsumptionOfLast30DaysRequestedNotification:
+    def __init__(self, consumption_n_days_ago_in_watt_hour):
+        self.consumption_n_days_ago_in_watt_hour = consumption_n_days_ago_in_watt_hour
+
+    def __str__(self):
+        name = self.__class__.__name__
+        return name + "(consumption_n_days_ago_in_watt_hour=" + _format_list_of_objects(str, self.consumption_n_days_ago_in_watt_hour) + ")"
+
+
+class ConsumptionOfLast24HoursRequestedNotification:
+    def __init__(self, consumption_n_hours_ago_in_watt_hour):
+        self.consumption_n_hours_ago_in_watt_hour = consumption_n_hours_ago_in_watt_hour
+
+    def __str__(self):
+        name = self.__class__.__name__
+        return name + "(consumption_n_hours_ago_in_watt_hour=" + _format_list_of_objects(str, self.consumption_n_hours_ago_in_watt_hour) + ")"
+
 

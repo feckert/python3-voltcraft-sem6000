@@ -18,6 +18,10 @@ def _format_hour_and_minute_as_time(hour, minute):
     return "{:02}:{:02}".format(hour, minute)
 
 
+def _format_year_and_month(year, month):
+    return "{:04}-{:02}".format(year, month)
+
+
 if __name__ == '__main__':
     if len(sys.argv) == 2 and sys.argv[1] == 'discover':    
         devices = sem6000.SEM6000.discover()
@@ -30,42 +34,75 @@ if __name__ == '__main__':
         print("\t\taddress:\tAddress of the bluetooth device to connect to, i.e. 00:11:22:33:44:55" , file=sys.stderr)
         print("\t\tpin:\t\t4-digit PIN of the device, i.e. 0000" , file=sys.stderr)
         print("\t\tcommand:\tOne of the following commands to execute on the device", file=sys.stderr)
-        print("\t\t\tdiscover\t\t\t\t\t\t\t\t\t\t- Scans for devices in range", file=sys.stderr)
+        print("\t\t\tdiscover", file=sys.stderr)
+        print("\t\t\t\tScans for devices in range", file=sys.stderr)
         print("", file=sys.stderr)
-        print("\t\t\tchange_pin <new_pin>\t\t\t\t\t\t\t\t\t- Changed the PIN", file=sys.stderr)
-        print("\t\t\treset_pin\t\t\t\t\t\t\t\t\t\t- Resets the PIN to 0000", file=sys.stderr)
+        print("\t\t\tchange_pin <new_pin>", file=sys.stderr)
+        print("\t\t\t\tChanged the PIN", file=sys.stderr)
+        print("\t\t\treset_pin", file=sys.stderr)
+        print("\t\t\t\tResets the PIN to 0000", file=sys.stderr)
         print("", file=sys.stderr)
-        print("\t\t\tpower_on\t\t\t\t\t\t\t\t\t\t- Powers the switch on", file=sys.stderr)
-        print("\t\t\tpower_off\t\t\t\t\t\t\t\t\t\t- Powers the switch off", file=sys.stderr)
+        print("\t\t\tpower_on", file=sys.stderr)
+        print("\t\t\t\tPowers the switch on", file=sys.stderr)
+        print("\t\t\tpower_off", file=sys.stderr)
+        print("\t\t\t\tPowers the switch off", file=sys.stderr)
         print("", file=sys.stderr)
-        print("\t\t\tled_on\t\t\t\t\t\t\t\t\t\t\t- Turns the LED on when the switch is turned on", file=sys.stderr)
-        print("\t\t\tled_off\t\t\t\t\t\t\t\t\t\t\t- Turn LED always off", file=sys.stderr)
+        print("\t\t\tled_on", file=sys.stderr)
+        print("\t\t\t\tTurns the LED on when the switch is turned on", file=sys.stderr)
+        print("\t\t\tled_off", file=sys.stderr)
+        print("\t\t\t\tTurn LED always off", file=sys.stderr)
         print("", file=sys.stderr)
-        print("\t\t\tset_date_and_time <isodateandtime>\t\t\t\t\t\t\t- Sets date and time which must be provided in iso format, i.e. 2020-01-01T12:00:00", file=sys.stderr)
-        print("\t\t\tsynchronize_date_and_time\t\t\t\t\t\t\t\t- Sets date and time of the device to the current system time", file=sys.stderr)
+        print("\t\t\tset_date_and_time <isodateandtime>", file=sys.stderr)
+        print("\t\t\t\tSets date and time which must be provided in iso format, i.e. 2020-01-01T12:00:00", file=sys.stderr)
+        print("\t\t\tsynchronize_date_and_time", file=sys.stderr)
+        print("\t\t\t\tSets date and time of the device to the current system time", file=sys.stderr)
         print("", file=sys.stderr)
-        print("\t\t\trequest_settings\t\t\t\t\t\t\t\t\t- Request current settings for power limit, prices and reduced period times", file=sys.stderr)
-        print("\t\t\tset_power_limit <power_limit_in_watt>\t\t\t\t\t\t\t- Sets the power limit in watt when the switch should be automatically turned off", file=sys.stderr)
-        print("\t\t\tset_prices <price_in_cent> <reduced_period_price_in_cent>\t\t\t\t- Set prices for normal and reduced period", file=sys.stderr)
-        print("\t\t\tset_reduced_period <is_active> <start_isotime> <end_isotime>\t\t\t\t- Set begin and end time of the reduced period", file=sys.stderr)
+        print("\t\t\trequest_settings", file=sys.stderr)
+        print("\t\t\t\tRequest current settings for power limit, prices and reduced period times", file=sys.stderr)
+        print("\t\t\tset_power_limit <power_limit_in_watt>", file=sys.stderr)
+        print("\t\t\t\tSets the power limit in watt when the switch should be automatically turned off", file=sys.stderr)
+        print("\t\t\tset_prices <price_in_cent> <reduced_period_price_in_cent>", file=sys.stderr)
+        print("\t\t\t\tSet prices for normal and reduced period", file=sys.stderr)
+        print("\t\t\tset_reduced_period <is_active> <start_isotime> <end_isotime>", file=sys.stderr)
+        print("\t\t\t\tSet begin and end time of the reduced period", file=sys.stderr)
         print("", file=sys.stderr)
-        print("\t\t\trequest_timer_status\t\t\t\t\t\t\t\t\t- Request the current status of the timer", file=sys.stderr)
-        print("\t\t\tset_timer <turn_on?> <delay_isotime>\t\t\t\t\t\t\t- Sets the switch action and the timer delay", file=sys.stderr)
-        print("\t\t\treset_timer\t\t\t\t\t\t\t\t\t\t- Resets/stops the timer", file=sys.stderr)
+        print("\t\t\trequest_timer_status", file=sys.stderr)
+        print("\t\t\t\tRequest the current status of the timer", file=sys.stderr)
+        print("\t\t\tset_timer <turn_on?> <delay_isotime>", file=sys.stderr)
+        print("\t\t\t\tSets the switch action and the timer delay", file=sys.stderr)
+        print("\t\t\treset_timer", file=sys.stderr)
+        print("\t\t\t\tResets/stops the timer", file=sys.stderr)
         print("", file=sys.stderr)
-        print("\t\t\trequest_scheduler\t\t\t\t\t\t\t\t\t- Request all scheduler entries", file=sys.stderr)
-        print("\t\t\tadd_scheduler <is_active?> <turn_on?> <repeat_on_weekdays> <isodatetime>\t\t- Add a scheduler entry, i.e. True True Mon,Wed,Sun 2020-01-01T12:00", file=sys.stderr)
-        print("\t\t\tedit_scheduler <slot_id> <is_active?> <turn_on?> <repeat_on_weekdays> <isodatetime>\t- Edit an existing scheduler entry, i.e. 12 True True \"\" 2020-01-01T12:00", file=sys.stderr)
-        print("\t\t\tremove_scheduler <slot_id>\t\t\t\t\t\t\t\t- Removes a scheduler entry", file=sys.stderr)
+        print("\t\t\trequest_scheduler", file=sys.stderr)
+        print("\t\t\t\tRequest all scheduler entries", file=sys.stderr)
+        print("\t\t\tadd_scheduler <is_active?> <turn_on?> <repeat_on_weekdays> <isodatetime>", file=sys.stderr)
+        print("\t\t\t\tAdd a scheduler entry, i.e. True True Mon,Wed,Sun 2020-01-01T12:00", file=sys.stderr)
+        print("\t\t\tedit_scheduler <slot_id> <is_active?> <turn_on?> <repeat_on_weekdays> <isodatetime>", file=sys.stderr)
+        print("\t\t\t\tEdit an existing scheduler entry, i.e. 12 True True \"\" 2020-01-01T12:00", file=sys.stderr)
+        print("\t\t\tremove_scheduler <slot_id>", file=sys.stderr)
+        print("\t\t\t\tRemoves a scheduler entry", file=sys.stderr)
         print("", file=sys.stderr)
-        print("\t\t\trequest_random_mode_status\t\t\t\t\t\t\t\t- Requests current status of the random mode", file=sys.stderr)
-        print("\t\t\tset_random_mode <is_active?> <active_on_weekdays> <start_isotime> <end_isotime>\t\t- Sets random mode, i.e. True Mon,Wed,Sun 22:00 04:00", file=sys.stderr)
+        print("\t\t\trequest_random_mode_status", file=sys.stderr)
+        print("\t\t\t\tRequests current status of the random mode", file=sys.stderr)
+        print("\t\t\tset_random_mode <is_active?> <active_on_weekdays> <start_isotime> <end_isotime>", file=sys.stderr)
+        print("\t\t\t\tSets random mode, i.e. True Mon,Wed,Sun 22:00 04:00", file=sys.stderr)
         print("", file=sys.stderr)
-        print("\t\t\trequest_measurement\t\t\t\t\t\t\t\t\t- Request current measurements", file=sys.stderr)
+        print("\t\t\trequest_measurement", file=sys.stderr)
+        print("\t\t\t\tRequest current measurements", file=sys.stderr)
         print("", file=sys.stderr)
-        print("\t\t\trequest_device_name\t\t\t\t\t\t\t\t\t- Requests the device name", file=sys.stderr)
-        print("\t\t\tset_device_name <new_name>\t\t\t\t\t\t\t\t- Changes the device name", file=sys.stderr)
-        print("\t\t\trequest_device_serial\t\t\t\t\t\t\t\t\t- Request the serial number of the device", file=sys.stderr)
+        print("\t\t\trequest_consumptions_of_last_12_months", file=sys.stderr)
+        print("\t\t\t\tRequest accumulated measurements of last 12 months", file=sys.stderr)
+        print("\t\t\trequest_consumptions_of_last_30_days", file=sys.stderr)
+        print("\t\t\t\tRequest accumulated measurements of last 30 days", file=sys.stderr)
+        print("\t\t\trequest_consumptions_of_last_24_hours", file=sys.stderr)
+        print("\t\t\t\tRequest accumulated measurements of last 24 hours", file=sys.stderr)
+        print("", file=sys.stderr)
+        print("\t\t\trequest_device_name", file=sys.stderr)
+        print("\t\t\t\tRequests the device name", file=sys.stderr)
+        print("\t\t\tset_device_name <new_name>", file=sys.stderr)
+        print("\t\t\t\tChanges the device name", file=sys.stderr)
+        print("\t\t\trequest_device_serial", file=sys.stderr)
+        print("\t\t\t\tRequest the serial number of the device", file=sys.stderr)
     else:
         deviceAddr = sys.argv[1]
         pin = sys.argv[2]
@@ -208,6 +245,7 @@ if __name__ == '__main__':
         if cmd == 'request_random_mode_status':
             response = sem6000.request_random_mode_status()
 
+            print("Random mode status:")
             if response.is_active:
                 print("\tActive:\t\t\tOn")
             else:
@@ -232,6 +270,7 @@ if __name__ == '__main__':
         if cmd == 'request_measurement':
             response = sem6000.request_measurement()
 
+            print("Current measurement:")
             if response.is_power_active:
                 print("\tPower:\t\t\tOn")
             else:
@@ -248,6 +287,47 @@ if __name__ == '__main__':
             print("\tCurrent:\t\t" + str(current_in_milliampere) + " mA")
             print("\tFrequency:\t\t" + str(frequency_in_hertz) + " Hz")
             print("\tTotal consumption:\t" + str(total_consumption_in_kilowatt_hour) + " kWh")
+        if cmd == 'request_consumptions_of_last_12_months':
+            response = sem6000.request_consumption_of_last_12_months()
+            now = datetime.datetime.now()
+
+            print("Consumptions of last 12 months")
+            for i in range(len(response.consumption_n_months_ago_in_watt_hour)):
+                if response.consumption_n_months_ago_in_watt_hour[i] is None:
+                    continue
+
+                year = now.year
+                month = now.month - i 
+                if month < 1:
+                    month = 12 - month
+                    year -= 1
+
+                print("\t" + _format_year_and_month(year, month) + ":\t" + str(response.consumption_n_months_ago_in_watt_hour[i]) + " Wh")
+        if cmd == 'request_consumptions_of_last_30_days':
+            response = sem6000.request_consumption_of_last_30_days()
+            now = datetime.datetime.now().date()
+
+            print("Consumptions of last 12 months")
+            for i in range(len(response.consumption_n_days_ago_in_watt_hour)):
+                if response.consumption_n_days_ago_in_watt_hour[i] is None:
+                    continue
+
+                d = now - datetime.timedelta(i)
+                print("\t" + d.isoformat() + ":\t" + str(response.consumption_n_days_ago_in_watt_hour[i]) + " Wh")
+        if cmd == 'request_consumptions_of_last_24_hours':
+            response = sem6000.request_consumption_of_last_24_hours()
+            now = datetime.datetime.now().time()
+
+            print("Consumptions of last 24 hours")
+            for i in range(len(response.consumption_n_hours_ago_in_watt_hour)):
+                if response.consumption_n_hours_ago_in_watt_hour[i] is None:
+                    continue
+
+                hour = now.hour - i
+                if hour < 0:
+                    hour += 24
+
+                print("\t" + _format_hour_and_minute_as_time(hour, 0) + ":\t" + str(response.consumption_n_hours_ago_in_watt_hour[i]) + " Wh")
         if cmd == 'request_device_name':
             device_name = sem6000.request_device_name()
 
