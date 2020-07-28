@@ -88,7 +88,7 @@ if __name__ == '__main__':
         print("\t\t\t\tSets random mode, i.e. True Mon,Wed,Sun 22:00 04:00", file=sys.stderr)
         print("", file=sys.stderr)
         print("\t\t\trequest_measurement", file=sys.stderr)
-        print("\t\t\t\tRequest current measurements", file=sys.stderr)
+        print("\t\t\t\tRequest current measurements / starts collection consumption data", file=sys.stderr)
         print("", file=sys.stderr)
         print("\t\t\trequest_consumptions_of_last_12_months", file=sys.stderr)
         print("\t\t\t\tRequest accumulated measurements of last 12 months", file=sys.stderr)
