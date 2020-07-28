@@ -210,19 +210,6 @@ class SetRandomModeCommand:
         return name + "(is_active=" + str(self.is_active) + ", active_on_weekdays=" + active_on_weekdays + ", start_hour=" + str(self.start_hour) + ", start_minute=" + str(self.start_minute) + ", end_hour=" + str(self.end_hour) + ", end_minute=" + str(self.end_minute) + ")"
 
 
-class SetDeviceNameCommand:
-        def __init__(self, new_name):
-            self.new_name = new_name
-
-        def __str__(self):
-            command = self.__class__.__name__
-            return command + "(new_name=" + str(self.new_name) + ")"
-
-
-class RequestDeviceSerialCommand(AbstractCommand):
-    pass
-
-
 class RequestMeasurementCommand(AbstractCommand):
     pass
 
@@ -235,7 +222,28 @@ class RequestConsumptionOfLast30DaysCommand(AbstractCommand):
     pass
 
 
-class RequestConsumptionOfLast24HoursCommand(AbstractCommand):
+class RequestConsumptionOfLast23HoursCommand(AbstractCommand):
+    pass
+
+
+class ResetConsumptionCommand(AbstractCommand):
+    pass
+
+
+class FactoryResetCommand(AbstractCommand):
+    pass
+
+
+class SetDeviceNameCommand:
+        def __init__(self, new_name):
+            self.new_name = new_name
+
+        def __str__(self):
+            command = self.__class__.__name__
+            return command + "(new_name=" + str(self.new_name) + ")"
+
+
+class RequestDeviceSerialCommand(AbstractCommand):
     pass
 
 
@@ -398,19 +406,6 @@ class RandomModeSetNotification(AbstractCommandConfirmationNotification):
     pass
 
 
-class DeviceNameSetNotification(AbstractCommandConfirmationNotification):
-    pass
-
-
-class DeviceSerialRequestedNotification:
-    def __init__(self, serial):
-        self.serial = serial
-
-    def __str__(self):
-        name = self.__class__.__name__
-        return name + "(serial=" + str(self.serial) + ")"
-
-
 class MeasurementRequestedNotification:
     def __init__(self, is_power_active, power_in_milliwatt, voltage_in_volt, current_in_milliampere, frequency_in_hertz, total_consumption_in_kilowatt_hour):
         self.is_power_active = is_power_active
@@ -443,7 +438,7 @@ class ConsumptionOfLast30DaysRequestedNotification:
         return name + "(consumption_n_days_ago_in_watt_hour=" + _format_list_of_objects(str, self.consumption_n_days_ago_in_watt_hour) + ")"
 
 
-class ConsumptionOfLast24HoursRequestedNotification:
+class ConsumptionOfLast23HoursRequestedNotification:
     def __init__(self, consumption_n_hours_ago_in_watt_hour):
         self.consumption_n_hours_ago_in_watt_hour = consumption_n_hours_ago_in_watt_hour
 
@@ -451,4 +446,24 @@ class ConsumptionOfLast24HoursRequestedNotification:
         name = self.__class__.__name__
         return name + "(consumption_n_hours_ago_in_watt_hour=" + _format_list_of_objects(str, self.consumption_n_hours_ago_in_watt_hour) + ")"
 
+
+class ResetConsumptionNotification(AbstractCommandConfirmationNotification):
+    pass
+
+
+class FactoryResetNotification(AbstractCommandConfirmationNotification):
+    pass
+
+
+class DeviceNameSetNotification(AbstractCommandConfirmationNotification):
+    pass
+
+
+class DeviceSerialRequestedNotification:
+    def __init__(self, serial):
+        self.serial = serial
+
+    def __str__(self):
+        name = self.__class__.__name__
+        return name + "(serial=" + str(self.serial) + ")"
 

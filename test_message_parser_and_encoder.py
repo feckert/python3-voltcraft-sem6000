@@ -190,20 +190,6 @@ class MessagesTest(unittest.TestCase):
 
         self.assertEqual(True, parsed_message.was_successful, 'was_successful value differs')
 
-    def test_DeviceNameSetNotification(self):
-        message = DeviceNameSetNotification(was_successful=True)
-        encoded_message = MessageEncoder().encode(message)
-        parsed_message = MessageParser().parse(encoded_message)
-
-        self.assertEqual(True, parsed_message.was_successful, 'was_successful value differs')
-
-    def test_DeviceSerialRequestedNotification(self):
-        message = DeviceSerialRequestedNotification("ML01D10012000000")
-        encoded_message = MessageEncoder().encode(message)
-        parsed_message = MessageParser().parse(encoded_message)
-
-        self.assertEqual("ML01D10012000000", message.serial, 'serial value differs')
-
     def test_MeasurementRequestedNotification(self):
         message = MeasurementRequestedNotification(is_power_active=True, power_in_milliwatt=80, voltage_in_volt=230, current_in_milliampere=1000, frequency_in_hertz=50, total_consumption_in_kilowatt_hour=1000)
         encoded_message = MessageEncoder().encode(message)
@@ -239,4 +225,33 @@ class MessagesTest(unittest.TestCase):
 
         self.assertEqual(24, len(parsed_message.consumption_n_hours_ago_in_watt_hour), 'number of values differ')
         self.assertEqual([10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240], parsed_message.consumption_n_hours_ago_in_watt_hour, 'values for consumption in watt hour differ')
+
+    def test_ResetConsumptionNotification(self):
+        message = ResetConsumptionNotification(was_successful=True)
+        encoded_message = MessageEncoder().encode(message)
+        parsed_message = MessageParser().parse(encoded_message)
+
+        self.assertEqual(True, parsed_message.was_successful, 'was_successful value differs')
+
+    def test_FactoryResetNotification(self):
+        message = FactoryResetNotification(was_successful=True)
+        encoded_message = MessageEncoder().encode(message)
+        parsed_message = MessageParser().parse(encoded_message)
+
+        self.assertEqual(True, parsed_message.was_successful, 'was_successful value differs')
+
+    def test_DeviceNameSetNotification(self):
+        message = DeviceNameSetNotification(was_successful=True)
+        encoded_message = MessageEncoder().encode(message)
+        parsed_message = MessageParser().parse(encoded_message)
+
+        self.assertEqual(True, parsed_message.was_successful, 'was_successful value differs')
+
+    def test_DeviceSerialRequestedNotification(self):
+        message = DeviceSerialRequestedNotification("ML01D10012000000")
+        encoded_message = MessageEncoder().encode(message)
+        parsed_message = MessageParser().parse(encoded_message)
+
+        self.assertEqual("ML01D10012000000", message.serial, 'serial value differs')
+
 
