@@ -158,6 +158,24 @@ class MessageEncoder():
 
             return self._encode_message(b'\x15\x00' + is_active + active_on_weekdays + start_hour + start_minute + end_hour + end_minute + b'\x00\x00')
 
+        if isinstance(message, RequestMeasurementCommand):
+            return self._encode_message(b'\x04\x00' + b'\x00\x00')
+
+        if isinstance(message, RequestConsumptionOfLast12MonthsCommand):
+            return self._encode_message(b'\x0c\x00' + b'\x00\x00')
+
+        if isinstance(message, RequestConsumptionOfLast30DaysCommand):
+            return self._encode_message(b'\x0b\x00' + b'\x00\x00')
+
+        if isinstance(message, RequestConsumptionOfLast23HoursCommand):
+            return self._encode_message(b'\x0a\x00' + b'\x00\x00')
+
+        if isinstance(message, ResetConsumptionCommand):
+            return self._encode_message(b'\x0f\x00' + b'\x02' + b'\x00\x00\x00\x00\x00')
+
+        if isinstance(message, FactoryResetCommand):
+            return self._encode_message(b'\x0f\x00' + b'\x00' + b'\x00\x00\x00\x00\x00')
+
         if isinstance(message, SetDeviceNameCommand):
             new_name = message.new_name
             if isinstance(new_name, str):
@@ -173,18 +191,6 @@ class MessageEncoder():
 
         if isinstance(message, RequestDeviceSerialCommand):
             return self._encode_message(b'\x11\x00' + b'\x00\x00')
-
-        if isinstance(message, RequestMeasurementCommand):
-            return self._encode_message(b'\x04\x00' + b'\x00\x00')
-
-        if isinstance(message, RequestConsumptionOfLast12MonthsCommand):
-            return self._encode_message(b'\x0c\x00' + b'\x00\x00')
-
-        if isinstance(message, RequestConsumptionOfLast30DaysCommand):
-            return self._encode_message(b'\x0b\x00' + b'\x00\x00')
-
-        if isinstance(message, RequestConsumptionOfLast24HoursCommand):
-            return self._encode_message(b'\x0a\x00' + b'\x00\x00')
 
         if isinstance(message, AuthorizationNotification):
             was_successful = b'\x01'
@@ -324,14 +330,6 @@ class MessageEncoder():
 
             return self._encode_message(b'\x15\x00' + was_successful + b'\x00')
 
-        if isinstance(message, DeviceNameSetNotification):
-            return self._encode_message(b'\x02\x00' + b'\x00')
-
-        if isinstance(message, DeviceSerialRequestedNotification):
-            serial = message.serial.encode()
-
-            return self._encode_message(b'\x11\x00' + serial + b'\x00\x00')
-
         if isinstance(message, MeasurementRequestedNotification):
             is_power_active = b'\x00'
             if message.is_power_active:
@@ -366,13 +364,27 @@ class MessageEncoder():
 
             return self._encode_message(b'\x0b\x00' + consumptions)
 
-        if isinstance(message, ConsumptionOfLast24HoursRequestedNotification):
+        if isinstance(message, ConsumptionOfLast23HoursRequestedNotification):
             consumptions = b''
 
             for consumption in message.consumption_n_hours_ago_in_watt_hour:
                 consumptions = consumption.to_bytes(2, 'big') + consumptions
 
             return self._encode_message(b'\x0a\x00' + consumptions)
+
+        if isinstance(message, ResetConsumptionNotification):
+            return self._encode_message(b'\x0f\x00' + b'\x02' + b'\x00')
+
+        if isinstance(message, FactoryResetNotification):
+            return self._encode_message(b'\x0f\x00' + b'\x00' + b'\x00')
+
+        if isinstance(message, DeviceNameSetNotification):
+            return self._encode_message(b'\x02\x00' + b'\x00')
+
+        if isinstance(message, DeviceSerialRequestedNotification):
+            serial = message.serial.encode()
+
+            return self._encode_message(b'\x11\x00' + serial + b'\x00\x00')
 
         raise Exception('Unsupported message ' + str(message))
 

@@ -247,14 +247,6 @@ class MessageParser:
 
             return RandomModeSetNotification(was_successful=was_successful)
 
-        if payload[0:2] == b'\x02\x00':
-            return DeviceNameSetNotification(was_successful=True)
-
-        if payload[0:2] == b'\x11\x00':
-            serial = payload[2:-2].decode('utf-8')
-
-            return DeviceSerialRequestedNotification(serial=serial)
-
         if payload[0:2] == b'\x04\x00':
             is_power_active = False
             if payload[2:3] == b'\x01':
@@ -293,6 +285,20 @@ class MessageParser:
             for i in range((len(payload)-2) // 2):
                 consumptions.insert(0, int.from_bytes(payload[2 + 2*i:2 + 2*(i+1)], 'big'))
 
-            return ConsumptionOfLast24HoursRequestedNotification(consumption_n_hours_ago_in_watt_hour=consumptions)
+            return ConsumptionOfLast23HoursRequestedNotification(consumption_n_hours_ago_in_watt_hour=consumptions)
+
+        if payload[0:3] == b'\x0f\x00\x02':
+            return ResetConsumptionNotification(was_successful=True)
+
+        if payload[0:3] == b'\x0f\x00\x00':
+            return FactoryResetNotification(was_successful=True)
+
+        if payload[0:2] == b'\x02\x00':
+            return DeviceNameSetNotification(was_successful=True)
+
+        if payload[0:2] == b'\x11\x00':
+            serial = payload[2:-2].decode('utf-8')
+
+            return DeviceSerialRequestedNotification(serial=serial)
 
         raise Exception('Unsupported message')

@@ -88,19 +88,23 @@ if __name__ == '__main__':
         print("\t\t\t\tSets random mode, i.e. True Mon,Wed,Sun 22:00 04:00", file=sys.stderr)
         print("", file=sys.stderr)
         print("\t\t\trequest_measurement", file=sys.stderr)
-        print("\t\t\t\tRequest current measurements", file=sys.stderr)
+        print("\t\t\t\tRequest current measurements / starts collection consumption data", file=sys.stderr)
         print("", file=sys.stderr)
         print("\t\t\trequest_consumptions_of_last_12_months", file=sys.stderr)
         print("\t\t\t\tRequest accumulated measurements of last 12 months", file=sys.stderr)
         print("\t\t\trequest_consumptions_of_last_30_days", file=sys.stderr)
         print("\t\t\t\tRequest accumulated measurements of last 30 days", file=sys.stderr)
-        print("\t\t\trequest_consumptions_of_last_24_hours", file=sys.stderr)
-        print("\t\t\t\tRequest accumulated measurements of last 24 hours", file=sys.stderr)
+        print("\t\t\trequest_consumptions_of_last_23_hours", file=sys.stderr)
+        print("\t\t\t\tRequest accumulated measurements of last 23 hours", file=sys.stderr)
+        print("\t\t\treset_consumption", file=sys.stderr)
+        print("\t\t\t\tResets collected consumption data", file=sys.stderr)
         print("", file=sys.stderr)
         print("\t\t\trequest_device_name", file=sys.stderr)
         print("\t\t\t\tRequests the device name", file=sys.stderr)
         print("\t\t\tset_device_name <new_name>", file=sys.stderr)
         print("\t\t\t\tChanges the device name", file=sys.stderr)
+        print("\t\t\tfactory_reset", file=sys.stderr)
+        print("\t\t\t\tResets the device back to factory defaults", file=sys.stderr)
         print("\t\t\trequest_device_serial", file=sys.stderr)
         print("\t\t\t\tRequest the serial number of the device", file=sys.stderr)
     else:
@@ -314,11 +318,11 @@ if __name__ == '__main__':
 
                 d = now - datetime.timedelta(i)
                 print("\t" + d.isoformat() + ":\t" + str(response.consumption_n_days_ago_in_watt_hour[i]) + " Wh")
-        if cmd == 'request_consumptions_of_last_24_hours':
-            response = sem6000.request_consumption_of_last_24_hours()
+        if cmd == 'request_consumptions_of_last_23_hours':
+            response = sem6000.request_consumption_of_last_23_hours()
             now = datetime.datetime.now().time()
 
-            print("Consumptions of last 24 hours")
+            print("Consumptions of last 23 hours")
             for i in range(len(response.consumption_n_hours_ago_in_watt_hour)):
                 if response.consumption_n_hours_ago_in_watt_hour[i] is None:
                     continue
@@ -328,6 +332,8 @@ if __name__ == '__main__':
                     hour += 24
 
                 print("\t" + _format_hour_and_minute_as_time(hour, 0) + ":\t" + str(response.consumption_n_hours_ago_in_watt_hour[i]) + " Wh")
+        if cmd == 'reset_consumption':
+            response = sem6000.reset_consumption()
         if cmd == 'request_device_name':
             device_name = sem6000.request_device_name()
 
@@ -336,6 +342,8 @@ if __name__ == '__main__':
             new_name = sys.argv[4]
 
             sem6000.set_device_name(new_name=new_name)
+        if cmd == 'factory_reset':
+            sem6000.factory_reset()
         if cmd == 'request_device_serial':
             response = sem6000.request_device_serial()
 

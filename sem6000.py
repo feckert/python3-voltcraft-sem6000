@@ -456,13 +456,33 @@ class SEM6000():
 
         return notification
 
-    def request_consumption_of_last_24_hours(self):
-        command = RequestConsumptionOfLast24HoursCommand()
+    def request_consumption_of_last_23_hours(self):
+        command = RequestConsumptionOfLast23HoursCommand()
         self._send_command(command)
         notification = self._consume_notification()
 
-        if not isinstance(notification, ConsumptionOfLast24HoursRequestedNotification):
-            raise("Request consumption of last 24 hours failed")
+        if not isinstance(notification, ConsumptionOfLast23HoursRequestedNotification):
+            raise("Request consumption of last 23 hours failed")
+
+        return notification
+
+    def reset_consumption(self):
+        command = ResetConsumptionCommand()
+        self._send_command(command)
+        notification = self._consume_notification()
+
+        if not isinstance(notification, ResetConsumptionNotification):
+            raise("Reset consumption failed")
+
+        return notification
+
+    def factory_reset(self):
+        command = FactoryResetCommand()
+        self._send_command(command)
+        notification = self._consume_notification()
+
+        if not isinstance(notification, FactoryResetNotification):
+            raise("Factory reset failed")
 
         return notification
 
