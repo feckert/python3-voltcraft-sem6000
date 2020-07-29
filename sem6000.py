@@ -87,14 +87,16 @@ class SEM6000():
         if not pin is None:
             self.authorize(self.pin)
 
-    def _send_command(self, command, with_response=False):
+    def _send_command(self, command, with_response=True):
         encoded_command = self._encoder.encode(command)
 
         if self.debug:
             print("sent data: " + str(binascii.hexlify(encoded_command)) + " (" + str(command) + ")", file=sys.stderr)
 
+        # btle_characteristics.write(..., withResponse=True) needs to be set if reply notifications are expected
         self._control_characteristics.write(encoded_command, with_response)
-        self._wait_for_notifications()
+        if with_response:
+            self._wait_for_notifications()
 
     def _wait_for_notifications(self):
         while True:
@@ -488,8 +490,7 @@ class SEM6000():
 
     def set_device_name(self, new_name):
         command = SetDeviceNameCommand(new_name=new_name)
-        # for some reason this command does only work if send with btle_characteristics.write(..., withResponse=True)
-        self._send_command(command, with_response=True)
+        self._send_command(command)
         notification = self._consume_notification()
 
         if not isinstance(notification, DeviceNameSetNotification):
