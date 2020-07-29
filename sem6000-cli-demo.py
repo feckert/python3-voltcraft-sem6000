@@ -116,24 +116,24 @@ if __name__ == '__main__':
 
         if cmd != 'reset_pin' and cmd != 'get_device_name':
             sem6000.authorize(pin)
-
+            
         if cmd == 'change_pin':
             sem6000.change_pin(sys.argv[4])
-        if cmd == 'reset_pin':
+        elif cmd == 'reset_pin':
             sem6000.reset_pin()
-        if cmd == 'power_on':
+        elif cmd == 'power_on':
             sem6000.power_on()
-        if cmd == 'power_off':
+        elif cmd == 'power_off':
             sem6000.power_off()
-        if cmd == 'led_on':
+        elif cmd == 'led_on':
             sem6000.led_on()
-        if cmd == 'led_off':
+        elif cmd == 'led_off':
             sem6000.led_off()
-        if cmd == 'set_date_and_time':
+        elif cmd == 'set_date_and_time':
             sem6000.set_date_and_time(sys.argv[4])
-        if cmd == 'synchronize_date_and_time':
+        elif cmd == 'synchronize_date_and_time':
             sem6000.set_date_and_time(datetime.datetime.now().isoformat())
-        if cmd == 'request_settings':
+        elif cmd == 'request_settings':
             response = sem6000.request_settings()
             assert isinstance(response, RequestedSettingsNotification)
 
@@ -155,13 +155,13 @@ if __name__ == '__main__':
                 print("\tLED state:\t\t\tOff")
 
             print("\tPower limit:\t\t\t{} W".format(response.power_limit_in_watt))
-        if cmd == 'set_power_limit':
+        elif cmd == 'set_power_limit':
             sem6000.set_power_limit(power_limit_in_watt=sys.argv[4])
-        if cmd == 'set_prices':
+        elif cmd == 'set_prices':
             sem6000.set_prices(normal_price_in_cent=sys.argv[4], reduced_period_price_in_cent=sys.argv[5])
-        if cmd == 'set_reduced_period':
+        elif cmd == 'set_reduced_period':
             sem6000.set_reduced_period(is_active=sys.argv[4], start_isotime=sys.argv[5], end_isotime=sys.argv[6])
-        if cmd == 'request_timer_status':
+        elif cmd == 'request_timer_status':
             response = sem6000.request_timer_status()
             assert isinstance(response, RequestedTimerStatusNotification)
 
@@ -185,19 +185,19 @@ if __name__ == '__main__':
                 print("\tTimer state:\t\tOff")
 
             print("\tOriginal timer length:\t" + str(original_timer_length))
-        if cmd == 'set_timer':
+        elif cmd == 'set_timer':
             is_reset_timer = False
             is_action_turn_on = sys.argv[4]
             delay_isotime = sys.argv[5]
 
             sem6000.set_timer(is_reset_timer=is_reset_timer, is_action_turn_on=is_action_turn_on, delay_isotime=delay_isotime)
-        if cmd == 'reset_timer':
+        elif cmd == 'reset_timer':
             is_reset_timer = True
             is_action_turn_on = False
             delay_isotime = "00:00"
 
             sem6000.set_timer(True, False, "00:00")
-        if cmd == 'request_scheduler':
+        elif cmd == 'request_scheduler':
             response = sem6000.request_scheduler()
 
             print("Schedulers:")
@@ -227,14 +227,14 @@ if __name__ == '__main__':
 
                 print("\tTime:\t\t\t" + _format_hour_and_minute_as_time(scheduler.hour, scheduler.minute))
                 print("")
-        if cmd == 'add_scheduler':
+        elif cmd == 'add_scheduler':
             is_active = sys.argv[4]
             is_action_turn_on = sys.argv[5]
             repeat_on_weekdays=sys.argv[6]
             isodatetime = sys.argv[7]
 
             response = sem6000.add_scheduler(is_active=is_active, is_action_turn_on=is_action_turn_on, repeat_on_weekdays=repeat_on_weekdays, isodatetime=isodatetime)
-        if cmd == 'edit_scheduler':
+        elif cmd == 'edit_scheduler':
             slot_id = sys.argv[4]
             is_active = sys.argv[5]
             is_action_turn_on = sys.argv[6]
@@ -242,11 +242,11 @@ if __name__ == '__main__':
             isodatetime = sys.argv[8]
 
             response = sem6000.edit_scheduler(slot_id=slot_id, is_active=is_active, is_action_turn_on=is_action_turn_on, repeat_on_weekdays=repeat_on_weekdays, isodatetime=isodatetime)
-        if cmd == 'remove_scheduler':
+        elif cmd == 'remove_scheduler':
             slot_id = sys.argv[4]
 
             response = sem6000.remove_scheduler(slot_id=slot_id)
-        if cmd == 'request_random_mode_status':
+        elif cmd == 'request_random_mode_status':
             response = sem6000.request_random_mode_status()
 
             print("Random mode status:")
@@ -264,14 +264,14 @@ if __name__ == '__main__':
             print("\tStart time:\t\t" + str(start_time))
             print("\tEnd time:\t\t" + str(end_time))
             print("")
-        if cmd == 'set_random_mode':
+        elif cmd == 'set_random_mode':
             is_active = sys.argv[4]
             active_on_weekdays = sys.argv[5]
             start_isotime = sys.argv[6]
             end_isotime = sys.argv[7]
 
             response = sem6000.set_random_mode(is_active=is_active, active_on_weekdays=active_on_weekdays, start_isotime=start_isotime, end_isotime=end_isotime)
-        if cmd == 'request_measurement':
+        elif cmd == 'request_measurement':
             response = sem6000.request_measurement()
 
             print("Current measurement:")
@@ -291,7 +291,7 @@ if __name__ == '__main__':
             print("\tCurrent:\t\t" + str(current_in_milliampere) + " mA")
             print("\tFrequency:\t\t" + str(frequency_in_hertz) + " Hz")
             print("\tTotal consumption:\t" + str(total_consumption_in_kilowatt_hour) + " kWh")
-        if cmd == 'request_consumptions_of_last_12_months':
+        elif cmd == 'request_consumptions_of_last_12_months':
             response = sem6000.request_consumption_of_last_12_months()
             now = datetime.datetime.now()
 
@@ -307,7 +307,7 @@ if __name__ == '__main__':
                     year -= 1
 
                 print("\t" + _format_year_and_month(year, month) + ":\t" + str(response.consumption_n_months_ago_in_watt_hour[i]) + " Wh")
-        if cmd == 'request_consumptions_of_last_30_days':
+        elif cmd == 'request_consumptions_of_last_30_days':
             response = sem6000.request_consumption_of_last_30_days()
             now = datetime.datetime.now().date()
 
@@ -318,7 +318,7 @@ if __name__ == '__main__':
 
                 d = now - datetime.timedelta(i)
                 print("\t" + d.isoformat() + ":\t" + str(response.consumption_n_days_ago_in_watt_hour[i]) + " Wh")
-        if cmd == 'request_consumptions_of_last_23_hours':
+        elif cmd == 'request_consumptions_of_last_23_hours':
             response = sem6000.request_consumption_of_last_23_hours()
             now = datetime.datetime.now().time()
 
@@ -332,19 +332,21 @@ if __name__ == '__main__':
                     hour += 24
 
                 print("\t" + _format_hour_and_minute_as_time(hour, 0) + ":\t" + str(response.consumption_n_hours_ago_in_watt_hour[i]) + " Wh")
-        if cmd == 'reset_consumption':
+        elif cmd == 'reset_consumption':
             response = sem6000.reset_consumption()
-        if cmd == 'request_device_name':
+        elif cmd == 'request_device_name':
             device_name = sem6000.request_device_name()
 
             print("Device-Name:\t" + device_name)
-        if cmd == 'set_device_name':
+        elif cmd == 'set_device_name':
             new_name = sys.argv[4]
 
             sem6000.set_device_name(new_name=new_name)
-        if cmd == 'factory_reset':
+        elif cmd == 'factory_reset':
             sem6000.factory_reset()
-        if cmd == 'request_device_serial':
+        elif cmd == 'request_device_serial':
             response = sem6000.request_device_serial()
 
             print("Device-Serial:\t" + str(response.serial))
+        else:
+            print("Invalid/unknown command: " + cmd, file=sys.stderr)
