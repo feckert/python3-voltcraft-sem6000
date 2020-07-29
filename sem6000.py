@@ -88,7 +88,7 @@ class SEM6000():
         self._name_characteristics = self._peripheral.getCharacteristics(uuid=SEM6000.CHARACTERISTICS_UUID_NAME)[0]
 
         if not pin is None:
-            self.authorize(self.pin)
+            self.authorize(pin)
 
     def _send_command(self, command, with_response=True):
         encoded_command = self._encoder.encode(command)
