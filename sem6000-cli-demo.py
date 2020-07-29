@@ -303,7 +303,7 @@ if __name__ == '__main__':
                 year = now.year
                 month = now.month - i 
                 if month < 1:
-                    month = 12 - month
+                    month += 12
                     year -= 1
 
                 print("\t" + _format_year_and_month(year, month) + ":\t" + str(response.consumption_n_months_ago_in_watt_hour[i]) + " Wh")
