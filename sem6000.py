@@ -74,8 +74,8 @@ class SEM6000():
     CHARACTERISTICS_UUID_NAME='00002a00-0000-1000-8000-00805f9b34fb'
     CHARACTERISTICS_UUID_CONTROL='0000fff3-0000-1000-8000-00805f9b34fb'
 
-    def __init__(self, deviceAddr=None, pin=None, iface=None, debug=False):
-        self.timeout = 10
+    def __init__(self, deviceAddr=None, pin=None, iface=None, timeout=3, debug=False):
+        self.timeout = timeout
         self.debug = debug
 
         self.pin = None
