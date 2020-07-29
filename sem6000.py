@@ -65,6 +65,9 @@ class SEM6000Delegate(btle.DefaultDelegate):
 
         return notification
 
+    def reset_notification_data(self):
+        self._raw_notifications.clear()
+
 
 class SEM6000():
     SERVICECLASS_UUID='0000fff0-0000-1000-8000-00805f9b34fb'
@@ -94,6 +97,7 @@ class SEM6000():
             print("sent data: " + str(binascii.hexlify(encoded_command)) + " (" + str(command) + ")", file=sys.stderr)
 
         # btle_characteristics.write(..., withResponse=True) needs to be set if reply notifications are expected
+        self._delegate.reset_notification_data()
         self._control_characteristics.write(encoded_command, with_response)
         if with_response:
             self._wait_for_notifications()
