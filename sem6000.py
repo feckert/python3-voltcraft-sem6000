@@ -78,17 +78,24 @@ class SEM6000():
         self.timeout = timeout
         self.debug = debug
 
+        self.connection_settings = {}
+
         self.pin = None
 
         self._encoder = encoder.MessageEncoder()
 
         self._delegate = SEM6000Delegate(self.debug)
-        self._peripheral = btle.Peripheral(deviceAddr=deviceAddr, addrType=btle.ADDR_TYPE_PUBLIC, iface=iface).withDelegate(self._delegate)
-        self._control_characteristics = self._peripheral.getCharacteristics(uuid=SEM6000.CHARACTERISTICS_UUID_CONTROL)[0]
-        self._name_characteristics = self._peripheral.getCharacteristics(uuid=SEM6000.CHARACTERISTICS_UUID_NAME)[0]
+        self._peripheral = btle.Peripheral().withDelegate(self._delegate)
+        self.connect(deviceAddr, iface)
 
         if not pin is None:
             self.authorize(pin)
+
+    def _reconnect(self):
+        self._peripheral.connect(self.connection_settings["deviceAddr"], self.connection_settings["addrType"], iface=self.connection_settings["iface"])
+
+        self._control_characteristics = self._peripheral.getCharacteristics(uuid=SEM6000.CHARACTERISTICS_UUID_CONTROL)[0]
+        self._name_characteristics = self._peripheral.getCharacteristics(uuid=SEM6000.CHARACTERISTICS_UUID_NAME)[0]
 
     def _send_command(self, command, with_response=True):
         encoded_command = self._encoder.encode(command)
@@ -98,6 +105,12 @@ class SEM6000():
 
         # btle_characteristics.write(..., withResponse=True) needs to be set if reply notifications are expected
         self._delegate.reset_notification_data()
+
+        try:
+            self._peripheral.status()
+        except btle.BTLEInternalError as e:
+            self._reconnect()
+
         self._control_characteristics.write(encoded_command, with_response)
         if with_response:
             self._wait_for_notifications()
@@ -164,6 +177,13 @@ class SEM6000():
             weekdays.append(weekday)
 
         return weekdays
+
+    def connect(self, deviceAddr, iface=None):
+        self.connection_settings["deviceAddr"] = deviceAddr
+        self.connection_settings["addrType"] = btle.ADDR_TYPE_PUBLIC
+        self.connection_settings["iface"] = iface
+
+        return self._reconnect()
 
     def discover(timeout=5):
         result = []
