@@ -112,6 +112,17 @@ class SEM6000():
         if self.pin:
             self.authorize(self.pin)
 
+    def _is_connected(self):
+        if self._peripheral is None:
+            return False
+
+        try:
+            self._peripheral.status()
+        except btle.BTLEInternalError as e:
+            return False
+
+        return True
+
     def _send_command(self, command, with_response=True):
         encoded_command = self._encoder.encode(command)
 
@@ -121,17 +132,7 @@ class SEM6000():
         # btle_characteristics.write(..., withResponse=True) needs to be set if reply notifications are expected
         self._delegate.reset_notification_data()
 
-        is_reconnect_necessary = False
-        if self._peripheral is None and self.connection_settings["deviceAddr"]:
-            is_reconnect_necessary = True
-
-        try:
-            if self._peripheral:
-                self._peripheral.status()
-        except btle.BTLEInternalError as e:
-            is_reconnect_necessary = True
-
-        if is_reconnect_necessary:
+        if not self._is_connected() and self.connection_settings["deviceAddr"] and self.pin:
             self._reconnect()
 
         self._control_characteristics.write(encoded_command, with_response)
