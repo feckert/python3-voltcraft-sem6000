@@ -85,17 +85,32 @@ class SEM6000():
         self._encoder = encoder.MessageEncoder()
 
         self._delegate = SEM6000Delegate(self.debug)
-        self._peripheral = btle.Peripheral().withDelegate(self._delegate)
+        self._peripheral = None
         self.connect(deviceAddr, iface)
 
         if not pin is None:
             self.authorize(pin)
 
+    def _disconnect(self):
+        if self._peripheral:
+            self._peripheral.disconnect()
+            self._peripheral = None
+
+            return True
+
+        return False
+
     def _reconnect(self):
+        self._disconnect()
+
+        self._peripheral = btle.Peripheral().withDelegate(self._delegate)
         self._peripheral.connect(self.connection_settings["deviceAddr"], self.connection_settings["addrType"], iface=self.connection_settings["iface"])
 
         self._control_characteristics = self._peripheral.getCharacteristics(uuid=SEM6000.CHARACTERISTICS_UUID_CONTROL)[0]
         self._name_characteristics = self._peripheral.getCharacteristics(uuid=SEM6000.CHARACTERISTICS_UUID_NAME)[0]
+
+        if self.pin:
+            self.authorize(self.pin)
 
     def _send_command(self, command, with_response=True):
         encoded_command = self._encoder.encode(command)
@@ -106,9 +121,17 @@ class SEM6000():
         # btle_characteristics.write(..., withResponse=True) needs to be set if reply notifications are expected
         self._delegate.reset_notification_data()
 
+        is_reconnect_necessary = False
+        if self._peripheral is None and self.connection_settings["deviceAddr"]:
+            is_reconnect_necessary = True
+
         try:
-            self._peripheral.status()
+            if self._peripheral:
+                self._peripheral.status()
         except btle.BTLEInternalError as e:
+            is_reconnect_necessary = True
+
+        if is_reconnect_necessary:
             self._reconnect()
 
         self._control_characteristics.write(encoded_command, with_response)
@@ -184,6 +207,9 @@ class SEM6000():
         self.connection_settings["iface"] = iface
 
         return self._reconnect()
+
+    def disconnect(self):
+        return self._disconnect()
 
     def discover(timeout=5):
         result = []
