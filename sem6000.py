@@ -185,6 +185,9 @@ class SEM6000():
 
         return self._reconnect()
 
+    def disconnect(self):
+        return self._peripheral.disconnect()
+
     def discover(timeout=5):
         result = []
 
