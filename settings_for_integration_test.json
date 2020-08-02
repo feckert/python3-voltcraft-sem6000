@@ -1,0 +1,91 @@
+{
+ "device-name": "Voltcraft",
+ "settings": {
+  "reduced-period": {
+   "is-active": false,
+   "price-in-cent": 100,
+   "start-time-in-minutes": 0,
+   "end-time-in-minutes": 0
+  },
+  "normal-price-in-cent": 200,
+  "is-led-active": false,
+  "power-limit-in-watt": 3680
+ },
+ "random-mode": {
+  "is-active": true,
+  "active-on-weekdays": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "start-hour": 8,
+  "start-minute": 0,
+  "end-hour": 16,
+  "end-minute": 0
+ },
+ "scheduler": {
+  "number-of-schedulers": 4,
+  "entries": {
+   "9": {
+    "is-active": true,
+    "is-action-turn-on": true,
+    "repeat-on-weekdays": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6
+    ],
+    "year": 2020,
+    "month": 1,
+    "day": 1,
+    "hour": 8,
+    "minute": 0
+   },
+   "10": {
+    "is-active": true,
+    "is-action-turn-on": false,
+    "repeat-on-weekdays": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6
+    ],
+    "year": 2020,
+    "month": 1,
+    "day": 1,
+    "hour": 10,
+    "minute": 0
+   },
+   "11": {
+    "is-active": true,
+    "is-action-turn-on": true,
+    "repeat-on-weekdays": [],
+    "year": 2020,
+    "month": 1,
+    "day": 1,
+    "hour": 15,
+    "minute": 0
+   },
+   "12": {
+    "is-active": true,
+    "is-action-turn-on": false,
+    "repeat-on-weekdays": [],
+    "year": 2020,
+    "month": 1,
+    "day": 1,
+    "hour": 16,
+    "minute": 0
+   }
+  }
+ }
+}
