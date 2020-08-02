@@ -143,7 +143,7 @@ class SetTimerCommand:
 
     def __str__(self):
         name = self.__class__.__name__
-        return name + "(is_reset_timer=" + str(self.is_reset_timer) + ", is_action_turn_on=" + str(self.is_action_turn_on) + ", target_second=" + str(self.target_second) + ", target_minute=" + str(self.target_minute) + ", target_hour=" + str(self.target_hour) + ", target_day=" + str(self.target_day) + ", target_month=" + str(self.target_month) + ", target_year=" + str(self.target_year) + ")"
+        return name + "(is_reset_timer=" + str(self.is_reset_timer) + ", is_action_turn_on=" + str(self.is_action_turn_on) + ", target_year=" + str(self.target_year) + ", target_month=" + str(self.target_month) + ", target_day=" + str(self.target_day) + ", target_hour=" + str(self.target_hour) + ", target_minute=" + str(self.target_minute) + ", target_second=" + str(self.target_second) + ")"
 
 
 class RequestSchedulerCommand:
@@ -312,7 +312,7 @@ class RequestedTimerStatusNotification:
 
     def __str__(self):
         name = self.__class__.__name__
-        return name + "(is_action_turn_on=" + str(self.is_action_turn_on) + ", target_second=" + str(self.target_second) + ", target_minute=" + str(self.target_minute) + ", target_hour=" + str(self.target_hour) + ", target_day=" + str(self.target_day) + ", target_month=" + str(self.target_month) + ", target_year=" + str(self.target_year) + ", original_timer_length_in_seconds=" + str(self.original_timer_length_in_seconds) + ")"
+        return name + "(is_action_turn_on=" + str(self.is_action_turn_on) + ", target_year=" + str(self.target_year) + ", target_month=" + str(self.target_month) + ", target_day=" + str(self.target_day) + ", target_hour=" + str(self.target_hour) + ", target_minute=" + str(self.target_minute) + ", target_second=" + str(self.target_second) + ", original_timer_length_in_seconds=" + str(self.original_timer_length_in_seconds) + ")"
 
 
 class TimerSetNotification(AbstractCommandConfirmationNotification):
