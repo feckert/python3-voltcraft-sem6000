@@ -169,7 +169,8 @@ class SEM6000():
             list_value = list_input.split(",")
 
         for i in range(len(list_value)):
-            list_value[i] = list_value[i].strip()
+            if type(list_value[i]) == str:
+                list_value[i] = list_value[i].strip()
 
         return list_value
 
@@ -193,9 +194,9 @@ class SEM6000():
     def _parse_weekdays_list(self, weekdays_list):
         weekdays=[]
 
-        weekday_strings_list = self._parse_list(weekdays_list)
-        for weekday_str in weekday_strings_list:
-            weekday = self._parse_weekday(weekday_str)
+        weekday_values_list = self._parse_list(weekdays_list)
+        for weekday_value in weekday_values_list:
+            weekday = self._parse_weekday(weekday_value)
             if weekday is None:
                 continue
             weekdays.append(weekday)
