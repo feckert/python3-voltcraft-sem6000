@@ -344,7 +344,7 @@ class SEM6000():
         self._send_command(command)
         notification = self._consume_notification()
 
-        if not isinstance(notification, PowerLimitSetNotification):
+        if not isinstance(notification, PowerLimitSetNotification) or not notification.was_successful:
             raise Exception("Set power limit failed")
 
         return notification
@@ -354,7 +354,7 @@ class SEM6000():
         self._send_command(command)
         notification = self._consume_notification()
 
-        if not isinstance(notification, PricesSetNotification):
+        if not isinstance(notification, PricesSetNotification) or not notification.was_successful:
             raise Exception("Set prices failed")
 
         return notification
@@ -370,7 +370,7 @@ class SEM6000():
         self._send_command(command)
         notification = self._consume_notification()
 
-        if not isinstance(notification, ReducedPeriodSetNotification):
+        if not isinstance(notification, ReducedPeriodSetNotification) or not notification.was_successful:
             raise Exception("Set reduced period failed")
 
         return notification
@@ -395,7 +395,7 @@ class SEM6000():
         self._send_command(command)
         notification = self._consume_notification()
 
-        if not isinstance(notification, TimerSetNotification):
+        if not isinstance(notification, TimerSetNotification) or not notification.was_successful:
             raise Exception("Set timer failed")
 
         return notification
@@ -429,7 +429,7 @@ class SEM6000():
         self._send_command(command)
         notification = self._consume_notification()
 
-        if not isinstance(notification, SchedulerSetNotification):
+        if not isinstance(notification, SchedulerSetNotification) or not notification.was_successful:
             raise Exception("Add scheduler failed")
 
         return notification
@@ -442,7 +442,7 @@ class SEM6000():
         self._send_command(command)
         notification = self._consume_notification()
 
-        if not isinstance(notification, SchedulerSetNotification):
+        if not isinstance(notification, SchedulerSetNotification) or not notification.was_successful:
             raise Exception("Edit scheduler failed")
 
         return notification
@@ -452,7 +452,7 @@ class SEM6000():
         self._send_command(command)
         notification = self._consume_notification()
 
-        if not isinstance(notification, SchedulerSetNotification):
+        if not isinstance(notification, SchedulerSetNotification) or not notification.was_successful:
             raise Exception("Remove scheduler failed")
 
         return notification
@@ -475,7 +475,7 @@ class SEM6000():
         self._send_command(command)
         notification = self._consume_notification()
 
-        if not isinstance(notification, RandomModeSetNotification):
+        if not isinstance(notification, RandomModeSetNotification) or not notification.was_successful:
             raise Exception("Set random mode failed")
 
         return notification
@@ -525,7 +525,7 @@ class SEM6000():
         self._send_command(command)
         notification = self._consume_notification()
 
-        if not isinstance(notification, ResetConsumptionNotification):
+        if not isinstance(notification, ResetConsumptionNotification) or not notification.was_successful:
             raise("Reset consumption failed")
 
         return notification
@@ -535,7 +535,7 @@ class SEM6000():
         self._send_command(command)
         notification = self._consume_notification()
 
-        if not isinstance(notification, FactoryResetNotification):
+        if not isinstance(notification, FactoryResetNotification) or not notification.was_successful:
             raise("Factory reset failed")
 
         return notification
@@ -545,7 +545,7 @@ class SEM6000():
         self._send_command(command)
         notification = self._consume_notification()
 
-        if not isinstance(notification, DeviceNameSetNotification):
+        if not isinstance(notification, DeviceNameSetNotification) or not notification.was_successful:
             raise Exception("Set device name failed")
 
         return notification
