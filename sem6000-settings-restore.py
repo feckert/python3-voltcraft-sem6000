@@ -41,7 +41,8 @@ else:
     device.factory_reset()
     device.disconnect()
 
-    device = sem6000.SEM6000(address, pin, debug=True)
+    device = sem6000.SEM6000(address, "0000", debug=True)
+    device.change_pin(pin)
 
     device.set_date_and_time(datetime.datetime.now().isoformat())
     device.set_device_name(data["device-name"])
