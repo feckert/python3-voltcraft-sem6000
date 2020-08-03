@@ -31,7 +31,19 @@ main() {
 	echo "Running integration test... " 1>&2
 	"$SCRIPTDIR/sem6000-settings-restore-demo.py" "$ADDRESS" "$PIN" "$SCRIPTDIR/${SETTINGS_FILE_FOR_TEST}"
 	"$SCRIPTDIR/sem6000-settings-backup-demo.py" "$ADDRESS" "$PIN" > "$TMPFILE"
-	diff "$TMPFILE" "${SETTINGS_FILE_FOR_TEST}" || TEST_FAILED=1
+	if ! diff "$TMPFILE" "${SETTINGS_FILE_FOR_TEST}"
+	then
+		TEST_FAILED=1
+		echo "FAILED" 1>&2 
+	fi
+	echo "" 1>&2
+
+	echo "Test reading values that are not covered by backup/restore settings script..." 1>&2
+	if ! "$SCRIPTDIR/sem6000-read-tests.py" "$ADDRESS" "$PIN"
+	then
+		TEST_FAILED=1
+		echo "FAILED" 1>&2
+	fi
 	echo "" 1>&2
 
 	echo "Restoring original settings from $SCRIPTDIR/${ORIGINAL_SETTINGS_FILE} ..." 1>&2
