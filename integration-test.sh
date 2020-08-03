@@ -18,18 +18,24 @@ main() {
 
 	TEST_FAILED=0
 
+	if [ -f "$SCRIPTDIR/${ORIGINAL_SETTINGS_FILE}" ]
+	then
+		echo "$SCRIPTDIR/${ORIGINAL_SETTINGS_FILE} already exists ... aborting" 1>&2
+		return 1
+	fi
+
 	echo "Backing up original settings to $SCRIPTDIR/${ORIGINAL_SETTINGS_FILE} ..." 1>&2
-	"$SCRIPTDIR/sem6000-settings-backup.py" "$ADDRESS" "$PIN" > "$SCRIPTDIR/${ORIGINAL_SETTINGS_FILE}"
+	"$SCRIPTDIR/sem6000-settings-backup-demo.py" "$ADDRESS" "$PIN" > "$SCRIPTDIR/${ORIGINAL_SETTINGS_FILE}"
 	echo "" 1>&2
 
 	echo "Running integration test... " 1>&2
-	"$SCRIPTDIR/sem6000-settings-restore.py" "$ADDRESS" "$PIN" "$SCRIPTDIR/${SETTINGS_FILE_FOR_TEST}"
-	"$SCRIPTDIR/sem6000-settings-backup.py" "$ADDRESS" "$PIN" > "$TMPFILE"
+	"$SCRIPTDIR/sem6000-settings-restore-demo.py" "$ADDRESS" "$PIN" "$SCRIPTDIR/${SETTINGS_FILE_FOR_TEST}"
+	"$SCRIPTDIR/sem6000-settings-backup-demo.py" "$ADDRESS" "$PIN" > "$TMPFILE"
 	diff "$TMPFILE" "${SETTINGS_FILE_FOR_TEST}" || TEST_FAILED=1
 	echo "" 1>&2
 
 	echo "Restoring original settings from $SCRIPTDIR/${ORIGINAL_SETTINGS_FILE} ..." 1>&2
-	"$SCRIPTDIR/sem6000-settings-restore.py" "$ADDRESS" "$PIN" "$SCRIPTDIR/${ORIGINAL_SETTINGS_FILE}"
+	"$SCRIPTDIR/sem6000-settings-restore-demo.py" "$ADDRESS" "$PIN" "$SCRIPTDIR/${ORIGINAL_SETTINGS_FILE}"
 	echo "" 1>&2
 
 	if [ "${TEST_FAILED}" == "0" ]
