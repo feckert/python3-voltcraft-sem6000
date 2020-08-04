@@ -2,14 +2,14 @@
  "device-name": "Voltcraft",
  "settings": {
   "reduced-period": {
-   "is-active": false,
-   "price-in-cent": 100,
-   "start-time-in-minutes": 0,
-   "end-time-in-minutes": 0
+   "is-active": true,
+   "price-in-cent": 23,
+   "start-time-in-minutes": 1320,
+   "end-time-in-minutes": 360
   },
-  "normal-price-in-cent": 200,
-  "is-led-active": false,
-  "power-limit-in-watt": 3680
+  "normal-price-in-cent": 42,
+  "is-led-active": true,
+  "power-limit-in-watt": 2000
  },
  "random-mode": {
   "is-active": true,
