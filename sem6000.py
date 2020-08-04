@@ -117,7 +117,9 @@ class SEM6000():
             return False
 
         try:
-            self._peripheral.status()
+            if self._peripheral.getState() != "conn":
+                return False
+
         except btle.BTLEInternalError as e:
             return False
 
@@ -136,6 +138,7 @@ class SEM6000():
             self._reconnect()
 
         self._control_characteristics.write(encoded_command, with_response)
+        
         if with_response:
             self._wait_for_notifications()
 
