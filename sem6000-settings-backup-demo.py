@@ -73,4 +73,5 @@ else:
         }
 
     json.dump(data, sys.stdout, indent=True)
+    print("")
 
