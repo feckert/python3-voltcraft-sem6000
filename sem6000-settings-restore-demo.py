@@ -55,6 +55,8 @@ else:
     else:
         device.led_off()
 
+    device.set_power_limit(data["settings"]["power-limit-in-watt"])
+
     start_time = datetime.time(data["random-mode"]["start-hour"], data["random-mode"]["start-minute"])
     end_time = datetime.time(data["random-mode"]["end-hour"], data["random-mode"]["end-minute"])
     device.set_random_mode(data["random-mode"]["is-active"], data["random-mode"]["active-on-weekdays"], start_time.isoformat(), end_time.isoformat())
