@@ -245,7 +245,7 @@ if __name__ == '__main__':
         elif cmd == 'remove_scheduler':
             slot_id = sys.argv[4]
 
-            response = sem6000.remove_scheduler(slot_id=slot_id)
+            sem6000.remove_scheduler(slot_id=slot_id)
         elif cmd == 'request_random_mode_status':
             response = sem6000.request_random_mode_status()
 
@@ -333,7 +333,7 @@ if __name__ == '__main__':
 
                 print("\t" + _format_hour_and_minute_as_time(hour, 0) + ":\t" + str(response.consumption_n_hours_ago_in_watt_hour[i]) + " Wh")
         elif cmd == 'reset_consumption':
-            response = sem6000.reset_consumption()
+            sem6000.reset_consumption()
         elif cmd == 'request_device_name':
             device_name = sem6000.request_device_name()
 
