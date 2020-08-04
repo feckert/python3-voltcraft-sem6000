@@ -1,4 +1,4 @@
-from message import *
+from .message import *
 
 import sys
 

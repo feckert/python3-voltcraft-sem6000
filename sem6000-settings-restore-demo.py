@@ -4,26 +4,8 @@ import datetime
 import json
 import sys
 
-import sem6000
-from message import *
-
-
-def _format_minutes_as_time(minutes):
-    hour = minutes // 60
-    minute = minutes - hour*60
-
-    return "{:02}:{:02}".format(hour, minute)
-
-def _format_seconds_as_time(seconds):
-    hour = seconds // (60*60)
-    seconds -= hour*60*60
-
-    minute = seconds // 60
-    seconds -= minute*60
-
-    second = seconds
-
-    return "{:02}:{:02}:{:02}".format(hour, minute, second)
+from sem6000 import sem6000
+from sem6000.message import *
 
 
 if len(sys.argv) <= 1:
@@ -48,7 +30,7 @@ else:
     device.set_device_name(data["device-name"])
 
     device.set_prices(data["settings"]["normal-price-in-cent"], data["settings"]["reduced-period"]["price-in-cent"])
-    device.set_reduced_period(data["settings"]["reduced-period"]["is-active"], _format_minutes_as_time(data["settings"]["reduced-period"]["start-time-in-minutes"]), _format_minutes_as_time(data["settings"]["reduced-period"]["end-time-in-minutes"]))
+    device.set_reduced_period(data["settings"]["reduced-period"]["is-active"], util._format_minutes_as_time(data["settings"]["reduced-period"]["start-time-in-minutes"]), util._format_minutes_as_time(data["settings"]["reduced-period"]["end-time-in-minutes"]))
 
     if data["settings"]["is-led-active"]:
         device.led_on()

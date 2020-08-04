@@ -1,24 +1,6 @@
 import datetime
-import enum
 
-def _list_values_to_enum(enum_class, list_of_values):
-    list_of_enums = []
-    for v in list_of_values:
-        list_of_enums.append(enum_class(v))
-    return list_of_enums
-
-def _format_list_of_objects(format_object_lambda, list_of_objects):
-    is_first = True
-    formatted_string = "["
-    for o in list_of_objects:
-        if not is_first:
-            formatted_string += ", "
-        formatted_string += format_object_lambda(o)
-        is_first = False
-    formatted_string += "]"
-
-    return formatted_string
-
+from . import util
 
 class AbstractCommand:
     def __str__(self):
@@ -193,7 +175,7 @@ class RequestRandomModeStatusCommand(AbstractCommand):
 
 class SetRandomModeCommand:
     def __init__(self, is_active, active_on_weekdays, start_hour, start_minute, end_hour, end_minute):
-        active_on_weekdays = _list_values_to_enum(Weekday, active_on_weekdays)
+        active_on_weekdays = util._list_values_to_enum(util.Weekday, active_on_weekdays)
 
         self.is_active = is_active
         self.active_on_weekdays = active_on_weekdays
@@ -204,7 +186,7 @@ class SetRandomModeCommand:
 
     def __str__(self):
         weekday_formatter = lambda w: w.name
-        active_on_weekdays = _format_list_of_objects(weekday_formatter, self.active_on_weekdays)
+        active_on_weekdays = util._format_list_of_objects(weekday_formatter, self.active_on_weekdays)
 
         name = self.__class__.__name__
         return name + "(is_active=" + str(self.is_active) + ", active_on_weekdays=" + active_on_weekdays + ", start_hour=" + str(self.start_hour) + ", start_minute=" + str(self.start_minute) + ", end_hour=" + str(self.end_hour) + ", end_minute=" + str(self.end_minute) + ")"
@@ -319,19 +301,9 @@ class TimerSetNotification(AbstractCommandConfirmationNotification):
     pass
 
 
-class Weekday(enum.Enum):
-    SUNDAY = 0
-    MONDAY = 1
-    TUESDAY = 2
-    WEDNESDAY = 3
-    THURSDAY = 4
-    FRIDAY = 5
-    SATURDAY = 6
-
-
 class Scheduler:
     def __init__(self, is_active, is_action_turn_on, repeat_on_weekdays, year, month, day, hour, minute):
-        repeat_on_weekdays = _list_values_to_enum(Weekday, repeat_on_weekdays)
+        repeat_on_weekdays = util._list_values_to_enum(util.Weekday, repeat_on_weekdays)
 
         self.is_active = is_active
         self.is_action_turn_on = is_action_turn_on
@@ -346,7 +318,7 @@ class Scheduler:
         name = self.__class__.__name__
 
         weekday_formatter = lambda w: w.name
-        repeat_on_weekdays = _format_list_of_objects(weekday_formatter, self.repeat_on_weekdays)
+        repeat_on_weekdays = util._format_list_of_objects(weekday_formatter, self.repeat_on_weekdays)
 
         return name + "(is_active=" + str(self.is_active) + ", is_action_turn_on=" + str(self.is_action_turn_on) + ", repeat_on_weekdays=" + repeat_on_weekdays + ", year=" + str(self.year) + ", month=" + str(self.month) + ", day=" + str(self.day) + ", hour=" + str(self.hour) + ", minute=" + str(self.minute) + ")"
 
@@ -374,7 +346,7 @@ class SchedulerRequestedNotification:
     def __str__(self):
         name = self.__class__.__name__
 
-        scheduler_entries = _format_list_of_objects(str, self.scheduler_entries)
+        scheduler_entries = util._format_list_of_objects(str, self.scheduler_entries)
 
         return name + "(number_of_schedulers=" + str(self.number_of_schedulers) + ", scheduler_entries=" + scheduler_entries + ")"
 
@@ -385,7 +357,7 @@ class SchedulerSetNotification(AbstractCommandConfirmationNotification):
 
 class RandomModeStatusRequestedNotification:
     def __init__(self, is_active, active_on_weekdays, start_hour, start_minute, end_hour, end_minute):
-        active_on_weekdays = _list_values_to_enum(Weekday, active_on_weekdays)
+        active_on_weekdays = util._list_values_to_enum(util.Weekday, active_on_weekdays)
 
         self.is_active = is_active
         self.active_on_weekdays = active_on_weekdays
@@ -396,7 +368,7 @@ class RandomModeStatusRequestedNotification:
 
     def __str__(self):
         weekday_formatter = lambda w: w.name
-        active_on_weekdays = _format_list_of_objects(weekday_formatter, self.active_on_weekdays)
+        active_on_weekdays = util._format_list_of_objects(weekday_formatter, self.active_on_weekdays)
 
         name = self.__class__.__name__
         return name + "(is_active=" + str(self.is_active) + ", active_on_weekdays=" + active_on_weekdays + ", start_hour=" + str(self.start_hour) + ", start_minute=" + str(self.start_minute) + ", end_hour=" + str(self.end_hour) + ", end_minute=" + str(self.end_minute) + ")"
@@ -426,7 +398,7 @@ class ConsumptionOfLast12MonthsRequestedNotification:
 
     def __str__(self):
         name = self.__class__.__name__
-        return name + "(consumption_n_months_ago_in_watt_hour=" + _format_list_of_objects(str, self.consumption_n_months_ago_in_watt_hour) + ")"
+        return name + "(consumption_n_months_ago_in_watt_hour=" + util._format_list_of_objects(str, self.consumption_n_months_ago_in_watt_hour) + ")"
 
 
 class ConsumptionOfLast30DaysRequestedNotification:
@@ -435,7 +407,7 @@ class ConsumptionOfLast30DaysRequestedNotification:
 
     def __str__(self):
         name = self.__class__.__name__
-        return name + "(consumption_n_days_ago_in_watt_hour=" + _format_list_of_objects(str, self.consumption_n_days_ago_in_watt_hour) + ")"
+        return name + "(consumption_n_days_ago_in_watt_hour=" + util._format_list_of_objects(str, self.consumption_n_days_ago_in_watt_hour) + ")"
 
 
 class ConsumptionOfLast23HoursRequestedNotification:
@@ -444,7 +416,7 @@ class ConsumptionOfLast23HoursRequestedNotification:
 
     def __str__(self):
         name = self.__class__.__name__
-        return name + "(consumption_n_hours_ago_in_watt_hour=" + _format_list_of_objects(str, self.consumption_n_hours_ago_in_watt_hour) + ")"
+        return name + "(consumption_n_hours_ago_in_watt_hour=" + util._format_list_of_objects(str, self.consumption_n_hours_ago_in_watt_hour) + ")"
 
 
 class ResetConsumptionNotification(AbstractCommandConfirmationNotification):

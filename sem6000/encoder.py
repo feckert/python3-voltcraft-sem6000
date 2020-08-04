@@ -1,4 +1,4 @@
-from message import *
+from .message import *
 
 class MessageEncoder():
     def _encode_message(self, payload, suffix=b'\xff\xff'):

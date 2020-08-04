@@ -25,7 +25,11 @@ main() {
 	fi
 
 	echo "Backing up original settings to $SCRIPTDIR/${ORIGINAL_SETTINGS_FILE} ..." 1>&2
-	"$SCRIPTDIR/sem6000-settings-backup-demo.py" "$ADDRESS" "$PIN" > "$SCRIPTDIR/${ORIGINAL_SETTINGS_FILE}"
+	if ! "$SCRIPTDIR/sem6000-settings-backup-demo.py" "$ADDRESS" "$PIN" > "$SCRIPTDIR/${ORIGINAL_SETTINGS_FILE}"
+	then
+		echo "Failed to backup current settings ... aborting" 1>&2
+		return 1
+	fi
 	echo "" 1>&2
 
 	echo "Running integration test... " 1>&2

@@ -3,9 +3,10 @@ import datetime
 import sys
 from bluepy import btle
 
-import parser
-import encoder
-from message import *
+from . import encoder
+from .message import *
+from . import parser
+from . import util
 
 
 class SEM6000Delegate(btle.DefaultDelegate):
@@ -152,59 +153,6 @@ class SEM6000():
 
     def _consume_notification(self):
         return self._delegate.consume_notification()
-
-    def _parse_boolean(self, boolean_string):
-        boolean_value = False
-    
-        if str(boolean_string).lower() == "true":
-            boolean_value = True
-        if str(boolean_string).lower() == "on":
-            boolean_value = True
-        if str(boolean_string).lower() == "1":
-            boolean_value = True
-    
-        return boolean_value
-
-    def _parse_list(self, list_input):
-        if type(list_input) == list:
-            list_value = list_input
-        if type(list_input) == str:
-            list_value = list_input.split(",")
-
-        for i in range(len(list_value)):
-            if type(list_value[i]) == str:
-                list_value[i] = list_value[i].strip()
-
-        return list_value
-
-    def _parse_weekday(self, weekday):
-        if isinstance(weekday, Weekday):
-            return weekday
-
-        if type(weekday) == int:
-            return Weekday(weekday)
-
-        weekday = weekday.lower()
-
-        weekday_num = 0
-        for weekday_str in ["sun", "mon", "tue", "wed", "thu", "fri", "sat"]:
-            if weekday_str in weekday or weekday == str(weekday_num):
-                return Weekday(weekday_num)
-            weekday_num += 1
-
-        return None
-
-    def _parse_weekdays_list(self, weekdays_list):
-        weekdays=[]
-
-        weekday_values_list = self._parse_list(weekdays_list)
-        for weekday_value in weekday_values_list:
-            weekday = self._parse_weekday(weekday_value)
-            if weekday is None:
-                continue
-            weekdays.append(weekday)
-
-        return weekdays
 
     def connect(self, deviceAddr, iface=None):
         self.connection_settings["deviceAddr"] = deviceAddr
@@ -369,7 +317,7 @@ class SEM6000():
         start_time_in_minutes = start_time.hour*60 + start_time.minute
         end_time_in_minutes = end_time.hour*60 + end_time.minute
 
-        command = SetReducedPeriodCommand(is_active=self._parse_boolean(is_active), start_time_in_minutes=start_time_in_minutes, end_time_in_minutes=end_time_in_minutes)
+        command = SetReducedPeriodCommand(is_active=util._parse_boolean(is_active), start_time_in_minutes=start_time_in_minutes, end_time_in_minutes=end_time_in_minutes)
         self._send_command(command)
         notification = self._consume_notification()
 
@@ -394,7 +342,7 @@ class SEM6000():
         dt = datetime.datetime.now() + timedelta
         dt = datetime.datetime(dt.year % 100, dt.month, dt.day, dt.hour, dt.minute, dt.second)
 
-        command = SetTimerCommand(is_reset_timer=False, is_action_turn_on=self._parse_boolean(is_action_turn_on), target_year=dt.year, target_month=dt.month, target_day=dt.day, target_hour=dt.hour, target_minute=dt.minute, target_second=dt.second)
+        command = SetTimerCommand(is_reset_timer=False, is_action_turn_on=util._parse_boolean(is_action_turn_on), target_year=dt.year, target_month=dt.month, target_day=dt.day, target_hour=dt.hour, target_minute=dt.minute, target_second=dt.second)
         self._send_command(command)
         notification = self._consume_notification()
 
@@ -438,7 +386,7 @@ class SEM6000():
         date_time = datetime.datetime.fromisoformat(isodatetime)
         date_time = datetime.datetime(year=date_time.year % 100, month=date_time.month, day=date_time.day, hour=date_time.hour, minute=date_time.minute)
 
-        command = AddSchedulerCommand(Scheduler(is_active=self._parse_boolean(is_active), is_action_turn_on=self._parse_boolean(is_action_turn_on), repeat_on_weekdays=self._parse_weekdays_list(repeat_on_weekdays), year=date_time.year, month=date_time.month, day=date_time.day, hour=date_time.hour, minute=date_time.minute))
+        command = AddSchedulerCommand(Scheduler(is_active=util._parse_boolean(is_active), is_action_turn_on=util._parse_boolean(is_action_turn_on), repeat_on_weekdays=util._parse_weekdays_list(repeat_on_weekdays), year=date_time.year, month=date_time.month, day=date_time.day, hour=date_time.hour, minute=date_time.minute))
         self._send_command(command)
         notification = self._consume_notification()
 
@@ -451,7 +399,7 @@ class SEM6000():
         date_time = datetime.datetime.fromisoformat(isodatetime)
         date_time = datetime.datetime(year=date_time.year % 100, month=date_time.month, day=date_time.day, hour=date_time.hour, minute=date_time.minute)
 
-        command = EditSchedulerCommand(slot_id=int(slot_id), scheduler=Scheduler(is_active=self._parse_boolean(is_active), is_action_turn_on=self._parse_boolean(is_action_turn_on), repeat_on_weekdays=self._parse_weekdays_list(repeat_on_weekdays), year=date_time.year, month=date_time.month, day=date_time.day, hour=date_time.hour, minute=date_time.minute))
+        command = EditSchedulerCommand(slot_id=int(slot_id), scheduler=Scheduler(is_active=util._parse_boolean(is_active), is_action_turn_on=util._parse_boolean(is_action_turn_on), repeat_on_weekdays=tuil._parse_weekdays_list(repeat_on_weekdays), year=date_time.year, month=date_time.month, day=date_time.day, hour=date_time.hour, minute=date_time.minute))
         self._send_command(command)
         notification = self._consume_notification()
 
@@ -484,7 +432,7 @@ class SEM6000():
         start_time = datetime.time.fromisoformat(start_isotime)
         end_time = datetime.time.fromisoformat(end_isotime)
 
-        command = SetRandomModeCommand(is_active=True, active_on_weekdays=self._parse_weekdays_list(active_on_weekdays), start_hour=start_time.hour, start_minute=start_time.minute, end_hour=end_time.hour, end_minute=end_time.minute)
+        command = SetRandomModeCommand(is_active=True, active_on_weekdays=util._parse_weekdays_list(active_on_weekdays), start_hour=start_time.hour, start_minute=start_time.minute, end_hour=end_time.hour, end_minute=end_time.minute)
         self._send_command(command)
         notification = self._consume_notification()
 

@@ -1,25 +1,11 @@
 #!/usr/bin/python3
 
-import sem6000
-from message import *
-from message import _format_list_of_objects
+from sem6000 import sem6000
+from sem6000.message import *
+from sem6000 import util
 
 import datetime
 import sys
-
-def _format_minutes_as_time(minutes):
-    hour = minutes // 60
-    minute = minutes - hour*60
-
-    return "{:02}:{:02}".format(hour, minute)
-
-
-def _format_hour_and_minute_as_time(hour, minute):
-    return "{:02}:{:02}".format(hour, minute)
-
-
-def _format_year_and_month(year, month):
-    return "{:04}-{:02}".format(year, month)
 
 
 if __name__ == '__main__':
@@ -148,8 +134,8 @@ if __name__ == '__main__':
             print("\tNormal price:\t\t\t{:.2f} EUR".format(response.normal_price_in_cent/100))
             print("\tReduced period price:\t\t{:.2f} EUR".format(response.reduced_period_price_in_cent/100))
 
-            print("\tRecuced period start:\t\t{} minutes ({})".format(response.reduced_period_start_time_in_minutes, _format_minutes_as_time(response.reduced_period_start_time_in_minutes)))
-            print("\tRecuced period end:\t\t{} minutes ({})".format(response.reduced_period_end_time_in_minutes, _format_minutes_as_time(response.reduced_period_end_time_in_minutes)))
+            print("\tRecuced period start:\t\t{} minutes ({})".format(response.reduced_period_start_time_in_minutes, util._format_minutes_as_time(response.reduced_period_start_time_in_minutes)))
+            print("\tRecuced period end:\t\t{} minutes ({})".format(response.reduced_period_end_time_in_minutes, util._format_minutes_as_time(response.reduced_period_end_time_in_minutes)))
 
             if response.is_led_active:
                 print("\tLED state:\t\t\tOn")
@@ -216,13 +202,13 @@ if __name__ == '__main__':
 
                 if scheduler.repeat_on_weekdays:
                     weekday_formatter = lambda w: w.name
-                    repeat_on_weekdays = _format_list_of_objects(weekday_formatter, scheduler.repeat_on_weekdays)
+                    repeat_on_weekdays = util._format_list_of_objects(weekday_formatter, scheduler.repeat_on_weekdays)
                     print("\tRepeat on weekdays:\t" + repeat_on_weekdays)
                 else:
                     date = datetime.date(year=scheduler.year, month=scheduler.month, day=scheduler.day)
                     print("\tDate:\t\t\t" + str(date))
 
-                print("\tTime:\t\t\t" + _format_hour_and_minute_as_time(scheduler.hour, scheduler.minute))
+                print("\tTime:\t\t\t" + util._format_hour_and_minute_as_time(scheduler.hour, scheduler.minute))
                 print("")
         elif cmd == 'add_scheduler':
             is_active = sys.argv[4]
@@ -253,9 +239,9 @@ if __name__ == '__main__':
                 print("\tActive:\t\t\tOff")
 
             weekday_formatter = lambda w: w.name
-            active_on_weekdays = _format_list_of_objects(weekday_formatter, response.active_on_weekdays)
-            start_time = _format_hour_and_minute_as_time(response.start_hour, response.start_minute)
-            end_time = _format_hour_and_minute_as_time(response.end_hour, response.end_minute)
+            active_on_weekdays = util._format_list_of_objects(weekday_formatter, response.active_on_weekdays)
+            start_time = util._format_hour_and_minute_as_time(response.start_hour, response.start_minute)
+            end_time = util._format_hour_and_minute_as_time(response.end_hour, response.end_minute)
 
             print("\tActive on weekdays:\t" + active_on_weekdays)
             print("\tStart time:\t\t" + str(start_time))
@@ -304,7 +290,7 @@ if __name__ == '__main__':
                     month += 12
                     year -= 1
 
-                print("\t" + _format_year_and_month(year, month) + ":\t" + str(response.consumption_n_months_ago_in_watt_hour[i]) + " Wh")
+                print("\t" + util._format_year_and_month(year, month) + ":\t" + str(response.consumption_n_months_ago_in_watt_hour[i]) + " Wh")
         elif cmd == 'request_consumptions_of_last_30_days':
             response = sem6000.request_consumption_of_last_30_days()
             now = datetime.datetime.now().date()
@@ -329,7 +315,7 @@ if __name__ == '__main__':
                 if hour < 0:
                     hour += 24
 
-                print("\t" + _format_hour_and_minute_as_time(hour, 0) + ":\t" + str(response.consumption_n_hours_ago_in_watt_hour[i]) + " Wh")
+                print("\t" + util._format_hour_and_minute_as_time(hour, 0) + ":\t" + str(response.consumption_n_hours_ago_in_watt_hour[i]) + " Wh")
         elif cmd == 'reset_consumption':
             sem6000.reset_consumption()
         elif cmd == 'request_device_name':

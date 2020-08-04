@@ -3,8 +3,8 @@
 import json
 import sys
 
-import sem6000
-from message import *
+from sem6000 import sem6000
+from sem6000.message import *
 
 if len(sys.argv) <= 1:
     print("Usage: " + sys.argv[0] + " <bluetooth address> <pin>", file=sys.stderr)
