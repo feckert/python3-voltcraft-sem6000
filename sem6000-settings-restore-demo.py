@@ -59,7 +59,10 @@ else:
 
     start_time = datetime.time(data["random-mode"]["start-hour"], data["random-mode"]["start-minute"])
     end_time = datetime.time(data["random-mode"]["end-hour"], data["random-mode"]["end-minute"])
-    device.set_random_mode(data["random-mode"]["is-active"], data["random-mode"]["active-on-weekdays"], start_time.isoformat(), end_time.isoformat())
+    if data["random-mode"]["is-active"]:
+        device.set_random_mode(data["random-mode"]["active-on-weekdays"], start_time.isoformat(), end_time.isoformat())
+    else:
+        device.reset_random_mode()
 
     slot_ids = list(data["scheduler"]["entries"].keys())
     slot_ids.reverse()

@@ -84,8 +84,10 @@ if __name__ == '__main__':
         print("", file=sys.stderr)
         print("\t\t\trequest_random_mode_status", file=sys.stderr)
         print("\t\t\t\tRequests current status of the random mode", file=sys.stderr)
-        print("\t\t\tset_random_mode <is_active?> <active_on_weekdays> <start_isotime> <end_isotime>", file=sys.stderr)
+        print("\t\t\tset_random_mode <active_on_weekdays> <start_isotime> <end_isotime>", file=sys.stderr)
         print("\t\t\t\tSets random mode, i.e. True Mon,Wed,Sun 22:00 04:00", file=sys.stderr)
+        print("\t\t\treset_random_mode", file=sys.stderr)
+        print("\t\t\t\tResets random mode", file=sys.stderr)
         print("", file=sys.stderr)
         print("\t\t\trequest_measurement", file=sys.stderr)
         print("\t\t\t\tRequest current measurements / starts collection consumption data", file=sys.stderr)
@@ -186,17 +188,12 @@ if __name__ == '__main__':
 
             print("\tOriginal timer length:\t" + str(original_timer_length))
         elif cmd == 'set_timer':
-            is_reset_timer = False
             is_action_turn_on = sys.argv[4]
             delay_isotime = sys.argv[5]
 
-            sem6000.set_timer(is_reset_timer=is_reset_timer, is_action_turn_on=is_action_turn_on, delay_isotime=delay_isotime)
+            sem6000.set_timer(is_action_turn_on=is_action_turn_on, delay_isotime=delay_isotime)
         elif cmd == 'reset_timer':
-            is_reset_timer = True
-            is_action_turn_on = False
-            delay_isotime = "00:00"
-
-            sem6000.set_timer(True, False, "00:00")
+            sem6000.reset_timer()
         elif cmd == 'request_scheduler':
             response = sem6000.request_scheduler()
 
@@ -265,12 +262,13 @@ if __name__ == '__main__':
             print("\tEnd time:\t\t" + str(end_time))
             print("")
         elif cmd == 'set_random_mode':
-            is_active = sys.argv[4]
-            active_on_weekdays = sys.argv[5]
-            start_isotime = sys.argv[6]
-            end_isotime = sys.argv[7]
+            active_on_weekdays = sys.argv[4]
+            start_isotime = sys.argv[5]
+            end_isotime = sys.argv[6]
 
-            response = sem6000.set_random_mode(is_active=is_active, active_on_weekdays=active_on_weekdays, start_isotime=start_isotime, end_isotime=end_isotime)
+            sem6000.set_random_mode(active_on_weekdays=active_on_weekdays, start_isotime=start_isotime, end_isotime=end_isotime)
+        elif cmd == 'reset_random_mode':
+            sem6000.reset_random_mode()
         elif cmd == 'request_measurement':
             response = sem6000.request_measurement()
 

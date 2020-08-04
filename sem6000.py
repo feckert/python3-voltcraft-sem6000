@@ -388,18 +388,28 @@ class SEM6000():
 
         return notification
 
-    def set_timer(self, is_reset_timer, is_action_turn_on, delay_isotime):
+    def set_timer(self, is_action_turn_on, delay_isotime):
         time = datetime.time.fromisoformat(delay_isotime)
         timedelta = datetime.timedelta(hours=time.hour, minutes=time.minute, seconds=time.second)
         dt = datetime.datetime.now() + timedelta
         dt = datetime.datetime(dt.year % 100, dt.month, dt.day, dt.hour, dt.minute, dt.second)
 
-        command = SetTimerCommand(is_reset_timer=self._parse_boolean(is_reset_timer), is_action_turn_on=self._parse_boolean(is_action_turn_on), target_year=dt.year, target_month=dt.month, target_day=dt.day, target_hour=dt.hour, target_minute=dt.minute, target_second=dt.second)
+        command = SetTimerCommand(is_reset_timer=False, is_action_turn_on=self._parse_boolean(is_action_turn_on), target_year=dt.year, target_month=dt.month, target_day=dt.day, target_hour=dt.hour, target_minute=dt.minute, target_second=dt.second)
         self._send_command(command)
         notification = self._consume_notification()
 
         if not isinstance(notification, TimerSetNotification) or not notification.was_successful:
             raise Exception("Set timer failed")
+
+        return notification
+
+    def reset_timer(self):
+        command = SetTimerCommand(is_reset_timer=True, is_action_turn_on=False, target_year=0, target_month=0, target_day=0, target_hour=0, target_minute=0, target_second=0)
+        self._send_command(command)
+        notification = self._consume_notification()
+
+        if not isinstance(notification, TimerSetNotification) or not notification.was_successful:
+            raise Exception("Reset timer failed")
 
         return notification
 
@@ -470,11 +480,21 @@ class SEM6000():
 
         return notification
 
-    def set_random_mode(self, is_active, active_on_weekdays, start_isotime, end_isotime):
+    def set_random_mode(self, active_on_weekdays, start_isotime, end_isotime):
         start_time = datetime.time.fromisoformat(start_isotime)
         end_time = datetime.time.fromisoformat(end_isotime)
 
-        command = SetRandomModeCommand(is_active=self._parse_boolean(is_active), active_on_weekdays=self._parse_weekdays_list(active_on_weekdays), start_hour=start_time.hour, start_minute=start_time.minute, end_hour=end_time.hour, end_minute=end_time.minute)
+        command = SetRandomModeCommand(is_active=True, active_on_weekdays=self._parse_weekdays_list(active_on_weekdays), start_hour=start_time.hour, start_minute=start_time.minute, end_hour=end_time.hour, end_minute=end_time.minute)
+        self._send_command(command)
+        notification = self._consume_notification()
+
+        if not isinstance(notification, RandomModeSetNotification) or not notification.was_successful:
+            raise Exception("Set random mode failed")
+
+        return notification
+
+    def reset_random_mode(self):
+        command = SetRandomModeCommand(is_active=False, active_on_weekdays=[], start_hour=0, start_minute=0, end_hour=0, end_minute=0)
         self._send_command(command)
         notification = self._consume_notification()
 
