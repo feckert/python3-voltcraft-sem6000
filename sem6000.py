@@ -394,7 +394,7 @@ class SEM6000():
         dt = datetime.datetime.now() + timedelta
         dt = datetime.datetime(dt.year % 100, dt.month, dt.day, dt.hour, dt.minute, dt.second)
 
-        command = SetTimerCommand(is_reset_timer=self._parse_boolean(is_reset_timer), is_action_turn_on=self._parse_boolean(is_action_turn_on), target_second=dt.second, target_minute=dt.minute, target_hour=dt.hour, target_day=dt.day, target_month=dt.month, target_year=dt.year)
+        command = SetTimerCommand(is_reset_timer=self._parse_boolean(is_reset_timer), is_action_turn_on=self._parse_boolean(is_action_turn_on), target_year=dt.year, target_month=dt.month, target_day=dt.day, target_hour=dt.hour, target_minute=dt.minute, target_second=dt.second)
         self._send_command(command)
         notification = self._consume_notification()
 

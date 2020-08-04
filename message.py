@@ -131,15 +131,15 @@ class RequestTimerStatusCommand(AbstractCommand):
 
 
 class SetTimerCommand:
-    def __init__(self, is_reset_timer, is_action_turn_on, target_second, target_minute, target_hour, target_day, target_month, target_year):
+    def __init__(self, is_reset_timer, is_action_turn_on, target_year, target_month, target_day, target_hour, target_minute, target_second):
         self.is_reset_timer = is_reset_timer
         self.is_action_turn_on = is_action_turn_on
-        self.target_second = target_second
-        self.target_minute = target_minute
-        self.target_hour = target_hour
-        self.target_day = target_day
-        self.target_month = target_month
         self.target_year = target_year
+        self.target_month = target_month
+        self.target_day = target_day
+        self.target_hour = target_hour
+        self.target_minute = target_minute
+        self.target_second = target_second
 
     def __str__(self):
         name = self.__class__.__name__
@@ -299,15 +299,15 @@ class ReducedPeriodSetNotification(AbstractCommandConfirmationNotification):
 
 
 class RequestedTimerStatusNotification:
-    def __init__(self, is_timer_running, is_action_turn_on, target_second, target_minute, target_hour, target_day, target_month, target_year, original_timer_length_in_seconds):
+    def __init__(self, is_timer_running, is_action_turn_on, target_year, target_month, target_day, target_hour, target_minute, target_second, original_timer_length_in_seconds):
         self.is_timer_running = is_timer_running
         self.is_action_turn_on = is_action_turn_on
-        self.target_second = target_second
-        self.target_minute = target_minute
-        self.target_hour = target_hour
-        self.target_day = target_day
-        self.target_month = target_month
         self.target_year = target_year
+        self.target_month = target_month
+        self.target_day = target_day
+        self.target_hour = target_hour
+        self.target_minute = target_minute
+        self.target_second = target_second
         self.original_timer_length_in_seconds = original_timer_length_in_seconds
 
     def __str__(self):

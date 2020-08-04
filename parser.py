@@ -179,7 +179,7 @@ class MessageParser:
 
             original_timer_length_in_seconds = int.from_bytes(payload[9:12], 'big')
 
-            return RequestedTimerStatusNotification(is_timer_running=is_timer_running, is_action_turn_on=is_action_turn_on, target_second=target_second, target_minute=target_minute, target_hour=target_hour, target_day=target_day, target_month=target_month, target_year=target_year, original_timer_length_in_seconds=original_timer_length_in_seconds)
+            return RequestedTimerStatusNotification(is_timer_running=is_timer_running, is_action_turn_on=is_action_turn_on, target_year=target_year, target_month=target_month, target_day=target_day, target_hour=target_hour, target_minute=target_minute, target_second=target_second, original_timer_length_in_seconds=original_timer_length_in_seconds)
 
         if payload[0:2] == b'\x08\x00':
             if len(payload) != 3:
