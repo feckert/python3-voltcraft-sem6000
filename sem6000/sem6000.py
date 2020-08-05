@@ -145,8 +145,11 @@ class SEM6000():
         # btle_characteristics.write(..., withResponse=True) needs to be set if reply notifications are expected
         self._delegate.reset_notification_data()
 
-        if not self._is_connected() and self.connection_settings["deviceAddr"] and self.pin:
-            self._reconnect()
+        if not self._is_connected():
+            if self.connection_settings["deviceAddr"] and self.pin:
+                self._reconnect()
+            else:
+                raise Exception("Not connected and no deviceAddress / pin set")
 
         self._control_characteristics.write(encoded_command, with_response)
         
