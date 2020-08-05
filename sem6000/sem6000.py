@@ -96,6 +96,8 @@ class SEM6000():
         if self._peripheral:
             self._peripheral.disconnect()
             self._peripheral = None
+            self._control_characteristics = None
+            self._name_characteristics = None
 
             return True
 
@@ -105,13 +107,21 @@ class SEM6000():
         self._disconnect()
 
         self._peripheral = btle.Peripheral().withDelegate(self._delegate)
-        self._peripheral.connect(self.connection_settings["deviceAddr"], self.connection_settings["addrType"], iface=self.connection_settings["iface"])
+        try:
+            self._peripheral.connect(self.connection_settings["deviceAddr"], self.connection_settings["addrType"], iface=self.connection_settings["iface"])
+        except btle.BTLEException as e:
+            self._disconnect()
+            raise e
 
         self._control_characteristics = self._peripheral.getCharacteristics(uuid=SEM6000.CHARACTERISTICS_UUID_CONTROL)[0]
         self._name_characteristics = self._peripheral.getCharacteristics(uuid=SEM6000.CHARACTERISTICS_UUID_NAME)[0]
 
         if self.pin:
-            self.authorize(self.pin)
+            try:
+                self.authorize(self.pin)
+            except Exception as e:
+                self._disconnect()
+                raise e
 
     def _is_connected(self):
         if self._peripheral is None:
