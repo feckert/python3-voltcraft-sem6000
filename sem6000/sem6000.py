@@ -207,17 +207,18 @@ class SEM6000():
         return data.decode(encoding='utf-8')
 
     def authorize(self, pin):
-        self.pin = None
-
         command = AuthorizeCommand(pin)
         self._send_command(command)
         notification = self._consume_notification()
 
-        if not isinstance(notification, AuthorizationNotification) or not notification.was_successful:
+        if not isinstance(notification, AuthorizationNotification):
             raise Exception("Authentication failed")
 
         if notification.was_successful:
             self.pin = pin
+        else:
+            self.pin = None
+            raise Exception("Authentication failed")
 
         return notification
 
