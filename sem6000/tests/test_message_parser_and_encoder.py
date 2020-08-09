@@ -83,11 +83,11 @@ class MessagesTest(unittest.TestCase):
         self.assertEqual(True, parsed_message.was_successful, 'was_successful value differs')
 
     def test_RequestedTimerStatusNotification(self):
-        message = RequestedTimerStatusNotification(is_timer_running=True, is_action_turn_on=True, target_year=4, target_month=3, target_day=12, target_hour=12, target_minute=34, target_second=12, original_timer_length_in_seconds=42)
+        message = RequestedTimerStatusNotification(is_active=True, is_action_turn_on=True, target_year=4, target_month=3, target_day=12, target_hour=12, target_minute=34, target_second=12, original_timer_length_in_seconds=42)
         encoded_message = MessageEncoder().encode(message)
         parsed_message = MessageParser().parse(encoded_message)
 
-        self.assertEqual(True, parsed_message.is_timer_running, 'is_timer_running value differs')
+        self.assertEqual(True, parsed_message.is_active, 'is_active value differs')
         self.assertEqual(True, parsed_message.is_action_turn_on, 'is_action_turn_on value differs')
         self.assertEqual(4, parsed_message.target_year, 'target_year value differs')
         self.assertEqual(3, parsed_message.target_month, 'target_month value differs')

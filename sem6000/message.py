@@ -281,8 +281,8 @@ class ReducedPeriodSetNotification(AbstractCommandConfirmationNotification):
 
 
 class RequestedTimerStatusNotification:
-    def __init__(self, is_timer_running, is_action_turn_on, target_year, target_month, target_day, target_hour, target_minute, target_second, original_timer_length_in_seconds):
-        self.is_timer_running = is_timer_running
+    def __init__(self, is_active, is_action_turn_on, target_year, target_month, target_day, target_hour, target_minute, target_second, original_timer_length_in_seconds):
+        self.is_active = is_active
         self.is_action_turn_on = is_action_turn_on
         self.target_year = target_year
         self.target_month = target_month
@@ -294,7 +294,7 @@ class RequestedTimerStatusNotification:
 
     def __str__(self):
         name = self.__class__.__name__
-        return name + "(is_action_turn_on=" + str(self.is_action_turn_on) + ", target_year=" + str(self.target_year) + ", target_month=" + str(self.target_month) + ", target_day=" + str(self.target_day) + ", target_hour=" + str(self.target_hour) + ", target_minute=" + str(self.target_minute) + ", target_second=" + str(self.target_second) + ", original_timer_length_in_seconds=" + str(self.original_timer_length_in_seconds) + ")"
+        return name + "(is_active=" + str(self.is_active) + ", is_action_turn_on=" + str(self.is_action_turn_on) + ", target_year=" + str(self.target_year) + ", target_month=" + str(self.target_month) + ", target_day=" + str(self.target_day) + ", target_hour=" + str(self.target_hour) + ", target_minute=" + str(self.target_minute) + ", target_second=" + str(self.target_second) + ", original_timer_length_in_seconds=" + str(self.original_timer_length_in_seconds) + ")"
 
 
 class TimerSetNotification(AbstractCommandConfirmationNotification):

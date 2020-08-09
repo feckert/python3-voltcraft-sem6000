@@ -156,7 +156,7 @@ if __name__ == '__main__':
             original_timer_length = datetime.timedelta(seconds=response.original_timer_length_in_seconds)
 
             print("Timer Status:")
-            if response.is_timer_running:
+            if response.is_active:
                 now = datetime.datetime.now()
                 now = datetime.datetime(now.year % 100, now.month, now.day, now.hour, now.minute, now.second)
 

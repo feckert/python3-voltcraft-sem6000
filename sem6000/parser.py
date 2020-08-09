@@ -162,13 +162,14 @@ class MessageParser:
             if len(payload) != 13:
                 raise InvalidPayloadLengthException(message_class=RequestedTimerStatusNotification.__class__, expected_payload_length=13, actual_payload_length=len(payload))
 
-            is_timer_running = True
+            is_active = False 
             is_action_turn_on = False
 
             if payload[2:3] == b'\x01':
+                is_active = True
                 is_action_turn_on = True
-            if payload[2:3] == b'\x00':
-                is_timer_running = False
+            if payload[2:3] == b'\x02':
+                is_active = True
 
             target_second = payload[3]
             target_minute = payload[4]
@@ -179,7 +180,7 @@ class MessageParser:
 
             original_timer_length_in_seconds = int.from_bytes(payload[9:12], 'big')
 
-            return RequestedTimerStatusNotification(is_timer_running=is_timer_running, is_action_turn_on=is_action_turn_on, target_year=target_year, target_month=target_month, target_day=target_day, target_hour=target_hour, target_minute=target_minute, target_second=target_second, original_timer_length_in_seconds=original_timer_length_in_seconds)
+            return RequestedTimerStatusNotification(is_active=is_active, is_action_turn_on=is_action_turn_on, target_year=target_year, target_month=target_month, target_day=target_day, target_hour=target_hour, target_minute=target_minute, target_second=target_second, original_timer_length_in_seconds=original_timer_length_in_seconds)
 
         if payload[0:2] == b'\x08\x00':
             if len(payload) != 3:

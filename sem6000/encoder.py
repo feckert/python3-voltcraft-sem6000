@@ -260,7 +260,7 @@ class MessageEncoder():
 
         if isinstance(message, RequestedTimerStatusNotification):
             timer_action = b'\x00'
-            if message.is_timer_running:
+            if message.is_active:
                 timer_action = b'\x02'
                 if message.is_action_turn_on:
                     timer_action = b'\x01'
