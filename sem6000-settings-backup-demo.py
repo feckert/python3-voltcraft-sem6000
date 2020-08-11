@@ -27,8 +27,8 @@ else:
         "reduced-period": {
             "is-active": settings_response.is_reduced_period,
             "price-in-cent": settings_response.reduced_period_price_in_cent,
-            "start-time-in-minutes": settings_response.reduced_period_start_time_in_minutes,
-            "end-time-in-minutes": settings_response.reduced_period_end_time_in_minutes
+            "start-isotime": settings_response.reduced_period_start_isotime,
+            "end-isotime": settings_response.reduced_period_end_isotime
         },
         "normal-price-in-cent": settings_response.normal_price_in_cent,
         "is-led-active": settings_response.is_led_active,
@@ -42,10 +42,8 @@ else:
     data["random-mode"] = {
         "is-active": random_mode_response.is_active,
         "active-on-weekdays": weekdays,
-        "start-hour": random_mode_response.start_hour,
-        "start-minute": random_mode_response.start_minute,
-        "end-hour": random_mode_response.end_hour,
-        "end-minute": random_mode_response.end_minute,
+        "start-isotime": random_mode_response.start_isotime,
+        "end-isotime": random_mode_response.end_isotime
     }
 
     data["scheduler"] = {
@@ -65,11 +63,7 @@ else:
             "is-active": scheduler.is_active,
             "is-action-turn-on": scheduler.is_action_turn_on,
             "repeat-on-weekdays": weekdays,
-            "year": scheduler.year,
-            "month": scheduler.month,
-            "day": scheduler.day,
-            "hour": scheduler.hour,
-            "minute": scheduler.minute
+            "isodatetime": scheduler.isodatetime
         }
 
     json.dump(data, sys.stdout, indent=True)

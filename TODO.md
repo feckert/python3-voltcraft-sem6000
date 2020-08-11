@@ -3,7 +3,7 @@
 - [ ] cleaner API for working with weekdays
 - [ ] cleaner API for working with repeated schedulers - no need to provide a date here
 - [x] cleaner API for working with timer - rename is_timer_running to is_active 
-- [ ] cleaner API response - replace separate values with isotime or isodatetime
+- [x] cleaner API response - replace separate values with isotime or isodatetime
 - [ ] cleaner API for schedulers - separate fields for isodate and isotime, since date values can be empty
 - [ ] cleaner API for returning device name - return notification object as response
 - [ ] introduce set_timer command for explicit target date and time - for restoring settings

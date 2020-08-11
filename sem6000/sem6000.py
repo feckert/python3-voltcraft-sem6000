@@ -283,9 +283,8 @@ class SEM6000():
         return notification
 
     def set_date_and_time(self, isodatetime):
-        date_and_time = datetime.datetime.fromisoformat(isodatetime)
 
-        command = SynchronizeDateAndTimeCommand(date_and_time.year, date_and_time.month, date_and_time.day, date_and_time.hour, date_and_time.minute, date_and_time.second)
+        command = SynchronizeDateAndTimeCommand(isodatetime)
         self._send_command(command)
         notification = self._consume_notification()
 
@@ -325,13 +324,7 @@ class SEM6000():
         return notification
 
     def set_reduced_period(self, is_active, start_isotime, end_isotime):
-        start_time = datetime.time.fromisoformat(start_isotime)
-        end_time = datetime.time.fromisoformat(end_isotime)
-
-        start_time_in_minutes = start_time.hour*60 + start_time.minute
-        end_time_in_minutes = end_time.hour*60 + end_time.minute
-
-        command = SetReducedPeriodCommand(is_active=util._parse_boolean(is_active), start_time_in_minutes=start_time_in_minutes, end_time_in_minutes=end_time_in_minutes)
+        command = SetReducedPeriodCommand(is_active=util._parse_boolean(is_active), start_isotime=start_isotime, end_isotime=end_isotime)
         self._send_command(command)
         notification = self._consume_notification()
 
@@ -354,9 +347,8 @@ class SEM6000():
         time = datetime.time.fromisoformat(delay_isotime)
         timedelta = datetime.timedelta(hours=time.hour, minutes=time.minute, seconds=time.second)
         dt = datetime.datetime.now() + timedelta
-        dt = datetime.datetime(dt.year % 100, dt.month, dt.day, dt.hour, dt.minute, dt.second)
 
-        command = SetTimerCommand(is_reset_timer=False, is_action_turn_on=util._parse_boolean(is_action_turn_on), target_year=dt.year, target_month=dt.month, target_day=dt.day, target_hour=dt.hour, target_minute=dt.minute, target_second=dt.second)
+        command = SetTimerCommand(is_reset_timer=False, is_action_turn_on=util._parse_boolean(is_action_turn_on), target_isodatetime=dt.isoformat(timespec='seconds'))
         self._send_command(command)
         notification = self._consume_notification()
 
@@ -366,7 +358,7 @@ class SEM6000():
         return notification
 
     def reset_timer(self):
-        command = SetTimerCommand(is_reset_timer=True, is_action_turn_on=False, target_year=0, target_month=0, target_day=0, target_hour=0, target_minute=0, target_second=0)
+        command = SetTimerCommand(is_reset_timer=True, is_action_turn_on=False)
         self._send_command(command)
         notification = self._consume_notification()
 
@@ -397,10 +389,7 @@ class SEM6000():
         return notification
 
     def add_scheduler(self, is_active, is_action_turn_on, repeat_on_weekdays, isodatetime):
-        date_time = datetime.datetime.fromisoformat(isodatetime)
-        date_time = datetime.datetime(year=date_time.year % 100, month=date_time.month, day=date_time.day, hour=date_time.hour, minute=date_time.minute)
-
-        command = AddSchedulerCommand(Scheduler(is_active=util._parse_boolean(is_active), is_action_turn_on=util._parse_boolean(is_action_turn_on), repeat_on_weekdays=util._parse_weekdays_list(repeat_on_weekdays), year=date_time.year, month=date_time.month, day=date_time.day, hour=date_time.hour, minute=date_time.minute))
+        command = AddSchedulerCommand(Scheduler(is_active=util._parse_boolean(is_active), is_action_turn_on=util._parse_boolean(is_action_turn_on), repeat_on_weekdays=util._parse_weekdays_list(repeat_on_weekdays), isodatetime=isodatetime))
         self._send_command(command)
         notification = self._consume_notification()
 
@@ -410,10 +399,7 @@ class SEM6000():
         return notification
 
     def edit_scheduler(self, slot_id, is_active, is_action_turn_on, repeat_on_weekdays, isodatetime):
-        date_time = datetime.datetime.fromisoformat(isodatetime)
-        date_time = datetime.datetime(year=date_time.year % 100, month=date_time.month, day=date_time.day, hour=date_time.hour, minute=date_time.minute)
-
-        command = EditSchedulerCommand(slot_id=int(slot_id), scheduler=Scheduler(is_active=util._parse_boolean(is_active), is_action_turn_on=util._parse_boolean(is_action_turn_on), repeat_on_weekdays=tuil._parse_weekdays_list(repeat_on_weekdays), year=date_time.year, month=date_time.month, day=date_time.day, hour=date_time.hour, minute=date_time.minute))
+        command = EditSchedulerCommand(slot_id=int(slot_id), scheduler=Scheduler(is_active=util._parse_boolean(is_active), is_action_turn_on=util._parse_boolean(is_action_turn_on), repeat_on_weekdays=tuil._parse_weekdays_list(repeat_on_weekdays), isodatetime=isodatetime))
         self._send_command(command)
         notification = self._consume_notification()
 
@@ -443,10 +429,7 @@ class SEM6000():
         return notification
 
     def set_random_mode(self, active_on_weekdays, start_isotime, end_isotime):
-        start_time = datetime.time.fromisoformat(start_isotime)
-        end_time = datetime.time.fromisoformat(end_isotime)
-
-        command = SetRandomModeCommand(is_active=True, active_on_weekdays=util._parse_weekdays_list(active_on_weekdays), start_hour=start_time.hour, start_minute=start_time.minute, end_hour=end_time.hour, end_minute=end_time.minute)
+        command = SetRandomModeCommand(is_active=True, active_on_weekdays=util._parse_weekdays_list(active_on_weekdays), start_isotime=start_isotime, end_isotime=end_isotime)
         self._send_command(command)
         notification = self._consume_notification()
 
@@ -456,7 +439,7 @@ class SEM6000():
         return notification
 
     def reset_random_mode(self):
-        command = SetRandomModeCommand(is_active=False, active_on_weekdays=[], start_hour=0, start_minute=0, end_hour=0, end_minute=0)
+        command = SetRandomModeCommand(is_active=False, active_on_weekdays=[], start_isotime="00:00", end_isotime="00:00")
         self._send_command(command)
         notification = self._consume_notification()
 

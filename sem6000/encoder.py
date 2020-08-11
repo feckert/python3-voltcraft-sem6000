@@ -1,5 +1,7 @@
 from .message import *
 
+import datetime
+
 class MessageEncoder():
     def _encode_message(self, payload, suffix=b'\xff\xff'):
         message = b'\x0f'
@@ -33,11 +35,13 @@ class MessageEncoder():
                 repeat_on_weekdays += 2**weekday.value
             repeat_on_weekdays = repeat_on_weekdays.to_bytes(1, 'big')
 
-            year = scheduler.year.to_bytes(1, 'big')
-            month = scheduler.month.to_bytes(1, 'big')
-            day = scheduler.day.to_bytes(1, 'big')
-            hour = scheduler.hour.to_bytes(1, 'big')
-            minute = scheduler.minute.to_bytes(1, 'big')
+            d = datetime.datetime.fromisoformat(scheduler.isodatetime)
+
+            year = (d.year % 100).to_bytes(1, 'big')
+            month = d.month.to_bytes(1, 'big')
+            day = d.day.to_bytes(1, 'big')
+            hour = d.hour.to_bytes(1, 'big')
+            minute = d.minute.to_bytes(1, 'big')
 
             return is_active + is_action_turn_on + repeat_on_weekdays + year + month + day + hour + minute
 
@@ -67,13 +71,15 @@ class MessageEncoder():
                 return self._encode_message(b'\x0f\x00\x05\x00' + b'\x00\x00\x00\x00')
 
         if isinstance(message, SynchronizeDateAndTimeCommand):
-            year = message.year.to_bytes(2, 'big')
-            month = message.month.to_bytes(1, 'big')
-            day = message.day.to_bytes(1, 'big')
+            d = datetime.datetime.fromisoformat(message.isodatetime)
 
-            hour = message.hour.to_bytes(1, 'big')
-            minute = message.minute.to_bytes(1, 'big')
-            second = message.second.to_bytes(1, 'big')
+            year = d.year.to_bytes(2, 'big')
+            month = d.month.to_bytes(1, 'big')
+            day = d.day.to_bytes(1, 'big')
+
+            hour = d.hour.to_bytes(1, 'big')
+            minute = d.minute.to_bytes(1, 'big')
+            second = d.second.to_bytes(1, 'big')
 
             return self._encode_message(b'\x01\x00' + second + minute + hour + day + month + year + b'\x00\x00')
 
@@ -96,8 +102,11 @@ class MessageEncoder():
             if message.is_active:
                 is_active = b'\x01'
 
-            start_time_in_minutes = message.start_time_in_minutes.to_bytes(2, 'big')
-            end_time_in_minutes = message.end_time_in_minutes.to_bytes(2, 'big')
+            start_time = datetime.time.fromisoformat(message.start_isotime)
+            end_time = datetime.time.fromisoformat(message.end_isotime)
+
+            start_time_in_minutes = (start_time.hour*60 + start_time.minute).to_bytes(2, 'big')
+            end_time_in_minutes = (end_time.hour*60 + end_time.minute).to_bytes(2, 'big')
 
             return self._encode_message(b'\x0f\x00\x01' + is_active + start_time_in_minutes + end_time_in_minutes)
 
@@ -111,12 +120,22 @@ class MessageEncoder():
                 if message.is_action_turn_on:
                     timer_action = b'\x01'
 
-            target_second = message.target_second.to_bytes(1, 'big')
-            target_minute = message.target_minute.to_bytes(1, 'big')
-            target_hour = message.target_hour.to_bytes(1, 'big')
-            target_day = message.target_day.to_bytes(1, 'big')
-            target_month = message.target_month.to_bytes(1, 'big')
-            target_year = message.target_year.to_bytes(1, 'big')
+            target_second = b'\x00'
+            target_minute = b'\x00'
+            target_hour = b'\x00'
+            target_day = b'\x00'
+            target_month = b'\x00'
+            target_year = b'\x00'
+
+            if not message.target_isodatetime is None:
+                d = datetime.datetime.fromisoformat(message.target_isodatetime)
+
+                target_second = d.second.to_bytes(1, 'big')
+                target_minute = d.minute.to_bytes(1, 'big')
+                target_hour = d.hour.to_bytes(1, 'big')
+                target_day = d.day.to_bytes(1, 'big')
+                target_month = d.month.to_bytes(1, 'big')
+                target_year = (d.year % 100).to_bytes(1, 'big')
 
             return self._encode_message(b'\x08\x00' + timer_action + target_second + target_minute + target_hour + target_day + target_month + target_year + b'\x00\x00')
 
@@ -151,10 +170,13 @@ class MessageEncoder():
                 active_on_weekdays += 2**weekday.value
             active_on_weekdays = active_on_weekdays.to_bytes(1, 'big')
 
-            start_hour = message.start_hour.to_bytes(1, 'big')
-            start_minute = message.start_minute.to_bytes(1, 'big')
-            end_hour = message.end_hour.to_bytes(1, 'big')
-            end_minute = message.end_minute.to_bytes(1, 'big')
+            start_time = datetime.time.fromisoformat(message.start_isotime)
+            end_time = datetime.time.fromisoformat(message.end_isotime)
+
+            start_hour = start_time.hour.to_bytes(1, 'big')
+            start_minute = start_time.minute.to_bytes(1, 'big')
+            end_hour = end_time.hour.to_bytes(1, 'big')
+            end_minute = end_time.minute.to_bytes(1, 'big')
 
             return self._encode_message(b'\x15\x00' + is_active + active_on_weekdays + start_hour + start_minute + end_hour + end_minute + b'\x00\x00')
 
@@ -238,8 +260,11 @@ class MessageEncoder():
             normal_price_in_cent = message.normal_price_in_cent.to_bytes(1, 'big')
             reduced_period_price_in_cent = message.reduced_period_price_in_cent.to_bytes(1, 'big')
 
-            reduced_period_start_time_in_minutes = message.reduced_period_start_time_in_minutes.to_bytes(2, 'big')
-            reduced_period_end_time_in_minutes = message.reduced_period_end_time_in_minutes.to_bytes(2, 'big')
+            reduced_period_start_time = datetime.time.fromisoformat(message.reduced_period_start_isotime)
+            reduced_period_end_time = datetime.time.fromisoformat(message.reduced_period_end_isotime)
+
+            reduced_period_start_time_in_minutes = (reduced_period_start_time.hour*60 + reduced_period_start_time.minute).to_bytes(2, 'big')
+            reduced_period_end_time_in_minutes = (reduced_period_end_time.hour*60 + reduced_period_end_time.minute).to_bytes(2, 'big')
 
             is_led_active = b'\x00'
             if message.is_led_active:
@@ -265,12 +290,14 @@ class MessageEncoder():
                 if message.is_action_turn_on:
                     timer_action = b'\x01'
 
-            target_second = message.target_second.to_bytes(1, 'big')
-            target_minute = message.target_minute.to_bytes(1, 'big')
-            target_hour = message.target_hour.to_bytes(1, 'big')
-            target_day = message.target_day.to_bytes(1, 'big')
-            target_month = message.target_month.to_bytes(1, 'big')
-            target_year = message.target_year.to_bytes(1, 'big')
+            d = datetime.datetime.fromisoformat(message.target_isodatetime)
+
+            target_second = d.second.to_bytes(1, 'big')
+            target_minute = d.minute.to_bytes(1, 'big')
+            target_hour = d.hour.to_bytes(1, 'big')
+            target_day = d.day.to_bytes(1, 'big')
+            target_month = d.month.to_bytes(1, 'big')
+            target_year = (d.year % 100).to_bytes(1, 'big')
 
             original_timer_length_in_seconds = message.original_timer_length_in_seconds.to_bytes(3, 'big')
 
@@ -316,10 +343,13 @@ class MessageEncoder():
                 active_on_weekdays += 2**weekday.value
             active_on_weekdays = active_on_weekdays.to_bytes(1, 'big')
 
-            start_hour = message.start_hour.to_bytes(1, 'big')
-            start_minute = message.start_minute.to_bytes(1, 'big')
-            end_hour = message.end_hour.to_bytes(1, 'big')
-            end_minute = message.end_minute.to_bytes(1, 'big')
+            start_time = datetime.time.fromisoformat(message.start_isotime)
+            end_time = datetime.time.fromisoformat(message.end_isotime)
+
+            start_hour = start_time.hour.to_bytes(1, 'big')
+            start_minute = start_time.minute.to_bytes(1, 'big')
+            end_hour = end_time.hour.to_bytes(1, 'big')
+            end_minute = end_time.minute.to_bytes(1, 'big')
 
             return self._encode_message(b'\x16\x00' + is_active + active_on_weekdays + start_hour + start_minute + end_hour + end_minute + b'\x00\x00')
 

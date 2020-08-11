@@ -134,8 +134,8 @@ if __name__ == '__main__':
             print("\tNormal price:\t\t\t{:.2f} EUR".format(response.normal_price_in_cent/100))
             print("\tReduced period price:\t\t{:.2f} EUR".format(response.reduced_period_price_in_cent/100))
 
-            print("\tRecuced period start:\t\t{} minutes ({})".format(response.reduced_period_start_time_in_minutes, util._format_minutes_as_time(response.reduced_period_start_time_in_minutes)))
-            print("\tRecuced period end:\t\t{} minutes ({})".format(response.reduced_period_end_time_in_minutes, util._format_minutes_as_time(response.reduced_period_end_time_in_minutes)))
+            print("\tRecuced period start:\t\t{}".format(response.reduced_period_start_isotime))
+            print("\tRecuced period end:\t\t{}".format(response.reduced_period_end_isotime))
 
             if response.is_led_active:
                 print("\tLED state:\t\t\tOn")
@@ -160,7 +160,7 @@ if __name__ == '__main__':
                 now = datetime.datetime.now()
                 now = datetime.datetime(now.year % 100, now.month, now.day, now.hour, now.minute, now.second)
 
-                dt = datetime.datetime(response.target_year, response.target_month, response.target_day, response.target_hour, response.target_minute, response.target_second)
+                dt = datetime.datetime.fromisoformat(response.target_isodatetime)
                 time_left = (dt - now)
 
                 print("\tTimer state:\t\tOn")
@@ -200,15 +200,16 @@ if __name__ == '__main__':
                 else:
                     print("\tAction:\t\t\tTurn Off")
 
+                dt = datetime.datetime.fromisoformat(scheduler.isodatetime)
                 if scheduler.repeat_on_weekdays:
                     weekday_formatter = lambda w: w.name
                     repeat_on_weekdays = util._format_list_of_objects(weekday_formatter, scheduler.repeat_on_weekdays)
                     print("\tRepeat on weekdays:\t" + repeat_on_weekdays)
                 else:
-                    date = datetime.date(year=scheduler.year, month=scheduler.month, day=scheduler.day)
+                    date = dt.date()
                     print("\tDate:\t\t\t" + str(date))
 
-                print("\tTime:\t\t\t" + util._format_hour_and_minute_as_time(scheduler.hour, scheduler.minute))
+                print("\tTime:\t\t\t" + dt.time().isoformat(timespec='minutes'))
                 print("")
         elif cmd == 'add_scheduler':
             is_active = sys.argv[4]
@@ -240,8 +241,9 @@ if __name__ == '__main__':
 
             weekday_formatter = lambda w: w.name
             active_on_weekdays = util._format_list_of_objects(weekday_formatter, response.active_on_weekdays)
-            start_time = util._format_hour_and_minute_as_time(response.start_hour, response.start_minute)
-            end_time = util._format_hour_and_minute_as_time(response.end_hour, response.end_minute)
+
+            start_time = response.start_isotime
+            end_time = response.end_isotime
 
             print("\tActive on weekdays:\t" + active_on_weekdays)
             print("\tStart time:\t\t" + str(start_time))

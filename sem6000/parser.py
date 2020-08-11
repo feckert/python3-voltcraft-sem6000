@@ -1,5 +1,7 @@
 from .message import *
+from . import util
 
+import datetime
 import sys
 
 class InvalidPayloadLengthException(Exception):
@@ -12,6 +14,14 @@ class InvalidPayloadLengthException(Exception):
         return "message has invalid payload length for " + self.message_class.__name__ +  " (expected: " + str(self.expected_payload_length) + ", actual=" + str(self.actual_payload_length) + ")"
 
 class MessageParser:
+    def __init__(self, year_diff=None):
+        # the device only operates with two digit years
+        # determine or set the difference to the current 4 digit year
+        if year_diff is None:
+            self.year_diff = (datetime.datetime.now().year % 100) * 100
+        else:
+            self.year_diff = year_diff
+
     def _parse_payload(self, data):
         if data[0:1] != b'\x0f':
             raise Exception("Invalid response")
@@ -35,11 +45,6 @@ class MessageParser:
         return payload
 
     def _parse_scheduler(self, data):
-        # only the last two digits are returned for the year
-        # determine the others from the current date
-        now = datetime.datetime.now()
-        year_diff = now.year - (now.year % 100)
-
         is_active = False
         if data[0:1] == b'\x01':
             is_active = True
@@ -54,13 +59,16 @@ class MessageParser:
             if repeat_on_weekdays_mask & 2**w:
                 repeat_on_weekdays.append(w)
 
-        year = int.from_bytes(data[3:4], 'big') + year_diff
+        # only the last two digits are returned for the year
+        year = int.from_bytes(data[3:4], 'big') + self.year_diff
         month = int.from_bytes(data[4:5], 'big')
         day  = int.from_bytes(data[5:6], 'big')
         hour = int.from_bytes(data[6:7], 'big')
         minute = int.from_bytes(data[7:8], 'big')
 
-        return Scheduler(is_active=is_active, is_action_turn_on=is_action_turn_on, repeat_on_weekdays=repeat_on_weekdays, year=year, month=month, day=day, hour=hour, minute=minute)
+        d = datetime.datetime(year, month, day, hour, minute)
+
+        return Scheduler(is_active=is_active, is_action_turn_on=is_action_turn_on, repeat_on_weekdays=repeat_on_weekdays, isodatetime=d.isoformat(timespec='minutes'))
 
     def parse(self, data):
         payload = self._parse_payload(data)
@@ -135,13 +143,16 @@ class MessageParser:
             reduced_period_start_time_in_minutes = int.from_bytes(payload[5:7], 'big')
             reduced_period_end_time_in_minutes = int.from_bytes(payload[7:9], 'big')
 
+            reduced_period_start_time = util._parse_time_from_minutes(reduced_period_start_time_in_minutes)
+            reduced_period_end_time = util._parse_time_from_minutes(reduced_period_end_time_in_minutes)
+
             is_led_active = False
             if payload[9:10] == b'\x01':
                 is_led_active = True
 
             power_limit_in_watt = int.from_bytes(payload[11:13], 'big')
 
-            return RequestedSettingsNotification(is_reduced_period=is_reduced_period, normal_price_in_cent=normal_price_in_cent, reduced_period_price_in_cent=reduced_period_price_in_cent, reduced_period_start_time_in_minutes=reduced_period_start_time_in_minutes, reduced_period_end_time_in_minutes=reduced_period_end_time_in_minutes, is_led_active=is_led_active, power_limit_in_watt=power_limit_in_watt)
+            return RequestedSettingsNotification(is_reduced_period=is_reduced_period, normal_price_in_cent=normal_price_in_cent, reduced_period_price_in_cent=reduced_period_price_in_cent, reduced_period_start_isotime=reduced_period_start_time.isoformat(timespec='minutes'), reduced_period_end_isotime=reduced_period_end_time.isoformat('minutes'), is_led_active=is_led_active, power_limit_in_watt=power_limit_in_watt)
 
         if payload[0:3] == b'\x05\x00\x00' and len(payload) == 3:
             return PowerLimitSetNotification(was_successful=True)
@@ -176,11 +187,17 @@ class MessageParser:
             target_hour = payload[5]
             target_day = payload[6]
             target_month = payload[7]
-            target_year = payload[8]
+            # only the last two digits are returned for the year
+            target_year = payload[8] + self.year_diff
 
             original_timer_length_in_seconds = int.from_bytes(payload[9:12], 'big')
 
-            return RequestedTimerStatusNotification(is_active=is_active, is_action_turn_on=is_action_turn_on, target_year=target_year, target_month=target_month, target_day=target_day, target_hour=target_hour, target_minute=target_minute, target_second=target_second, original_timer_length_in_seconds=original_timer_length_in_seconds)
+            if target_year and target_month and target_day:
+                d = datetime.datetime(target_year, target_month, target_day, target_hour, target_minute, target_second)
+            else:
+                d = datetime.datetime(1970, 1, 1, target_hour, target_minute, target_second)
+
+            return RequestedTimerStatusNotification(is_active=is_active, is_action_turn_on=is_action_turn_on, target_isodatetime=d.isoformat(timespec='seconds'), original_timer_length_in_seconds=original_timer_length_in_seconds)
 
         if payload[0:2] == b'\x08\x00':
             if len(payload) != 3:
@@ -239,7 +256,10 @@ class MessageParser:
             end_hour = int.from_bytes(payload[6:7], 'big')
             end_minute = int.from_bytes(payload[7:8], 'big')
 
-            return RandomModeStatusRequestedNotification(is_active=is_active, active_on_weekdays=active_on_weekdays, start_hour=start_hour, start_minute=start_minute, end_hour=end_hour, end_minute=end_minute)
+            start_time = datetime.time(start_hour, start_minute)
+            end_time = datetime.time(end_hour, end_minute)
+
+            return RandomModeStatusRequestedNotification(is_active=is_active, active_on_weekdays=active_on_weekdays, start_isotime=start_time.isoformat(timespec='minutes'), end_isotime=end_time.isoformat(timespec='minutes'))
 
         if payload[0:2] == b'\x15\x00':
             was_successful = False

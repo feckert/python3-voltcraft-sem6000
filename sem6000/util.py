@@ -1,3 +1,4 @@
+import datetime
 import enum
 
 class Weekday(enum.Enum):
@@ -8,27 +9,6 @@ class Weekday(enum.Enum):
     THURSDAY = 4
     FRIDAY = 5
     SATURDAY = 6
-
-
-def _format_minutes_as_time(minutes):
-    hour = minutes // 60
-    minute = minutes - hour*60
-
-    return "{:02}:{:02}".format(hour, minute)
-
-def _format_seconds_as_time(seconds):
-    hour = seconds // (60*60)
-    seconds -= hour*60*60
-
-    minute = seconds // 60
-    seconds -= minute*60
-
-    second = seconds
-
-    return "{:02}:{:02}:{:02}".format(hour, minute, second)
-
-def _format_hour_and_minute_as_time(hour, minute):
-    return "{:02}:{:02}".format(hour, minute)
 
 
 def _format_year_and_month(year, month):
@@ -76,6 +56,12 @@ def _parse_list(list_input):
             list_value[i] = list_value[i].strip()
 
     return list_value
+
+def _parse_time_from_minutes(minutes):
+    hour = minutes // 60
+    minute = minutes - hour*60
+
+    return datetime.time(hour, minute)
 
 def _parse_weekday(weekday):
     if isinstance(weekday, Weekday):

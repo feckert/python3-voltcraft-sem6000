@@ -49,15 +49,15 @@ class MessagesTest(unittest.TestCase):
         self.assertEqual(True, parsed_message.was_successful, 'was_successful value differs')
 
     def test_RequestedSettingsNotification(self):
-        message = RequestedSettingsNotification(is_reduced_period=True, normal_price_in_cent=100, reduced_period_price_in_cent=50, reduced_period_start_time_in_minutes=1320, reduced_period_end_time_in_minutes=300, is_led_active=True, power_limit_in_watt=500)
+        message = RequestedSettingsNotification(is_reduced_period=True, normal_price_in_cent=100, reduced_period_price_in_cent=50, reduced_period_start_isotime="22:00", reduced_period_end_isotime="05:00", is_led_active=True, power_limit_in_watt=500)
         encoded_message = MessageEncoder().encode(message)
         parsed_message = MessageParser().parse(encoded_message)
 
         self.assertEqual(True, parsed_message.is_reduced_period, 'reduced_period_is_active value differs')
         self.assertEqual(100, parsed_message.normal_price_in_cent, 'normal_price_in_cent value differs')
         self.assertEqual(50, parsed_message.reduced_period_price_in_cent, 'reduced_price value_in_cent differs')
-        self.assertEqual(1320, parsed_message.reduced_period_start_time_in_minutes, 'reduced_period_start_time_in_minutes value differs')
-        self.assertEqual(300, parsed_message.reduced_period_end_time_in_minutes, 'reduced_period_end_time_in_minutes value differs')
+        self.assertEqual("22:00", parsed_message.reduced_period_start_isotime, 'reduced_period_start_isotime value differs')
+        self.assertEqual("05:00", parsed_message.reduced_period_end_isotime, 'reduced_period_end_isotime value differs')
         self.assertEqual(True, parsed_message.is_led_active, 'is_led_active value differs')
         self.assertEqual(500, parsed_message.power_limit_in_watt, 'power_limit_in_watt value differs')
 
@@ -83,18 +83,13 @@ class MessagesTest(unittest.TestCase):
         self.assertEqual(True, parsed_message.was_successful, 'was_successful value differs')
 
     def test_RequestedTimerStatusNotification(self):
-        message = RequestedTimerStatusNotification(is_active=True, is_action_turn_on=True, target_year=4, target_month=3, target_day=12, target_hour=12, target_minute=34, target_second=12, original_timer_length_in_seconds=42)
+        message = RequestedTimerStatusNotification(is_active=True, is_action_turn_on=True, target_isodatetime="2004-03-12T12:34:12", original_timer_length_in_seconds=42)
         encoded_message = MessageEncoder().encode(message)
-        parsed_message = MessageParser().parse(encoded_message)
+        parsed_message = MessageParser(year_diff=2000).parse(encoded_message)
 
         self.assertEqual(True, parsed_message.is_active, 'is_active value differs')
         self.assertEqual(True, parsed_message.is_action_turn_on, 'is_action_turn_on value differs')
-        self.assertEqual(4, parsed_message.target_year, 'target_year value differs')
-        self.assertEqual(3, parsed_message.target_month, 'target_month value differs')
-        self.assertEqual(12, parsed_message.target_day, 'target_day value differs')
-        self.assertEqual(12, parsed_message.target_hour, 'target_hour value differs')
-        self.assertEqual(34, parsed_message.target_minute, 'target_minute value differs')
-        self.assertEqual(12, parsed_message.target_second, 'target_second value differs')
+        self.assertEqual("2004-03-12T12:34:12", parsed_message.target_isodatetime, 'target_isodatetime value differs')
         self.assertEqual(42, parsed_message.original_timer_length_in_seconds, 'original_timer_length_in_seconds value differs')
 
     def test_TimerSetNotification(self):
@@ -117,13 +112,13 @@ class MessagesTest(unittest.TestCase):
             repeat_on_weekdays.append(util.Weekday.FRIDAY)
             repeat_on_weekdays.append(util.Weekday.SATURDAY)
 
-            scheduler = Scheduler(is_active=True, is_action_turn_on=True, repeat_on_weekdays=repeat_on_weekdays, year=20, month=12, day=3, hour=12, minute=34)
+            scheduler = Scheduler(is_active=True, is_action_turn_on=True, repeat_on_weekdays=repeat_on_weekdays, isodatetime="2020-12-03T12:34")
             scheduler_entries.append(SchedulerEntry(slot_id=i, scheduler=scheduler))
 
         message = SchedulerRequestedNotification(number_of_schedulers=12, scheduler_entries=scheduler_entries)
 
         encoded_message = MessageEncoder().encode(message)
-        parsed_message = MessageParser().parse(encoded_message)
+        parsed_message = MessageParser(year_diff=2000).parse(encoded_message)
 
         self.assertEqual(12, parsed_message.number_of_schedulers)
         self.assertEqual(12, len(parsed_message.scheduler_entries))
@@ -141,11 +136,7 @@ class MessagesTest(unittest.TestCase):
             self.assertEqual(True, parsed_message.scheduler_entries[i].scheduler.is_active, 'is_active value differs on scheduler ' + str(i))
             self.assertEqual(True, parsed_message.scheduler_entries[i].scheduler.is_action_turn_on, 'is_action_turn_on value differs on scheduler ' + str(i))
             self.assertEqual(repeat_on_weekday_expected, parsed_message.scheduler_entries[i].scheduler.repeat_on_weekdays, 'repeat_on_weekdays value differs on scheduler ' + str(i))
-            self.assertEqual(2020, parsed_message.scheduler_entries[i].scheduler.year, 'year value differs on scheduler ' + str(i))
-            self.assertEqual(12, parsed_message.scheduler_entries[i].scheduler.month, 'month value differs on scheduler ' + str(i))
-            self.assertEqual(3, parsed_message.scheduler_entries[i].scheduler.day, 'day value differs on scheduler ' + str(i))
-            self.assertEqual(12, parsed_message.scheduler_entries[i].scheduler.hour, 'hour value differs on scheduler ' + str(i))
-            self.assertEqual(34, parsed_message.scheduler_entries[i].scheduler.minute, 'minute value differs on scheduler ' + str(i))
+            self.assertEqual("2020-12-03T12:34", parsed_message.scheduler_entries[i].scheduler.isodatetime, 'isodatetime value differs on scheduler ' + str(i))
 
     def test_SchedulerSetNotification(self):
         message = SchedulerSetNotification(was_successful=True)
@@ -164,7 +155,7 @@ class MessagesTest(unittest.TestCase):
         active_on_weekdays.append(util.Weekday.FRIDAY)
         active_on_weekdays.append(util.Weekday.SATURDAY)
 
-        message = RandomModeStatusRequestedNotification(is_active=True, active_on_weekdays=active_on_weekdays, start_hour=10, start_minute=30, end_hour=18, end_minute=45)
+        message = RandomModeStatusRequestedNotification(is_active=True, active_on_weekdays=active_on_weekdays, start_isotime="10:30", end_isotime="18:45")
         encoded_message = MessageEncoder().encode(message)
         parsed_message = MessageParser().parse(encoded_message)
 
@@ -179,10 +170,8 @@ class MessagesTest(unittest.TestCase):
 
         self.assertEqual(True, parsed_message.is_active, 'is_active value differs')
         self.assertEqual(active_on_weekdays_expected, parsed_message.active_on_weekdays, 'active_on_weekdays value differs')
-        self.assertEqual(10, parsed_message.start_hour, 'start_hour value differs')
-        self.assertEqual(30, parsed_message.start_minute, 'start_minute value differs')
-        self.assertEqual(18, parsed_message.end_hour, 'end_hour value differs')
-        self.assertEqual(45, parsed_message.end_minute, 'end_minute value differs')
+        self.assertEqual("10:30", parsed_message.start_isotime, 'start_isotime value differs')
+        self.assertEqual("18:45", parsed_message.end_isotime, 'end_isotime value differs')
 
     def test_RandomModeSetNotification(self):
         message = RandomModeSetNotification(was_successful=True)

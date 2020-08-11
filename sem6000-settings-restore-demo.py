@@ -30,7 +30,7 @@ else:
     device.set_device_name(data["device-name"])
 
     device.set_prices(data["settings"]["normal-price-in-cent"], data["settings"]["reduced-period"]["price-in-cent"])
-    device.set_reduced_period(data["settings"]["reduced-period"]["is-active"], util._format_minutes_as_time(data["settings"]["reduced-period"]["start-time-in-minutes"]), util._format_minutes_as_time(data["settings"]["reduced-period"]["end-time-in-minutes"]))
+    device.set_reduced_period(data["settings"]["reduced-period"]["is-active"], data["settings"]["reduced-period"]["start-isotime"], data["settings"]["reduced-period"]["end-isotime"])
 
     if data["settings"]["is-led-active"]:
         device.led_on()
@@ -39,10 +39,8 @@ else:
 
     device.set_power_limit(data["settings"]["power-limit-in-watt"])
 
-    start_time = datetime.time(data["random-mode"]["start-hour"], data["random-mode"]["start-minute"])
-    end_time = datetime.time(data["random-mode"]["end-hour"], data["random-mode"]["end-minute"])
     if data["random-mode"]["is-active"]:
-        device.set_random_mode(data["random-mode"]["active-on-weekdays"], start_time.isoformat(), end_time.isoformat())
+        device.set_random_mode(data["random-mode"]["active-on-weekdays"], data["random-mode"]["start-isotime"], data["random-mode"]["end-isotime"])
     else:
         device.reset_random_mode()
 
@@ -51,7 +49,5 @@ else:
     for slot_id in slot_ids:
         scheduler = data["scheduler"]["entries"][slot_id]
 
-        target_datetime = datetime.datetime(scheduler["year"], scheduler["month"], scheduler["day"], scheduler["hour"], scheduler["minute"])
-
-        device.add_scheduler(scheduler["is-active"], scheduler["is-action-turn-on"], scheduler["repeat-on-weekdays"], target_datetime.isoformat())
+        device.add_scheduler(scheduler["is-active"], scheduler["is-action-turn-on"], scheduler["repeat-on-weekdays"], scheduler["isodatetime"])
 

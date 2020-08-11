@@ -1,6 +1,6 @@
-import datetime
-
 from . import util
+
+import datetime
 
 class AbstractCommand:
     def __str__(self):
@@ -58,20 +58,13 @@ class LEDSwitchCommand(AbstractSwitchCommand):
 
 
 class SynchronizeDateAndTimeCommand():
-    def __init__(self, year, month, day, hour, minute, second):
-        d = datetime.datetime(year, month, day, hour, minute, second)
-
-        self.year = d.year
-        self.month = d.month
-        self.day = d.day
-
-        self.hour = d.hour
-        self.minute = d.minute
-        self.second = d.second
+    def __init__(self, isodatetime):
+        d = datetime.datetime.fromisoformat(isodatetime)
+        self.isodatetime = d.isoformat(timespec='seconds')
 
     def __str__(self):
         name = self.__class__.__name__
-        return name + "(year=" + str(self.year) + ", month=" + str(self.month) + ", day=" + str(self.day) + ", hour=" + str(self.hour) + ", minute=" + str(self.minute) + ", second=" + str(self.second) + ")"
+        return name + "(isodatetime=" + str(self.isodatetime) + ")"
 
 
 class RequestSettingsCommand(AbstractCommand):
@@ -98,14 +91,14 @@ class SetPricesCommand():
 
 
 class SetReducedPeriodCommand():
-    def __init__(self, is_active, start_time_in_minutes, end_time_in_minutes):
+    def __init__(self, is_active, start_isotime, end_isotime):
         self.is_active = is_active
-        self.start_time_in_minutes = start_time_in_minutes
-        self.end_time_in_minutes = end_time_in_minutes
+        self.start_isotime = start_isotime
+        self.end_isotime = end_isotime
 
     def __str__(self):
         name = self.__class__.__name__
-        return name + "(is_active=" + str(self.is_active) + ", start_time_in_minutes=" + str(self.start_time_in_minutes) + ", end_time_in_minutes=" + str(self.end_time_in_minutes) + ")"
+        return name + "(is_active=" + str(self.is_active) + ", start_isotime=" + str(self.start_isotime) + ", end_isotime=" + str(self.end_isotime) + ")"
 
 
 class RequestTimerStatusCommand(AbstractCommand):
@@ -113,19 +106,24 @@ class RequestTimerStatusCommand(AbstractCommand):
 
 
 class SetTimerCommand:
-    def __init__(self, is_reset_timer, is_action_turn_on, target_year, target_month, target_day, target_hour, target_minute, target_second):
+    def __init__(self, is_reset_timer, is_action_turn_on, target_isodatetime=None):
+        if not is_reset_timer and target_isodatetime is None:
+            raise Exception("target_isodatetime parameter is None")
+
+        if is_reset_timer and not target_isodatetime is None:
+            raise Exception("target_isodatetime parameter is expected to be None if timer is being reset")
+
         self.is_reset_timer = is_reset_timer
         self.is_action_turn_on = is_action_turn_on
-        self.target_year = target_year
-        self.target_month = target_month
-        self.target_day = target_day
-        self.target_hour = target_hour
-        self.target_minute = target_minute
-        self.target_second = target_second
+        self.target_isodatetime = None
+
+        if not is_reset_timer:
+            d = datetime.datetime.fromisoformat(target_isodatetime)
+            self.target_isodatetime = d.isoformat(timespec='seconds')
 
     def __str__(self):
         name = self.__class__.__name__
-        return name + "(is_reset_timer=" + str(self.is_reset_timer) + ", is_action_turn_on=" + str(self.is_action_turn_on) + ", target_year=" + str(self.target_year) + ", target_month=" + str(self.target_month) + ", target_day=" + str(self.target_day) + ", target_hour=" + str(self.target_hour) + ", target_minute=" + str(self.target_minute) + ", target_second=" + str(self.target_second) + ")"
+        return name + "(is_reset_timer=" + str(self.is_reset_timer) + ", is_action_turn_on=" + str(self.is_action_turn_on) + ", target_isodatetime=" + str(self.target_isodatetime) + ")"
 
 
 class RequestSchedulerCommand:
@@ -174,22 +172,24 @@ class RequestRandomModeStatusCommand(AbstractCommand):
 
 
 class SetRandomModeCommand:
-    def __init__(self, is_active, active_on_weekdays, start_hour, start_minute, end_hour, end_minute):
+    def __init__(self, is_active, active_on_weekdays, start_isotime, end_isotime):
         active_on_weekdays = util._list_values_to_enum(util.Weekday, active_on_weekdays)
 
         self.is_active = is_active
         self.active_on_weekdays = active_on_weekdays
-        self.start_hour = start_hour
-        self.start_minute = start_minute
-        self.end_hour = end_hour
-        self.end_minute = end_minute
+
+        start_time = datetime.time.fromisoformat(start_isotime)
+        end_time = datetime.time.fromisoformat(end_isotime)
+
+        self.start_isotime = start_time.isoformat(timespec='minutes')
+        self.end_isotime = end_time.isoformat(timespec='minutes')
 
     def __str__(self):
         weekday_formatter = lambda w: w.name
         active_on_weekdays = util._format_list_of_objects(weekday_formatter, self.active_on_weekdays)
 
         name = self.__class__.__name__
-        return name + "(is_active=" + str(self.is_active) + ", active_on_weekdays=" + active_on_weekdays + ", start_hour=" + str(self.start_hour) + ", start_minute=" + str(self.start_minute) + ", end_hour=" + str(self.end_hour) + ", end_minute=" + str(self.end_minute) + ")"
+        return name + "(is_active=" + str(self.is_active) + ", active_on_weekdays=" + active_on_weekdays + ", start_isotime=" + str(self.start_isotime) + ", end_isotime=" + str(self.end_isotime) + ")"
 
 
 class RequestMeasurementCommand(AbstractCommand):
@@ -254,18 +254,23 @@ class SynchronizeDateAndTimeNotification(AbstractCommandConfirmationNotification
 
 
 class RequestedSettingsNotification:
-    def __init__(self, is_reduced_period, normal_price_in_cent, reduced_period_price_in_cent, reduced_period_start_time_in_minutes, reduced_period_end_time_in_minutes, is_led_active, power_limit_in_watt):
+    def __init__(self, is_reduced_period, normal_price_in_cent, reduced_period_price_in_cent, reduced_period_start_isotime, reduced_period_end_isotime, is_led_active, power_limit_in_watt):
         self.is_reduced_period = is_reduced_period
         self.normal_price_in_cent = normal_price_in_cent
         self.reduced_period_price_in_cent = reduced_period_price_in_cent
-        self.reduced_period_start_time_in_minutes = reduced_period_start_time_in_minutes
-        self.reduced_period_end_time_in_minutes = reduced_period_end_time_in_minutes
+
+        start_time = datetime.time.fromisoformat(reduced_period_start_isotime)
+        end_time = datetime.time.fromisoformat(reduced_period_end_isotime)
+
+        self.reduced_period_start_isotime = start_time.isoformat(timespec='minutes')
+        self.reduced_period_end_isotime = end_time.isoformat(timespec='minutes')
+
         self.is_led_active = is_led_active
         self.power_limit_in_watt = power_limit_in_watt
 
     def __str__(self):
         name = self.__class__.__name__
-        return name + "(is_reduced_period=" + str(self.is_reduced_period) + ", normal_price_in_cent=" + str(self.normal_price_in_cent) + ", reduced_periiod_price_in_cent=" + str(self.reduced_period_price_in_cent) + ", reduced_period_start_time_in_minutes=" + str(self.reduced_period_start_time_in_minutes) + ", reduced_period_end_time_in_minutes=" + str(self.reduced_period_end_time_in_minutes) + ", is_led_active=" + str(self.is_led_active) + ", power_limit_in_watt=" + str(self.power_limit_in_watt) + ")"
+        return name + "(is_reduced_period=" + str(self.is_reduced_period) + ", normal_price_in_cent=" + str(self.normal_price_in_cent) + ", reduced_periiod_price_in_cent=" + str(self.reduced_period_price_in_cent) + ", reduced_period_start_isotime=" + str(self.reduced_period_start_isotime) + ", reduced_period_end_isotime=" + str(self.reduced_period_end_isotime) + ", is_led_active=" + str(self.is_led_active) + ", power_limit_in_watt=" + str(self.power_limit_in_watt) + ")"
 
 
 class PowerLimitSetNotification(AbstractCommandConfirmationNotification):
@@ -281,20 +286,17 @@ class ReducedPeriodSetNotification(AbstractCommandConfirmationNotification):
 
 
 class RequestedTimerStatusNotification:
-    def __init__(self, is_active, is_action_turn_on, target_year, target_month, target_day, target_hour, target_minute, target_second, original_timer_length_in_seconds):
+    def __init__(self, is_active, is_action_turn_on, target_isodatetime, original_timer_length_in_seconds):
+        d = datetime.datetime.fromisoformat(target_isodatetime)
+
         self.is_active = is_active
         self.is_action_turn_on = is_action_turn_on
-        self.target_year = target_year
-        self.target_month = target_month
-        self.target_day = target_day
-        self.target_hour = target_hour
-        self.target_minute = target_minute
-        self.target_second = target_second
+        self.target_isodatetime = d.isoformat(timespec='seconds')
         self.original_timer_length_in_seconds = original_timer_length_in_seconds
 
     def __str__(self):
         name = self.__class__.__name__
-        return name + "(is_active=" + str(self.is_active) + ", is_action_turn_on=" + str(self.is_action_turn_on) + ", target_year=" + str(self.target_year) + ", target_month=" + str(self.target_month) + ", target_day=" + str(self.target_day) + ", target_hour=" + str(self.target_hour) + ", target_minute=" + str(self.target_minute) + ", target_second=" + str(self.target_second) + ", original_timer_length_in_seconds=" + str(self.original_timer_length_in_seconds) + ")"
+        return name + "(is_active=" + str(self.is_active) + ", is_action_turn_on=" + str(self.is_action_turn_on) + ", target_isodatetime=" + str(self.target_isodatetime) + ", original_timer_length_in_seconds=" + str(self.original_timer_length_in_seconds) + ")"
 
 
 class TimerSetNotification(AbstractCommandConfirmationNotification):
@@ -302,17 +304,16 @@ class TimerSetNotification(AbstractCommandConfirmationNotification):
 
 
 class Scheduler:
-    def __init__(self, is_active, is_action_turn_on, repeat_on_weekdays, year, month, day, hour, minute):
+    def __init__(self, is_active, is_action_turn_on, repeat_on_weekdays, isodatetime):
+
         repeat_on_weekdays = util._list_values_to_enum(util.Weekday, repeat_on_weekdays)
 
         self.is_active = is_active
         self.is_action_turn_on = is_action_turn_on
         self.repeat_on_weekdays = repeat_on_weekdays
-        self.year = year
-        self.month = month
-        self.day = day
-        self.hour = hour
-        self.minute = minute
+
+        d = datetime.datetime.fromisoformat(isodatetime)
+        self.isodatetime = d.isoformat(timespec='minutes')
 
     def __str__(self):
         name = self.__class__.__name__
@@ -320,7 +321,7 @@ class Scheduler:
         weekday_formatter = lambda w: w.name
         repeat_on_weekdays = util._format_list_of_objects(weekday_formatter, self.repeat_on_weekdays)
 
-        return name + "(is_active=" + str(self.is_active) + ", is_action_turn_on=" + str(self.is_action_turn_on) + ", repeat_on_weekdays=" + repeat_on_weekdays + ", year=" + str(self.year) + ", month=" + str(self.month) + ", day=" + str(self.day) + ", hour=" + str(self.hour) + ", minute=" + str(self.minute) + ")"
+        return name + "(is_active=" + str(self.is_active) + ", is_action_turn_on=" + str(self.is_action_turn_on) + ", repeat_on_weekdays=" + repeat_on_weekdays + ", isodatetime=" + str(self.isodatetime) + ")"
 
 
 class SchedulerEntry:
@@ -356,22 +357,24 @@ class SchedulerSetNotification(AbstractCommandConfirmationNotification):
 
 
 class RandomModeStatusRequestedNotification:
-    def __init__(self, is_active, active_on_weekdays, start_hour, start_minute, end_hour, end_minute):
+    def __init__(self, is_active, active_on_weekdays, start_isotime, end_isotime):
         active_on_weekdays = util._list_values_to_enum(util.Weekday, active_on_weekdays)
 
         self.is_active = is_active
         self.active_on_weekdays = active_on_weekdays
-        self.start_hour = start_hour
-        self.start_minute = start_minute
-        self.end_hour = end_hour
-        self.end_minute = end_minute
+
+        start_time = datetime.time.fromisoformat(start_isotime)
+        end_time = datetime.time.fromisoformat(end_isotime)
+
+        self.start_isotime = start_time.isoformat(timespec='minutes')
+        self.end_isotime = end_time.isoformat(timespec='minutes')
 
     def __str__(self):
         weekday_formatter = lambda w: w.name
         active_on_weekdays = util._format_list_of_objects(weekday_formatter, self.active_on_weekdays)
 
         name = self.__class__.__name__
-        return name + "(is_active=" + str(self.is_active) + ", active_on_weekdays=" + active_on_weekdays + ", start_hour=" + str(self.start_hour) + ", start_minute=" + str(self.start_minute) + ", end_hour=" + str(self.end_hour) + ", end_minute=" + str(self.end_minute) + ")"
+        return name + "(is_active=" + str(self.is_active) + ", active_on_weekdays=" + active_on_weekdays + ", start_isotime=" + str(self.start_isotime) + ", end_isotime=" + str(self.end_isotime) + ")"
 
 
 class RandomModeSetNotification(AbstractCommandConfirmationNotification):
