@@ -87,7 +87,9 @@ class SEM6000():
 
         self._delegate = SEM6000Delegate(self.debug)
         self._peripheral = None
-        self.connect(deviceAddr, iface)
+
+        if not deviceAddr is None:
+            self.connect(deviceAddr, iface)
 
         if not pin is None:
             self.authorize(pin)
