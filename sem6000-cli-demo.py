@@ -317,7 +317,9 @@ if __name__ == '__main__':
                 if hour < 0:
                     hour += 24
 
-                print("\t" + util._format_hour_and_minute_as_time(hour, 0) + ":\t" + str(response.consumption_n_hours_ago_in_watt_hour[i]) + " Wh")
+                isotime = datetime.time(hour, 0).isoformat(timespec='minutes')
+
+                print("\t" + isotime + ":\t" + str(response.consumption_n_hours_ago_in_watt_hour[i]) + " Wh")
         elif cmd == 'reset_consumption':
             sem6000.reset_consumption()
         elif cmd == 'request_device_name':
