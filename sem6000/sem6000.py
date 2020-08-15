@@ -1,15 +1,15 @@
 import binascii
 import datetime
 import sys
-from bluepy import btle
 
+from .bluetooth_lowenergy_interface.bluepy_interface import *
 from . import encoder
 from .message import *
 from . import parser
 from . import util
 
 
-class SEM6000Delegate(btle.DefaultDelegate):
+class SEM6000Delegate():
     def __init__(self, debug=False):
         btle.DefaultDelegate.__init__(self)
 
@@ -21,7 +21,10 @@ class SEM6000Delegate(btle.DefaultDelegate):
 
         self._parser = parser.MessageParser()
 
-    def handleNotification(self, cHandle, data):
+    def __call__(self, characteristic_uuid, data):
+        self._handle_notification(characteristic_uuid, data)
+
+    def _handle_notification(self, characteristic_uuid, data):
         self._raw_notifications.append(data)
 
     def has_final_raw_notification(self):
@@ -72,10 +75,11 @@ class SEM6000Delegate(btle.DefaultDelegate):
 
 class SEM6000():
     SERVICECLASS_UUID='0000fff0-0000-1000-8000-00805f9b34fb'
-    CHARACTERISTICS_UUID_NAME='00002a00-0000-1000-8000-00805f9b34fb'
-    CHARACTERISTICS_UUID_CONTROL='0000fff3-0000-1000-8000-00805f9b34fb'
+    CHARACTERISTIC_UUID_NAME='00002a00-0000-1000-8000-00805f9b34fb'
+    CHARACTERISTIC_UUID_CONTROL='0000fff3-0000-1000-8000-00805f9b34fb'
+    CHARACTERISTIC_UUID_RESPONSE='0000fff4-0000-1000-8000-00805f9b34fb'
 
-    def __init__(self, deviceAddr=None, pin=None, iface=None, timeout=3, debug=False):
+    def __init__(self, deviceAddr=None, pin=None, bluetooth_device='hci0', timeout=3, debug=False):
         self.timeout = timeout
         self.debug = debug
 
@@ -86,20 +90,18 @@ class SEM6000():
         self._encoder = encoder.MessageEncoder()
 
         self._delegate = SEM6000Delegate(self.debug)
-        self._peripheral = None
+        self._bluetooth_lowenergy_interface = BluePyBtLeInterface(bluetooth_device=bluetooth_device)
+        self._bluetooth_lowenergy_interface.add_notification_handler(self._delegate._handle_notification)
 
         if not deviceAddr is None:
-            self.connect(deviceAddr, iface)
+            self.connect(deviceAddr)
 
         if not pin is None:
             self.authorize(pin)
 
     def _disconnect(self):
-        if self._peripheral:
-            self._peripheral.disconnect()
-            self._peripheral = None
-            self._control_characteristics = None
-            self._name_characteristics = None
+        if self._bluetooth_lowenergy_interface:
+            self._bluetooth_lowenergy_interface.disconnect()
 
             return True
 
@@ -108,15 +110,13 @@ class SEM6000():
     def _reconnect(self):
         self._disconnect()
 
-        self._peripheral = btle.Peripheral().withDelegate(self._delegate)
         try:
-            self._peripheral.connect(self.connection_settings["deviceAddr"], self.connection_settings["addrType"], iface=self.connection_settings["iface"])
+            self._bluetooth_lowenergy_interface.connect(self.connection_settings["deviceAddr"])
         except btle.BTLEException as e:
             self._disconnect()
             raise e
 
-        self._control_characteristics = self._peripheral.getCharacteristics(uuid=SEM6000.CHARACTERISTICS_UUID_CONTROL)[0]
-        self._name_characteristics = self._peripheral.getCharacteristics(uuid=SEM6000.CHARACTERISTICS_UUID_NAME)[0]
+        self._bluetooth_lowenergy_interface.enable_notifications()
 
         if self.pin:
             try:
@@ -126,25 +126,17 @@ class SEM6000():
                 raise e
 
     def _is_connected(self):
-        if self._peripheral is None:
+        if self._bluetooth_lowenergy_interface is None:
             return False
 
-        try:
-            if self._peripheral.getState() != "conn":
-                return False
+        return self._bluetooth_lowenergy_interface.is_connected()
 
-        except btle.BTLEInternalError as e:
-            return False
-
-        return True
-
-    def _send_command(self, command, with_response=True):
+    def _send_command(self, command):
         encoded_command = self._encoder.encode(command)
 
         if self.debug:
             print("sent data: " + str(binascii.hexlify(encoded_command)) + " (" + str(command) + ")", file=sys.stderr)
 
-        # btle_characteristics.write(..., withResponse=True) needs to be set if reply notifications are expected
         self._delegate.reset_notification_data()
 
         if not self._is_connected():
@@ -153,14 +145,12 @@ class SEM6000():
             else:
                 raise Exception("Not connected and no deviceAddress / pin set")
 
-        self._control_characteristics.write(encoded_command, with_response)
-        
-        if with_response:
-            self._wait_for_notifications()
+        self._bluetooth_lowenergy_interface.write_to_characteristic(SEM6000.CHARACTERISTIC_UUID_CONTROL, encoded_command)
+        self._wait_for_notifications()
 
     def _wait_for_notifications(self):
         while True:
-            if not self._peripheral.waitForNotifications(self.timeout):
+            if not self._bluetooth_lowenergy_interface.wait_for_notifications(self.timeout):
                 break
 
             if self._delegate.has_final_raw_notification():
@@ -169,42 +159,24 @@ class SEM6000():
     def _consume_notification(self):
         return self._delegate.consume_notification()
 
-    def connect(self, deviceAddr, iface=None):
+    def connect(self, deviceAddr):
         self.connection_settings["deviceAddr"] = deviceAddr
-        self.connection_settings["addrType"] = btle.ADDR_TYPE_PUBLIC
-        self.connection_settings["iface"] = iface
 
         return self._reconnect()
 
     def disconnect(self):
         return self._disconnect()
 
-    def discover(timeout=5):
-        result = []
+    def discover(timeout=5, bluetooth_device='hci0'):
+        bluetooth_lowenergy_interface = BluePyBtLeInterface(bluetooth_device=bluetooth_device)
 
-        scanner = btle.Scanner()
-        scanner_results = scanner.scan(timeout)
-        
-        for device in scanner_results:
-            address = device.addr
-            # 0x02 - query "Incomplete List of 16-bit Service Class UUIDs"
-            service_class_uuids = device.getValueText(2)
-            # 0x09 - query complete local name
-            complete_local_name = device.getValueText(9)
-
-            if not service_class_uuids == SEM6000.SERVICECLASS_UUID:
-                # not a sem6000 device
-                continue
-
-            result.append({'address': address, 'name': complete_local_name})
-
-        return result
+        return bluetooth_lowenergy_interface.discover(timeout, service_uuids=[SEM6000.SERVICECLASS_UUID])
 
     def request_device_name(self):
-        data = self._name_characteristics.read()
+        data = self._bluetooth_lowenergy_interface.read_from_characteristic(SEM6000.CHARACTERISTIC_UUID_NAME)
 
         if self.debug:
-            print("received data: characteristics_uuid=" + SEM6000.CHARACTERISTICS_UUID_NAME + ", data=" + str(binascii.hexlify(data)), file=sys.stderr)
+            print("received data: " + str(binascii.hexlify(data)), file=sys.stderr)
 
         return data.decode(encoding='utf-8')
 
