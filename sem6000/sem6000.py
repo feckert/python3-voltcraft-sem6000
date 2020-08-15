@@ -11,8 +11,6 @@ from . import util
 
 class SEM6000Delegate():
     def __init__(self, debug=False):
-        btle.DefaultDelegate.__init__(self)
-
         self.debug = False
         if debug:
             self.debug = True
@@ -112,7 +110,7 @@ class SEM6000():
 
         try:
             self._bluetooth_lowenergy_interface.connect(self.connection_settings["deviceAddr"])
-        except btle.BTLEException as e:
+        except Exception as e:
             self._disconnect()
             raise e
 
