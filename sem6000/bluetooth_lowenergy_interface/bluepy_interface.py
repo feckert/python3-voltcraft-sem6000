@@ -1,4 +1,5 @@
 from . import abstract_interface
+from .timeout_decorator import *
 
 from bluepy import btle
 
@@ -24,6 +25,7 @@ class BluePyBtLeInterface(abstract_interface.AbstractBluetoothInterface):
         self._characteristic_by_uuid = {}
         self._characteristic_by_bluepy_handle = {}
 
+    @DisconnectAfterTimeout(300)
     def _get_characteristic(self, uuid):
         if uuid in self._characteristic_by_uuid:
             characteristic = self._characteristic_by_uuid[uuid]
@@ -35,6 +37,7 @@ class BluePyBtLeInterface(abstract_interface.AbstractBluetoothInterface):
 
         return characteristic
 
+    @DisconnectAfterTimeout(300)
     def _get_characteristic_by_bluepy_handle(self, bluepy_handle):
         if bluepy_handle in self._characteristic_by_bluepy_handle:
             characteristic = self._characteristic_by_bluepy_handle[bluepy_handle]
@@ -131,16 +134,19 @@ class BluePyBtLeInterface(abstract_interface.AbstractBluetoothInterface):
 
         return True
 
+    @DisconnectAfterTimeout(300)
     def write_to_characteristic(self, uuid, data):
         characteristic = self._get_characteristic(uuid)
 
         return characteristic.write(data, self._is_notifications_enabled)
 
+    @DisconnectAfterTimeout(300)
     def read_from_characteristic(self, uuid):
         characteristic = self._get_characteristic(uuid)
 
         return characteristic.read()
 
+    @DisconnectAfterTimeout(300)
     def wait_for_notifications(self, timeout=None):
         if not timeout is None:
             return self._peripheral.waitForNotifications(timeout)
