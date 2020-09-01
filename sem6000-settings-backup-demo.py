@@ -14,14 +14,14 @@ else:
 
     device = sem6000.SEM6000(address, pin, debug=True)
 
-    device_name = device.request_device_name()
+    device_name_response = device.request_device_name()
 
     settings_response = device.request_settings()
     random_mode_response = device.request_random_mode_status()
     scheduler_response = device.request_scheduler()
 
     data = {}
-    data["device-name"] = device_name
+    data["device-name"] = device_name_response.device_name
 
     data["settings"] = {
         "reduced-period": {

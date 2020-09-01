@@ -323,9 +323,9 @@ if __name__ == '__main__':
         elif cmd == 'reset_consumption':
             sem6000.reset_consumption()
         elif cmd == 'request_device_name':
-            device_name = sem6000.request_device_name()
+            response = sem6000.request_device_name()
 
-            print("Device-Name:\t" + device_name)
+            print("Device-Name:\t" + response.device_name)
         elif cmd == 'set_device_name':
             new_name = sys.argv[4]
 

@@ -434,6 +434,15 @@ class DeviceNameSetNotification(AbstractCommandConfirmationNotification):
     pass
 
 
+class DeviceNameRequestedNotification:
+    def __init__(self, device_name):
+        self.device_name = device_name
+
+    def __str__(self):
+        name = self.__class__.name
+        return name + "(device_name=" + self.device_name + ")"
+
+
 class DeviceSerialRequestedNotification:
     def __init__(self, serial):
         self.serial = serial

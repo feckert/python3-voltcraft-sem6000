@@ -176,7 +176,9 @@ class SEM6000():
         if self.debug:
             print("received data: " + str(binascii.hexlify(data)), file=sys.stderr)
 
-        return data.decode(encoding='utf-8')
+        device_name = data.decode(encoding='utf-8')
+
+        return DeviceNameRequestedNotification(device_name)
 
     def authorize(self, pin):
         command = AuthorizeCommand(pin)
