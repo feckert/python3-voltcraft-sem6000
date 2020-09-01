@@ -6,50 +6,50 @@ from sem6000.message import *
 from sem6000 import util
 
 class MessagesTest(unittest.TestCase):
-    def test_AuthorizationNotification(self):
-        message = AuthorizationNotification(was_successful=True)
+    def test_AuthorizedNotification(self):
+        message = AuthorizedNotification(was_successful=True)
         encoded_message = MessageEncoder().encode(message)
         parsed_message = MessageParser().parse(encoded_message)
 
         self.assertEqual(True, parsed_message.was_successful, 'was_successful value differs')
 
-    def test_ChangePinNotification(self):
-        message = ChangePinNotification(was_successful=True)
+    def test_PinChangedNotification(self):
+        message = PinChangedNotification(was_successful=True)
         encoded_message = MessageEncoder().encode(message)
         parsed_message = MessageParser().parse(encoded_message)
 
         self.assertEqual(True, parsed_message.was_successful, 'was_successful value differs')
 
-    def test_ResetPinNotification(self):
-        message = ResetPinNotification(was_successful=True)
+    def test_PinResetNotification(self):
+        message = PinResetNotification(was_successful=True)
         encoded_message = MessageEncoder().encode(message)
         parsed_message = MessageParser().parse(encoded_message)
 
         self.assertEqual(True, parsed_message.was_successful, 'was_successful value differs')
 
-    def test_PowerSwitchNotification(self):
-        message = PowerSwitchNotification(was_successful=True)
+    def test_PowerSwitchedNotification(self):
+        message = PowerSwitchedNotification(was_successful=True)
         encoded_message = MessageEncoder().encode(message)
         parsed_message = MessageParser().parse(encoded_message)
 
         self.assertEqual(True, parsed_message.was_successful, 'was_successful value differs')
 
-    def test_LEDSwitchNotification(self):
-        message = LEDSwitchNotification(was_successful=True)
+    def test_NightmodeSetNotification(self):
+        message = NightmodeSetNotification(was_successful=True)
         encoded_message = MessageEncoder().encode(message)
         parsed_message = MessageParser().parse(encoded_message)
 
         self.assertEqual(True, parsed_message.was_successful, 'was_successful value differs')
 
     def test_SynchroizeDateAndTimeNotification(self):
-        message = SynchronizeDateAndTimeNotification(was_successful=True)
+        message = DateAndTimeSetNotification(was_successful=True)
         encoded_message = MessageEncoder().encode(message)
         parsed_message = MessageParser().parse(encoded_message)
 
         self.assertEqual(True, parsed_message.was_successful, 'was_successful value differs')
 
-    def test_RequestedSettingsNotification(self):
-        message = RequestedSettingsNotification(is_reduced_period=True, normal_price_in_cent=100, reduced_period_price_in_cent=50, reduced_period_start_isotime="22:00", reduced_period_end_isotime="05:00", is_led_active=True, power_limit_in_watt=500)
+    def test_SettingsRequestedNotification(self):
+        message = SettingsRequestedNotification(is_reduced_period=True, normal_price_in_cent=100, reduced_period_price_in_cent=50, reduced_period_start_isotime="22:00", reduced_period_end_isotime="05:00", is_nightmode_active=True, power_limit_in_watt=500)
         encoded_message = MessageEncoder().encode(message)
         parsed_message = MessageParser().parse(encoded_message)
 
@@ -58,7 +58,7 @@ class MessagesTest(unittest.TestCase):
         self.assertEqual(50, parsed_message.reduced_period_price_in_cent, 'reduced_price value_in_cent differs')
         self.assertEqual("22:00", parsed_message.reduced_period_start_isotime, 'reduced_period_start_isotime value differs')
         self.assertEqual("05:00", parsed_message.reduced_period_end_isotime, 'reduced_period_end_isotime value differs')
-        self.assertEqual(True, parsed_message.is_led_active, 'is_led_active value differs')
+        self.assertEqual(True, parsed_message.is_nightmode_active, 'is_nightmode_active value differs')
         self.assertEqual(500, parsed_message.power_limit_in_watt, 'power_limit_in_watt value differs')
 
     def test_PowerLimitSetNotification(self):
@@ -82,8 +82,8 @@ class MessagesTest(unittest.TestCase):
 
         self.assertEqual(True, parsed_message.was_successful, 'was_successful value differs')
 
-    def test_RequestedTimerStatusNotification(self):
-        message = RequestedTimerStatusNotification(is_active=True, is_action_turn_on=True, target_isodatetime="2004-03-12T12:34:12", original_timer_length_in_seconds=42)
+    def test_TimerStatusRequestedNotification(self):
+        message = TimerStatusRequestedNotification(is_active=True, is_action_turn_on=True, target_isodatetime="2004-03-12T12:34:12", original_timer_length_in_seconds=42)
         encoded_message = MessageEncoder().encode(message)
         parsed_message = MessageParser(year_diff=2000).parse(encoded_message)
 
@@ -216,8 +216,8 @@ class MessagesTest(unittest.TestCase):
         self.assertEqual(24, len(parsed_message.consumption_n_hours_ago_in_watt_hour), 'number of values differ')
         self.assertEqual([10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240], parsed_message.consumption_n_hours_ago_in_watt_hour, 'values for consumption in watt hour differ')
 
-    def test_ResetConsumptionNotification(self):
-        message = ResetConsumptionNotification(was_successful=True)
+    def test_ConsumptionResetNotification(self):
+        message = ConsumptionResetNotification(was_successful=True)
         encoded_message = MessageEncoder().encode(message)
         parsed_message = MessageParser().parse(encoded_message)
 

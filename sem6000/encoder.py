@@ -64,11 +64,11 @@ class MessageEncoder():
             else:
                 return self._encode_message(b'\x03\x00\x00' + b'\x00\x00')
 
-        if isinstance(message, LEDSwitchCommand):
+        if isinstance(message, NightmodeSetCommand):
             if message.on:
-                return self._encode_message(b'\x0f\x00\x05\x01' + b'\x00\x00\x00\x00')
-            else:
                 return self._encode_message(b'\x0f\x00\x05\x00' + b'\x00\x00\x00\x00')
+            else:
+                return self._encode_message(b'\x0f\x00\x05\x01' + b'\x00\x00\x00\x00')
 
         if isinstance(message, SynchronizeDateAndTimeCommand):
             d = datetime.datetime.fromisoformat(message.isodatetime)
@@ -214,45 +214,45 @@ class MessageEncoder():
         if isinstance(message, RequestDeviceSerialCommand):
             return self._encode_message(b'\x11\x00' + b'\x00\x00')
 
-        if isinstance(message, AuthorizationNotification):
+        if isinstance(message, AuthorizedNotification):
             was_successful = b'\x01'
             if message.was_successful:
                 was_successful = b'\x00'
 
             return self._encode_message(b'\x17\x00' + was_successful + b'\x00\x00')
 
-        if isinstance(message, ChangePinNotification):
+        if isinstance(message, PinChangedNotification):
             was_successful = b'\x01'
             if message.was_successful:
                 was_successful = b'\x00'
 
             return self._encode_message(b'\x17\x00' + was_successful + b'\x01\x00')
 
-        if isinstance(message, ResetPinNotification):
+        if isinstance(message, PinResetNotification):
             was_successful = b'\x01'
             if message.was_successful:
                 was_successful = b'\x00'
 
             return self._encode_message(b'\x17\x00' + was_successful + b'\x02\x00')
 
-        if isinstance(message, PowerSwitchNotification):
+        if isinstance(message, PowerSwitchedNotification):
             was_successful = b'\x01'
             if message.was_successful:
                 was_successful = b'\x00'
 
             return self._encode_message(b'\x03\x00' + was_successful)
 
-        if isinstance(message, LEDSwitchNotification):
+        if isinstance(message, NightmodeSetNotification):
             return self._encode_message(b'\x0f\x00' + b'\x05\x00')
 
-        if isinstance(message, SynchronizeDateAndTimeNotification):
+        if isinstance(message, DateAndTimeSetNotification):
             was_successful = b'\x01'
             if message.was_successful:
                 was_successful = b'\x00'
 
             return self._encode_message(b'\x01\x00' + was_successful)
 
-        if isinstance(message, RequestedSettingsNotification):
+        if isinstance(message, SettingsRequestedNotification):
             is_reduced_period = b'\x00'
             if message.is_reduced_period:
                 is_reduced_period = b'\x01'
@@ -266,13 +266,13 @@ class MessageEncoder():
             reduced_period_start_time_in_minutes = (reduced_period_start_time.hour*60 + reduced_period_start_time.minute).to_bytes(2, 'big')
             reduced_period_end_time_in_minutes = (reduced_period_end_time.hour*60 + reduced_period_end_time.minute).to_bytes(2, 'big')
 
-            is_led_active = b'\x00'
-            if message.is_led_active:
-                is_led_active = b'\x01'
+            is_nightmode_active = b'\x01'
+            if message.is_nightmode_active:
+                is_nightmode_active = b'\x00'
 
             power_limit_in_watt = message.power_limit_in_watt.to_bytes(2, 'big')
 
-            return self._encode_message(b'\x10\x00' + is_reduced_period + normal_price_in_cent + reduced_period_price_in_cent + reduced_period_start_time_in_minutes + reduced_period_end_time_in_minutes + is_led_active + b'\x00' + power_limit_in_watt)
+            return self._encode_message(b'\x10\x00' + is_reduced_period + normal_price_in_cent + reduced_period_price_in_cent + reduced_period_start_time_in_minutes + reduced_period_end_time_in_minutes + is_nightmode_active + b'\x00' + power_limit_in_watt)
 
         if isinstance(message, PowerLimitSetNotification):
             return self._encode_message(b'\x05\x00' + b'\x00')
@@ -283,7 +283,7 @@ class MessageEncoder():
         if isinstance(message, ReducedPeriodSetNotification):
             return self._encode_message(b'\x0f\x00\x01' + b'\x00')
 
-        if isinstance(message, RequestedTimerStatusNotification):
+        if isinstance(message, TimerStatusRequestedNotification):
             timer_action = b'\x00'
             if message.is_active:
                 timer_action = b'\x02'
@@ -402,7 +402,7 @@ class MessageEncoder():
 
             return self._encode_message(b'\x0a\x00' + consumptions)
 
-        if isinstance(message, ResetConsumptionNotification):
+        if isinstance(message, ConsumptionResetNotification):
             return self._encode_message(b'\x0f\x00' + b'\x02' + b'\x00')
 
         if isinstance(message, FactoryResetNotification):

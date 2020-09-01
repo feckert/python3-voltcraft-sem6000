@@ -81,57 +81,57 @@ class MessageParser:
             if payload[2:3] == b'\x00':
                 was_successful = True
 
-            return AuthorizationNotification(was_successful=was_successful)
+            return AuthorizedNotification(was_successful=was_successful)
 
         if payload[0:2] == b'\x17\x00' and payload[3:4] == b'\x01':
             if len(payload) != 5:
-                raise InvalidPayloadLengthException(message_class=ChangePinNotification.__class__, expected_payload_length=5, actual_payload_length=len(payload))
+                raise InvalidPayloadLengthException(message_class=PinChangedNotification.__class__, expected_payload_length=5, actual_payload_length=len(payload))
 
             was_successful = False
             if payload[2:3] == b'\x00':
                 was_successful = True
             
-            return ChangePinNotification(was_successful=was_successful)
+            return PinChangedNotification(was_successful=was_successful)
 
         if payload[0:2] == b'\x17\x00' and payload[3:4] == b'\x02':
             if len(payload) != 5:
-                raise InvalidPayloadLengthException(message_class=ResetPinNotification.__class__, expected_payload_length=5, actual_payload_length=len(payload))
+                raise InvalidPayloadLengthException(message_class=PinResetNotification.__class__, expected_payload_length=5, actual_payload_length=len(payload))
 
             was_successful = False
             if payload[2:3] == b'\x00':
                 was_successful = True
 
-            return ResetPinNotification(was_successful=was_successful)
+            return PinResetNotification(was_successful=was_successful)
 
         if payload[0:2] == b'\x03\x00':
             if len(payload) != 3:
-                raise InvalidPayloadLengthException(message_class=PowerSwitchNotification.__class__, expected_payload_length=3, actual_payload_length=len(payload))
+                raise InvalidPayloadLengthException(message_class=PowerSwitchedNotification.__class__, expected_payload_length=3, actual_payload_length=len(payload))
 
             was_successful = False
             if payload[2:3] == b'\x00':
                 was_successful = True
 
-            return PowerSwitchNotification(was_successful=was_successful)
+            return PowerSwitchedNotification(was_successful=was_successful)
 
         if payload[0:3] == b'\x0f\x00\x05':
             if len(payload) != 4:
-                raise InvalidPayloadLengthException(message_class=LEDSwitchNotification.__class__, expected_payload_length=4, actual_payload_length=len(payload))
+                raise InvalidPayloadLengthException(message_class=NightmodeSetNotification.__class__, expected_payload_length=4, actual_payload_length=len(payload))
 
-            return LEDSwitchNotification(was_successful=True)
+            return NightmodeSetNotification(was_successful=True)
 
         if payload[0:2] == b'\x01\x00':
             if len(payload) != 3:
-                raise InvalidPayloadLengthException(message_class=SynchronizeDateAndTimeNotification.__class__, expected_payload_length=3, actual_payload_length=len(payload))
+                raise InvalidPayloadLengthException(message_class=DateAndTimeSetNotification.__class__, expected_payload_length=3, actual_payload_length=len(payload))
 
             was_successful = False
             if payload[2:3] == b'\x00':
                 was_successful = True
 
-            return SynchronizeDateAndTimeNotification(was_successful=was_successful)
+            return DateAndTimeSetNotification(was_successful=was_successful)
 
         if payload[0:2] == b'\x10\x00':
             if len(payload) != 13:
-                raise InvalidPayloadLengthException(message_class=RequestedSettingsNotification.__class__, expected_payload_length=13, actual_payload_length=len(payload))
+                raise InvalidPayloadLengthException(message_class=SettingsRequestedNotification.__class__, expected_payload_length=13, actual_payload_length=len(payload))
 
             is_reduced_period = False
             if payload[2:3] == b'\x01':
@@ -146,13 +146,13 @@ class MessageParser:
             reduced_period_start_time = util._parse_time_from_minutes(reduced_period_start_time_in_minutes)
             reduced_period_end_time = util._parse_time_from_minutes(reduced_period_end_time_in_minutes)
 
-            is_led_active = False
+            is_nightmode_active = True
             if payload[9:10] == b'\x01':
-                is_led_active = True
+                is_nightmode_active = False
 
             power_limit_in_watt = int.from_bytes(payload[11:13], 'big')
 
-            return RequestedSettingsNotification(is_reduced_period=is_reduced_period, normal_price_in_cent=normal_price_in_cent, reduced_period_price_in_cent=reduced_period_price_in_cent, reduced_period_start_isotime=reduced_period_start_time.isoformat(timespec='minutes'), reduced_period_end_isotime=reduced_period_end_time.isoformat('minutes'), is_led_active=is_led_active, power_limit_in_watt=power_limit_in_watt)
+            return SettingsRequestedNotification(is_reduced_period=is_reduced_period, normal_price_in_cent=normal_price_in_cent, reduced_period_price_in_cent=reduced_period_price_in_cent, reduced_period_start_isotime=reduced_period_start_time.isoformat(timespec='minutes'), reduced_period_end_isotime=reduced_period_end_time.isoformat('minutes'), is_nightmode_active=is_nightmode_active, power_limit_in_watt=power_limit_in_watt)
 
         if payload[0:3] == b'\x05\x00\x00' and len(payload) == 3:
             return PowerLimitSetNotification(was_successful=True)
@@ -171,7 +171,7 @@ class MessageParser:
 
         if payload[0:2] == b'\x09\x00':
             if len(payload) != 13:
-                raise InvalidPayloadLengthException(message_class=RequestedTimerStatusNotification.__class__, expected_payload_length=13, actual_payload_length=len(payload))
+                raise InvalidPayloadLengthException(message_class=TimerStatusRequestedNotification.__class__, expected_payload_length=13, actual_payload_length=len(payload))
 
             is_active = False 
             is_action_turn_on = False
@@ -197,7 +197,7 @@ class MessageParser:
             else:
                 d = datetime.datetime(1970, 1, 1, target_hour, target_minute, target_second)
 
-            return RequestedTimerStatusNotification(is_active=is_active, is_action_turn_on=is_action_turn_on, target_isodatetime=d.isoformat(timespec='seconds'), original_timer_length_in_seconds=original_timer_length_in_seconds)
+            return TimerStatusRequestedNotification(is_active=is_active, is_action_turn_on=is_action_turn_on, target_isodatetime=d.isoformat(timespec='seconds'), original_timer_length_in_seconds=original_timer_length_in_seconds)
 
         if payload[0:2] == b'\x08\x00':
             if len(payload) != 3:
@@ -309,7 +309,7 @@ class MessageParser:
             return ConsumptionOfLast23HoursRequestedNotification(consumption_n_hours_ago_in_watt_hour=consumptions)
 
         if payload[0:3] == b'\x0f\x00\x02':
-            return ResetConsumptionNotification(was_successful=True)
+            return ConsumptionResetNotification(was_successful=True)
 
         if payload[0:3] == b'\x0f\x00\x00':
             return FactoryResetNotification(was_successful=True)

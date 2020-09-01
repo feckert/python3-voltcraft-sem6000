@@ -32,10 +32,10 @@ else:
     device.set_prices(data["settings"]["normal-price-in-cent"], data["settings"]["reduced-period"]["price-in-cent"])
     device.set_reduced_period(data["settings"]["reduced-period"]["is-active"], data["settings"]["reduced-period"]["start-isotime"], data["settings"]["reduced-period"]["end-isotime"])
 
-    if data["settings"]["is-led-active"]:
-        device.led_on()
+    if data["settings"]["is-nightmode-active"]:
+        device.nightmode_on()
     else:
-        device.led_off()
+        device.nightmode_off()
 
     device.set_power_limit(data["settings"]["power-limit-in-watt"])
 

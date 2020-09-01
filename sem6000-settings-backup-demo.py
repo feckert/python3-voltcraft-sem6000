@@ -31,7 +31,7 @@ else:
             "end-isotime": settings_response.reduced_period_end_isotime
         },
         "normal-price-in-cent": settings_response.normal_price_in_cent,
-        "is-led-active": settings_response.is_led_active,
+        "is-nightmode-active": settings_response.is_nightmode_active,
         "power-limit-in-watt": settings_response.power_limit_in_watt
     }
 

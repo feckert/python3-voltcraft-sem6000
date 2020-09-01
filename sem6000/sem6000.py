@@ -78,6 +78,15 @@ class SEM6000():
     CHARACTERISTIC_UUID_RESPONSE='0000fff4-0000-1000-8000-00805f9b34fb'
 
     def __init__(self, deviceAddr=None, pin=None, bluetooth_device='hci0', timeout=3, debug=False):
+        """ Create a new SEM6000() instance
+        
+            Parameters:
+                deviceAddr          - Optional, MAC address of a remote device to connect to immediately, i.e. '00:11:22:33:44:55'.
+                pin                 - Optional, 4 digit numeric pin, i.e. '0000'.
+                bluetooth_device    - Optional, bluetooth device name to use. Default: 'hci0'
+                timeout             - Optional, maximum time in seconds to wait for a response from the device. Default: 3
+                debug               - Optional, if set to true commands and responses are printed to sys.stderr
+        """
         self.timeout = timeout
         self.debug = debug
 
@@ -109,7 +118,7 @@ class SEM6000():
         self._disconnect()
 
         try:
-            self._bluetooth_lowenergy_interface.connect(self.connection_settings["deviceAddr"])
+            self._bluetooth_lowenergy_interface.connect(self.connection_settings["device_address"])
         except Exception as e:
             self._disconnect()
             raise e
@@ -138,7 +147,7 @@ class SEM6000():
         self._delegate.reset_notification_data()
 
         if not self._is_connected():
-            if self.connection_settings["deviceAddr"] and self.pin:
+            if self.connection_settings["device_address"] and self.pin:
                 self._reconnect()
             else:
                 raise Exception("Not connected and no deviceAddress / pin set")
@@ -157,20 +166,43 @@ class SEM6000():
     def _consume_notification(self):
         return self._delegate.consume_notification()
 
-    def connect(self, deviceAddr):
-        self.connection_settings["deviceAddr"] = deviceAddr
+    def connect(self, device_address):
+        """
+        Connect to a remote device.
+
+        Parameters:
+            device_address  - MAC address to connect to, i.e. '00:11:22:33:44:55'.
+        """
+        self.connection_settings["device_address"] = device_address
 
         return self._reconnect()
 
     def disconnect(self):
+        """
+        Disconnect from the current remote device.
+        """
         return self._disconnect()
 
     def discover(timeout=5, bluetooth_device='hci0'):
+        """
+        Discover remote devices.
+
+        This method needs special permissions.
+        
+        Parameters:
+            timeout             - Optional, time in seconds to wait for devices to respond. Default: 5
+            bluetooth_device    - Optional, bluetooth device name to use. Default: 'hciß'
+        """
         bluetooth_lowenergy_interface = BluePyBtLeInterface(bluetooth_device=bluetooth_device)
 
         return bluetooth_lowenergy_interface.discover(timeout, service_uuids=[SEM6000.SERVICECLASS_UUID])
 
     def request_device_name(self):
+        """
+        Request the name of the remote device.
+
+        Returns a DeviceNameRequestedNotification.
+        """
         data = self._bluetooth_lowenergy_interface.read_from_characteristic(SEM6000.CHARACTERISTIC_UUID_NAME)
 
         if self.debug:
@@ -181,11 +213,19 @@ class SEM6000():
         return DeviceNameRequestedNotification(device_name)
 
     def authorize(self, pin):
+        """
+        Authorize on the connected device.
+
+        Parameters:
+            pin - 4 digit PIN, i.e. '0000'
+
+        Returns an AuthorizedNotification.
+        """
         command = AuthorizeCommand(pin)
         self._send_command(command)
         notification = self._consume_notification()
 
-        if not isinstance(notification, AuthorizationNotification):
+        if not isinstance(notification, AuthorizedNotification):
             raise Exception("Authentication failed")
 
         if notification.was_successful:
@@ -197,87 +237,137 @@ class SEM6000():
         return notification
 
     def change_pin(self, new_pin):
+        """
+        Change the pin on the remote device.
+
+        Parameters:
+            new_pin - 4 digit PIN to change the current PIN to, i.e. '0000'
+
+        Returns a PinChangedNotification.
+        """
         command = ChangePinCommand(self.pin, new_pin)
         self._send_command(command)
         notification = self._consume_notification()
 
-        if not isinstance(notification, ChangePinNotification) or not notification.was_successful:
+        if not isinstance(notification, PinChangedNotification) or not notification.was_successful:
             raise Exception("Change PIN failed")
 
         return notification
 
     def reset_pin(self):
+        """
+        Reset the pin to 0000 on the remote device.
+
+        Returns a PinResetNotification.
+        """
         command = ResetPinCommand()
         self._send_command(command)
         notification = self._consume_notification()
 
-        if not isinstance(notification, ResetPinNotification) or not notification.was_successful:
+        if not isinstance(notification, PinResetNotification) or not notification.was_successful:
             raise Exception("Reset PIN failed")
 
         return notification
 
     def power_on(self):
+        """
+        Tell the remote device to turn the power on.
+
+        Returns a PowerSwitchedNotification.
+        """
         command = PowerSwitchCommand(True)
         self._send_command(command)
         notification = self._consume_notification()
         
-        if not isinstance(notification, PowerSwitchNotification) or not notification.was_successful:
+        if not isinstance(notification, PowerSwitchedNotification) or not notification.was_successful:
             raise Exception("Power on failed")
 
         return notification
 
     def power_off(self):
+        """
+        Tell the remote device to turn the power off.
+
+        Returns a PowerSwitchedNotification.
+        """
         command = PowerSwitchCommand(False)
         self._send_command(command)
         notification = self._consume_notification()
         
-        if not isinstance(notification, PowerSwitchNotification) or not notification.was_successful:
+        if not isinstance(notification, PowerSwitchedNotification) or not notification.was_successful:
             raise Exception("Power off failed")
 
         return notification
 
-    def led_on(self):
-        command = LEDSwitchCommand(True)
+    def nightmode_on(self):
+        """
+        Activate nightmode on the remote device.
+
+        Returns a NightmodeSetNotification.
+        """
+        command = NightmodeSetCommand(True)
         self._send_command(command)
         notification = self._consume_notification()
         
-        if not isinstance(notification, LEDSwitchNotification) or not notification.was_successful:
-            raise Exception("LED on failed")
+        if not isinstance(notification, NightmodeSetNotification) or not notification.was_successful:
+            raise Exception("Nightmode on failed")
 
         return notification
 
-    def led_off(self):
-        command = LEDSwitchCommand(False)
+    def nightmode_off(self):
+        """
+        Disable nightmode on the remote device.
+
+        Returns a NightmodeSetNotification.
+        """
+        command = NightmodeSetCommand(False)
         self._send_command(command)
         notification = self._consume_notification()
         
-        if not isinstance(notification, LEDSwitchNotification) or not notification.was_successful:
-            raise Exception("LED off failed")
+        if not isinstance(notification, NightmodeSetNotification) or not notification.was_successful:
+            raise Exception("Nightmode off failed")
 
         return notification
 
     def set_date_and_time(self, isodatetime):
+        """
+        Set date and time on the remote device.
 
+        Parameters:
+            isodatetime - ISO string representing date and time, i.e. '2020-01-01T10:00'
+
+        Returns a DateAndTimeSetNotification.
+        """
         command = SynchronizeDateAndTimeCommand(isodatetime)
         self._send_command(command)
         notification = self._consume_notification()
 
-        if not isinstance(notification, SynchronizeDateAndTimeNotification) or not notification.was_successful:
+        if not isinstance(notification, DateAndTimeSetNotification) or not notification.was_successful:
             raise Exception("Set date and time failed")
 
         return notification
 
     def request_settings(self):
+        """
+        Request the current settings from the remote device.
+
+        Returns a SettingsRequestedNotification.
+        """
         command = RequestSettingsCommand()
         self._send_command(command)
         notification = self._consume_notification()
 
-        if not isinstance(notification, RequestedSettingsNotification):
+        if not isinstance(notification, SettingsRequestedNotification):
             raise Exception("Request settings failed")
 
         return notification
 
     def set_power_limit(self, power_limit_in_watt):
+        """
+        Set the power limit when the remote device should be automatically turn off.
+
+        Returns a PowerLimitSetNotification.
+        """
         command = SetPowerLimitCommand(power_limit_in_watt=int(power_limit_in_watt))
         self._send_command(command)
         notification = self._consume_notification()
@@ -288,6 +378,15 @@ class SEM6000():
         return notification
 
     def set_prices(self, normal_price_in_cent, reduced_period_price_in_cent):
+        """
+        Set the power prices.
+
+        Parameters:
+            normal_price_in_cent            - Power price in cents.
+            reduced_period_price_in_cent    - Power price in cents during reduced period.
+
+        Returns a PricesSetNotification.
+        """
         command = SetPricesCommand(normal_price_in_cent=int(normal_price_in_cent), reduced_period_price_in_cent=int(reduced_period_price_in_cent))
         self._send_command(command)
         notification = self._consume_notification()
@@ -298,6 +397,16 @@ class SEM6000():
         return notification
 
     def set_reduced_period(self, is_active, start_isotime, end_isotime):
+        """
+        Sets start and end time of the reduced period.
+
+        Parameters:
+            is_active       - True if reduced prices should be used, False if not.
+            start_isotime   - ISO start time of the reduced period, i.e. '10:00'
+            end_isotime     - ISO end time of the reduced period, i.e. '20:00'
+
+        Returns a ReducedPeriodSetNotification.
+        """
         command = SetReducedPeriodCommand(is_active=util._parse_boolean(is_active), start_isotime=start_isotime, end_isotime=end_isotime)
         self._send_command(command)
         notification = self._consume_notification()
@@ -308,16 +417,30 @@ class SEM6000():
         return notification
 
     def request_timer_status(self):
+        """
+        Request the current status of the timer.
+
+        Returns a TimerStatusRequestedNotification.
+        """
         command = RequestTimerStatusCommand()
         self._send_command(command)
         notification = self._consume_notification()
 
-        if not isinstance(notification, RequestedTimerStatusNotification):
+        if not isinstance(notification, TimerStatusRequestedNotification):
             raise Exception("Request timer status failed")
 
         return notification
 
     def set_timer(self, is_action_turn_on, delay_isotime):
+        """
+        Activate the timer.
+
+        Parameters:
+            is_action_turn_on   - True if the power should be turned on after the delay has passed, False if the power should be turned off.
+            delay_isotime       - Delay in iso time format, i.e. '00:00::05' for 5 seconds.
+
+        Returns a TimerSetNotification.
+        """
         time = datetime.time.fromisoformat(delay_isotime)
         timedelta = datetime.timedelta(hours=time.hour, minutes=time.minute, seconds=time.second)
         dt = datetime.datetime.now() + timedelta
@@ -332,6 +455,11 @@ class SEM6000():
         return notification
 
     def reset_timer(self):
+        """
+        Stop and reset the timer.
+
+        Returns a TimerSetNotification.
+        """
         command = SetTimerCommand(is_reset_timer=True, is_action_turn_on=False)
         self._send_command(command)
         notification = self._consume_notification()
@@ -342,6 +470,11 @@ class SEM6000():
         return notification
 
     def request_scheduler(self):
+        """
+        Request all currently set schedulers.
+
+        Returns a SchedulerRequestedNotification.
+        """
         command = RequestSchedulerCommand(page_number=0)
         self._send_command(command)
         notification = self._consume_notification()
@@ -363,6 +496,17 @@ class SEM6000():
         return notification
 
     def add_scheduler(self, is_active, is_action_turn_on, repeat_on_weekdays, isodatetime):
+        """
+        Add a scheduler entry.
+
+        Parameters:
+            is_active           - True if the scheduler entry should be active, else False.
+            is_action_turn_on   - True if the power should be turned on, False if the power should be turned off.
+            repeat_on_weekdays  - Comma separated list of Weekdays the scheduler should be repeated on, i.e. 'Mon,Wed,Fri'
+            isodatetime         - ISO date and time for when the scheduler entry should be executed, i.e. '2020-01-01T10:00'
+
+        Returns a SchedulerSetNotification.
+        """
         command = AddSchedulerCommand(Scheduler(is_active=util._parse_boolean(is_active), is_action_turn_on=util._parse_boolean(is_action_turn_on), repeat_on_weekdays=util._parse_weekdays_list(repeat_on_weekdays), isodatetime=isodatetime))
         self._send_command(command)
         notification = self._consume_notification()
@@ -373,6 +517,18 @@ class SEM6000():
         return notification
 
     def edit_scheduler(self, slot_id, is_active, is_action_turn_on, repeat_on_weekdays, isodatetime):
+        """
+        Edit an existing scheduler entry.
+
+        Parameters:
+            slot_id             - id of the slot where the scheduler entry is currently stored at.
+            is_active           - True if the scheduler entry should be active, else False.
+            is_action_turn_on   - True if the power should be turned on, False if the power should be turned off.
+            repeat_on_weekdays  - Comma separated list of Weekdays the scheduler should be repeated on, i.e. 'Mon,Wed,Fri'
+            isodatetime         - ISO date and time for when the scheduler entry should be executed, i.e. '2020-01-01T10:00'
+
+        Returns a SchedulerSetNotification.
+        """
         command = EditSchedulerCommand(slot_id=int(slot_id), scheduler=Scheduler(is_active=util._parse_boolean(is_active), is_action_turn_on=util._parse_boolean(is_action_turn_on), repeat_on_weekdays=tuil._parse_weekdays_list(repeat_on_weekdays), isodatetime=isodatetime))
         self._send_command(command)
         notification = self._consume_notification()
@@ -383,6 +539,14 @@ class SEM6000():
         return notification
 
     def remove_scheduler(self, slot_id):
+        """
+        Remove an existing scheduler entry.
+
+        Parameters:
+            slot_id             - id of the slot where the scheduler entry is currently stored at.
+
+        Returns a SchedulerSetNotification.
+        """
         command = RemoveSchedulerCommand(slot_id=int(slot_id))
         self._send_command(command)
         notification = self._consume_notification()
@@ -393,6 +557,11 @@ class SEM6000():
         return notification
 
     def request_random_mode_status(self):
+        """
+        Request the current status of the random mode from the remote device.
+
+        Returns a RandomModeStatusRequestedNotification.
+        """
         command = RequestRandomModeStatusCommand()
         self._send_command(command)
         notification = self._consume_notification()
@@ -403,6 +572,16 @@ class SEM6000():
         return notification
 
     def set_random_mode(self, active_on_weekdays, start_isotime, end_isotime):
+        """
+        Activate random mode on the remote device.
+
+        Parameters:
+            active_on_weekdays  - Comma separated list of Weekdays the scheduler should be repeated on, i.e. 'Mon,Wed,Fri'
+            start_isotime       - ISO time of when random mode should start, i.e. '10:00'
+            end_isotime         - ISO time of when random mode should stop, i.e. '20:00'
+
+        Returns a RandomModeSetNotification.
+        """
         command = SetRandomModeCommand(is_active=True, active_on_weekdays=util._parse_weekdays_list(active_on_weekdays), start_isotime=start_isotime, end_isotime=end_isotime)
         self._send_command(command)
         notification = self._consume_notification()
@@ -413,6 +592,11 @@ class SEM6000():
         return notification
 
     def reset_random_mode(self):
+        """
+        Disable random mode on the remote device.
+
+        Returns a RandomModeSetNotification.
+        """
         command = SetRandomModeCommand(is_active=False, active_on_weekdays=[], start_isotime="00:00", end_isotime="00:00")
         self._send_command(command)
         notification = self._consume_notification()
@@ -423,6 +607,11 @@ class SEM6000():
         return notification
 
     def request_measurement(self):
+        """
+        Request current measurement values.
+
+        Returns a MeasurementRequestedNotification.
+        """
         command = RequestMeasurementCommand()
         self._send_command(command)
         notification = self._consume_notification()
@@ -433,6 +622,13 @@ class SEM6000():
         return notification
 
     def request_consumption_of_last_12_months(self):
+        """
+        Request consumption values of last 12 months.
+
+        Date and time need to be set for the device to start collecting these data.
+
+        Returns a ConsumptionOfLast12MonthsRequestedNotification.
+        """
         command = RequestConsumptionOfLast12MonthsCommand()
         self._send_command(command)
         notification = self._consume_notification()
@@ -443,6 +639,13 @@ class SEM6000():
         return notification
 
     def request_consumption_of_last_30_days(self):
+        """
+        Request consumption values of last 30 days.
+
+        Date and time need to be set for the device to start collecting these data.
+
+        Returns a ConsumptionOfLast30DaysRequestedNotification.
+        """
         command = RequestConsumptionOfLast30DaysCommand()
         self._send_command(command)
         notification = self._consume_notification()
@@ -453,6 +656,13 @@ class SEM6000():
         return notification
 
     def request_consumption_of_last_23_hours(self):
+        """
+        Request consumption values of curent hour and last 23 hours.
+
+        Date and time need to be set for the device to start collecting these data.
+
+        Returns a ConsumptionOfLast23HoursRequestedNotification.
+        """
         command = RequestConsumptionOfLast23HoursCommand()
         self._send_command(command)
         notification = self._consume_notification()
@@ -463,16 +673,26 @@ class SEM6000():
         return notification
 
     def reset_consumption(self):
+        """
+        Reset consumption data.
+
+        Returns a ResetConsumptionNoticiation.
+        """
         command = ResetConsumptionCommand()
         self._send_command(command)
         notification = self._consume_notification()
 
-        if not isinstance(notification, ResetConsumptionNotification) or not notification.was_successful:
+        if not isinstance(notification, ConsumptionResetNotification) or not notification.was_successful:
             raise("Reset consumption failed")
 
         return notification
 
     def factory_reset(self):
+        """
+        Reset the remote device to factory state.
+
+        Returns a FactoryResetNotification.
+        """
         command = FactoryResetCommand()
         self._send_command(command)
         notification = self._consume_notification()
@@ -483,6 +703,14 @@ class SEM6000():
         return notification
 
     def set_device_name(self, new_name):
+        """
+        Set the name of the remote device.
+
+        Parameters:
+            new_name    - Name to be set.
+
+        Returns a DeviceNameSetNotification.
+        """
         command = SetDeviceNameCommand(new_name=new_name)
         self._send_command(command)
         notification = self._consume_notification()
@@ -493,6 +721,11 @@ class SEM6000():
         return notification
 
     def request_device_serial(self):
+        """
+        Request the serial number of the remote device.
+
+        Returns a DeviceSerialRequestedNotification.
+        """
         command = RequestDeviceSerialCommand()
         self._send_command(command)
         notification = self._consume_notification()

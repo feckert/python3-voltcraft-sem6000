@@ -8,7 +8,7 @@
    "end-isotime": "06:00"
   },
   "normal-price-in-cent": 42,
-  "is-led-active": true,
+  "is-nightmode-active": false,
   "power-limit-in-watt": 2000
  },
  "random-mode": {

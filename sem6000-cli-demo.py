@@ -33,10 +33,10 @@ if __name__ == '__main__':
         print("\t\t\tpower_off", file=sys.stderr)
         print("\t\t\t\tPowers the switch off", file=sys.stderr)
         print("", file=sys.stderr)
-        print("\t\t\tled_on", file=sys.stderr)
-        print("\t\t\t\tTurns the LED on when the switch is turned on", file=sys.stderr)
-        print("\t\t\tled_off", file=sys.stderr)
+        print("\t\t\tnightmode_on", file=sys.stderr)
         print("\t\t\t\tTurn LED always off", file=sys.stderr)
+        print("\t\t\tnightmode_off", file=sys.stderr)
+        print("\t\t\t\tTurns the LED on when the switch is turned on", file=sys.stderr)
         print("", file=sys.stderr)
         print("\t\t\tset_date_and_time <isodateandtime>", file=sys.stderr)
         print("\t\t\t\tSets date and time which must be provided in iso format, i.e. 2020-01-01T12:00:00. Setting date and time also  starts collection of consumption data", file=sys.stderr)
@@ -113,17 +113,17 @@ if __name__ == '__main__':
             sem6000.power_on()
         elif cmd == 'power_off':
             sem6000.power_off()
-        elif cmd == 'led_on':
-            sem6000.led_on()
-        elif cmd == 'led_off':
-            sem6000.led_off()
+        elif cmd == 'nightmode_on':
+            sem6000.nightmode_on()
+        elif cmd == 'nightmode_off':
+            sem6000.nightmode_off()
         elif cmd == 'set_date_and_time':
             sem6000.set_date_and_time(sys.argv[4])
         elif cmd == 'synchronize_date_and_time':
             sem6000.set_date_and_time(datetime.datetime.now().isoformat())
         elif cmd == 'request_settings':
             response = sem6000.request_settings()
-            assert isinstance(response, RequestedSettingsNotification)
+            assert isinstance(response, SettingsRequestedNotification)
 
             print("Settings:")
             if response.is_reduced_period:
@@ -137,10 +137,10 @@ if __name__ == '__main__':
             print("\tRecuced period start:\t\t{}".format(response.reduced_period_start_isotime))
             print("\tRecuced period end:\t\t{}".format(response.reduced_period_end_isotime))
 
-            if response.is_led_active:
-                print("\tLED state:\t\t\tOn")
+            if response.is_nightmode_active:
+                print("\tNightmode state:\t\tOn")
             else:
-                print("\tLED state:\t\t\tOff")
+                print("\tNightmode state:\t\tOff")
 
             print("\tPower limit:\t\t\t{} W".format(response.power_limit_in_watt))
         elif cmd == 'set_power_limit':
@@ -151,7 +151,7 @@ if __name__ == '__main__':
             sem6000.set_reduced_period(is_active=sys.argv[4], start_isotime=sys.argv[5], end_isotime=sys.argv[6])
         elif cmd == 'request_timer_status':
             response = sem6000.request_timer_status()
-            assert isinstance(response, RequestedTimerStatusNotification)
+            assert isinstance(response, TimerStatusRequestedNotification)
 
             original_timer_length = datetime.timedelta(seconds=response.original_timer_length_in_seconds)
 

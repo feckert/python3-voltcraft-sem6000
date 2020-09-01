@@ -53,7 +53,7 @@ class PowerSwitchCommand(AbstractSwitchCommand):
     pass
 
 
-class LEDSwitchCommand(AbstractSwitchCommand):
+class NightmodeSetCommand(AbstractSwitchCommand):
     pass
 
 
@@ -229,32 +229,32 @@ class RequestDeviceSerialCommand(AbstractCommand):
     pass
 
 
-class AuthorizationNotification(AbstractCommandConfirmationNotification):
+class AuthorizedNotification(AbstractCommandConfirmationNotification):
     pass
 
 
-class ChangePinNotification(AbstractCommandConfirmationNotification):
+class PinChangedNotification(AbstractCommandConfirmationNotification):
     pass
 
 
-class ResetPinNotification(AbstractCommandConfirmationNotification):
+class PinResetNotification(AbstractCommandConfirmationNotification):
     pass
 
 
-class PowerSwitchNotification(AbstractCommandConfirmationNotification):
+class PowerSwitchedNotification(AbstractCommandConfirmationNotification):
     pass
 
 
-class LEDSwitchNotification(AbstractCommandConfirmationNotification):
+class NightmodeSetNotification(AbstractCommandConfirmationNotification):
     pass
 
 
-class SynchronizeDateAndTimeNotification(AbstractCommandConfirmationNotification):
+class DateAndTimeSetNotification(AbstractCommandConfirmationNotification):
     pass
 
 
-class RequestedSettingsNotification:
-    def __init__(self, is_reduced_period, normal_price_in_cent, reduced_period_price_in_cent, reduced_period_start_isotime, reduced_period_end_isotime, is_led_active, power_limit_in_watt):
+class SettingsRequestedNotification:
+    def __init__(self, is_reduced_period, normal_price_in_cent, reduced_period_price_in_cent, reduced_period_start_isotime, reduced_period_end_isotime, is_nightmode_active, power_limit_in_watt):
         self.is_reduced_period = is_reduced_period
         self.normal_price_in_cent = normal_price_in_cent
         self.reduced_period_price_in_cent = reduced_period_price_in_cent
@@ -265,12 +265,12 @@ class RequestedSettingsNotification:
         self.reduced_period_start_isotime = start_time.isoformat(timespec='minutes')
         self.reduced_period_end_isotime = end_time.isoformat(timespec='minutes')
 
-        self.is_led_active = is_led_active
+        self.is_nightmode_active = is_nightmode_active
         self.power_limit_in_watt = power_limit_in_watt
 
     def __str__(self):
         name = self.__class__.__name__
-        return name + "(is_reduced_period=" + str(self.is_reduced_period) + ", normal_price_in_cent=" + str(self.normal_price_in_cent) + ", reduced_periiod_price_in_cent=" + str(self.reduced_period_price_in_cent) + ", reduced_period_start_isotime=" + str(self.reduced_period_start_isotime) + ", reduced_period_end_isotime=" + str(self.reduced_period_end_isotime) + ", is_led_active=" + str(self.is_led_active) + ", power_limit_in_watt=" + str(self.power_limit_in_watt) + ")"
+        return name + "(is_reduced_period=" + str(self.is_reduced_period) + ", normal_price_in_cent=" + str(self.normal_price_in_cent) + ", reduced_periiod_price_in_cent=" + str(self.reduced_period_price_in_cent) + ", reduced_period_start_isotime=" + str(self.reduced_period_start_isotime) + ", reduced_period_end_isotime=" + str(self.reduced_period_end_isotime) + ", is_nightmode_active=" + str(self.is_nightmode_active) + ", power_limit_in_watt=" + str(self.power_limit_in_watt) + ")"
 
 
 class PowerLimitSetNotification(AbstractCommandConfirmationNotification):
@@ -285,7 +285,7 @@ class ReducedPeriodSetNotification(AbstractCommandConfirmationNotification):
     pass
 
 
-class RequestedTimerStatusNotification:
+class TimerStatusRequestedNotification:
     def __init__(self, is_active, is_action_turn_on, target_isodatetime, original_timer_length_in_seconds):
         d = datetime.datetime.fromisoformat(target_isodatetime)
 
@@ -422,7 +422,7 @@ class ConsumptionOfLast23HoursRequestedNotification:
         return name + "(consumption_n_hours_ago_in_watt_hour=" + util._format_list_of_objects(str, self.consumption_n_hours_ago_in_watt_hour) + ")"
 
 
-class ResetConsumptionNotification(AbstractCommandConfirmationNotification):
+class ConsumptionResetNotification(AbstractCommandConfirmationNotification):
     pass
 
 
