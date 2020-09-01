@@ -10,5 +10,5 @@
 - [ ] rename led command to nightmode
 - [ ] cleaner API - use change instead of set consistently
 - [x] move pseudo commands from cli demo to sem6000 module (i.e. reset\_timer, reset\_random_mode)
-- [ ] introduce hierarchy in settings response (i.e. reduced-perion sub-object)
+- [ ] introduce hierarchy in settings response (i.e. reduced-period sub-object)
 - [ ] settings backup / restore cli: beautification of JSON
