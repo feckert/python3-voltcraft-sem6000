@@ -407,7 +407,11 @@ class SEM6000():
 
         Returns a ReducedPeriodSetNotification.
         """
-        command = SetReducedPeriodCommand(is_active=util._parse_boolean(is_active), start_isotime=start_isotime, end_isotime=end_isotime)
+        command = SetReducedPeriodCommand(
+            is_active=util._parse_boolean(is_active), 
+            start_isotime=start_isotime, 
+            end_isotime=end_isotime)
+
         self._send_command(command)
         notification = self._consume_notification()
 
@@ -445,7 +449,11 @@ class SEM6000():
         timedelta = datetime.timedelta(hours=time.hour, minutes=time.minute, seconds=time.second)
         dt = datetime.datetime.now() + timedelta
 
-        command = SetTimerCommand(is_reset_timer=False, is_action_turn_on=util._parse_boolean(is_action_turn_on), target_isodatetime=dt.isoformat(timespec='seconds'))
+        command = SetTimerCommand(
+            is_reset_timer=False, 
+            is_action_turn_on=util._parse_boolean(is_action_turn_on), 
+            target_isodatetime=dt.isoformat(timespec='seconds'))
+
         self._send_command(command)
         notification = self._consume_notification()
 
@@ -582,7 +590,12 @@ class SEM6000():
 
         Returns a RandomModeSetNotification.
         """
-        command = SetRandomModeCommand(is_active=True, active_on_weekdays=util._parse_weekdays_list(active_on_weekdays), start_isotime=start_isotime, end_isotime=end_isotime)
+        command = SetRandomModeCommand(
+            is_active=True, 
+            active_on_weekdays=util._parse_weekdays_list(active_on_weekdays), 
+            start_isotime=start_isotime, 
+            end_isotime=end_isotime)
+
         self._send_command(command)
         notification = self._consume_notification()
 
@@ -597,7 +610,12 @@ class SEM6000():
 
         Returns a RandomModeSetNotification.
         """
-        command = SetRandomModeCommand(is_active=False, active_on_weekdays=[], start_isotime="00:00", end_isotime="00:00")
+        command = SetRandomModeCommand(
+            is_active=False, 
+            active_on_weekdays=[], 
+            start_isotime="00:00", 
+            end_isotime="00:00")
+
         self._send_command(command)
         notification = self._consume_notification()
 
