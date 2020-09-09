@@ -1,5 +1,3 @@
-# Replace gatttool dependency with gatt-python
-
 - [ ] cleaner API for working with weekdays
 - [x] cleaner API for working with timer - rename is_timer_running to is_active 
 - [x] cleaner API response - replace separate values with isotime or isodatetime
