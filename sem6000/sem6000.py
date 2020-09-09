@@ -503,19 +503,24 @@ class SEM6000():
 
         return notification
 
-    def add_scheduler(self, is_active, is_action_turn_on, repeat_on_weekdays, isodatetime):
+    def add_onetime_scheduler(self, is_active, is_action_turn_on, isodatetime):
         """
-        Add a scheduler entry.
+        Add a scheduler entry occuring at a specific date and time.
 
         Parameters:
             is_active           - True if the scheduler entry should be active, else False.
             is_action_turn_on   - True if the power should be turned on, False if the power should be turned off.
-            repeat_on_weekdays  - Comma separated list of Weekdays the scheduler should be repeated on, i.e. 'Mon,Wed,Fri'
             isodatetime         - ISO date and time for when the scheduler entry should be executed, i.e. '2020-01-01T10:00'
 
         Returns a SchedulerSetNotification.
         """
-        command = AddSchedulerCommand(Scheduler(is_active=util._parse_boolean(is_active), is_action_turn_on=util._parse_boolean(is_action_turn_on), repeat_on_weekdays=util._parse_weekdays_list(repeat_on_weekdays), isodatetime=isodatetime))
+        command = AddSchedulerCommand(
+            OneTimeScheduler(
+                is_active=util._parse_boolean(is_active), 
+                is_action_turn_on=util._parse_boolean(is_action_turn_on), 
+                isodatetime=isodatetime
+            ))
+
         self._send_command(command)
         notification = self._consume_notification()
 
@@ -524,20 +529,84 @@ class SEM6000():
 
         return notification
 
-    def edit_scheduler(self, slot_id, is_active, is_action_turn_on, repeat_on_weekdays, isodatetime):
+    def edit_onetime_scheduler(self, slot_id, is_active, is_action_turn_on, isodatetime):
         """
-        Edit an existing scheduler entry.
+        Edit an existing scheduler entry occuring at a specific date and time.
+
+        Parameters:
+            slot_id             - id of the slot where the scheduler entry is currently stored at.
+            is_active           - True if the scheduler entry should be active, else False.
+            is_action_turn_on   - True if the power should be turned on, False if the power should be turned off.
+            isodatetime         - ISO date and time for when the scheduler entry should be executed, i.e. '2020-01-01T10:00'
+
+        Returns a SchedulerSetNotification.
+        """
+        command = EditSchedulerCommand(
+            slot_id=int(slot_id), 
+            scheduler=OneTimeScheduler(
+                is_active=util._parse_boolean(is_active), 
+                is_action_turn_on=util._parse_boolean(is_action_turn_on), 
+                isodatetime=isodatetime
+            ))
+
+        self._send_command(command)
+        notification = self._consume_notification()
+
+        if not isinstance(notification, SchedulerSetNotification) or not notification.was_successful:
+            raise Exception("Edit scheduler failed")
+
+        return notification
+
+    def add_repeated_scheduler(self, is_active, is_action_turn_on, repeat_on_weekdays, isotime):
+        """
+        Add a scheduler entry that will be repeated regulary.
+
+        Parameters:
+            is_active           - True if the scheduler entry should be active, else False.
+            is_action_turn_on   - True if the power should be turned on, False if the power should be turned off.
+            repeat_on_weekdays  - Comma separated list of Weekdays the scheduler should be repeated on, i.e. 'Mon,Wed,Fri'
+            isotime             - ISO time for when the scheduler entry should be executed, i.e. '10:00'
+
+        Returns a SchedulerSetNotification.
+        """
+        command = AddSchedulerCommand(
+            RepeatedScheduler(
+                is_active=util._parse_boolean(is_active), 
+                is_action_turn_on=util._parse_boolean(is_action_turn_on), 
+                repeat_on_weekdays=util._parse_weekdays_list(repeat_on_weekdays), 
+                isotime=isotime
+            ))
+
+        self._send_command(command)
+        notification = self._consume_notification()
+
+        if not isinstance(notification, SchedulerSetNotification) or not notification.was_successful:
+            raise Exception("Add scheduler failed")
+
+        return notification
+
+    def edit_repeated_scheduler(self, slot_id, is_active, is_action_turn_on, repeat_on_weekdays, isotime):
+        """
+        Edit an existing scheduler entry that will be repeated regulary.
 
         Parameters:
             slot_id             - id of the slot where the scheduler entry is currently stored at.
             is_active           - True if the scheduler entry should be active, else False.
             is_action_turn_on   - True if the power should be turned on, False if the power should be turned off.
             repeat_on_weekdays  - Comma separated list of Weekdays the scheduler should be repeated on, i.e. 'Mon,Wed,Fri'
-            isodatetime         - ISO date and time for when the scheduler entry should be executed, i.e. '2020-01-01T10:00'
+            isotime             - ISO time for when the scheduler entry should be executed, i.e. '10:00'
 
         Returns a SchedulerSetNotification.
         """
-        command = EditSchedulerCommand(slot_id=int(slot_id), scheduler=Scheduler(is_active=util._parse_boolean(is_active), is_action_turn_on=util._parse_boolean(is_action_turn_on), repeat_on_weekdays=tuil._parse_weekdays_list(repeat_on_weekdays), isodatetime=isodatetime))
+        command = EditSchedulerCommand(
+            slot_id=int(slot_id), 
+            scheduler=RepeatedScheduler(
+                is_active=util._parse_boolean(is_active), 
+                is_action_turn_on=util._parse_boolean(is_action_turn_on), 
+                repeat_on_weekdays=util._parse_weekdays_list(repeat_on_weekdays), 
+                isotime=isotime
+            ))
+
         self._send_command(command)
         notification = self._consume_notification()
 

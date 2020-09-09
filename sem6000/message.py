@@ -315,13 +315,41 @@ class Scheduler:
         d = datetime.datetime.fromisoformat(isodatetime)
         self.isodatetime = d.isoformat(timespec='minutes')
 
+
+class OneTimeScheduler(Scheduler):
+    def __init__(self, is_active, is_action_turn_on, isodatetime):
+        Scheduler.__init__(self, 
+            is_active=is_active, 
+            is_action_turn_on=is_action_turn_on,
+            repeat_on_weekdays=[], 
+            isodatetime=isodatetime)
+
     def __str__(self):
         name = self.__class__.__name__
 
         weekday_formatter = lambda w: w.name
         repeat_on_weekdays = util._format_list_of_objects(weekday_formatter, self.repeat_on_weekdays)
 
-        return name + "(is_active=" + str(self.is_active) + ", is_action_turn_on=" + str(self.is_action_turn_on) + ", repeat_on_weekdays=" + repeat_on_weekdays + ", isodatetime=" + str(self.isodatetime) + ")"
+        return name + "(is_active=" + str(self.is_active) + ", is_action_turn_on=" + str(self.is_action_turn_on) + ", isodatetime=" + str(self.isodatetime) + ")"
+
+
+class RepeatedScheduler(Scheduler):
+    def __init__(self, is_active, is_action_turn_on, repeat_on_weekdays, isotime):
+        Scheduler.__init__(self, 
+            is_active=is_active, 
+            is_action_turn_on=is_action_turn_on,
+            repeat_on_weekdays=repeat_on_weekdays, 
+            isodatetime=datetime.date.today().isoformat() + 'T' + isotime)
+
+    def __str__(self):
+        name = self.__class__.__name__
+
+        weekday_formatter = lambda w: w.name
+        repeat_on_weekdays = util._format_list_of_objects(weekday_formatter, self.repeat_on_weekdays)
+
+        isotime = datetime.datetime.fromisoformat(self.isodatetime).time().isoformat(timespec='minutes')
+
+        return name + "(is_active=" + str(self.is_active) + ", is_action_turn_on=" + str(self.is_action_turn_on) + ", repeat_on_weekdays=" + repeat_on_weekdays + ", isotime=" + isotime + ")"
 
 
 class SchedulerEntry:

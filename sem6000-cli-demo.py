@@ -61,9 +61,13 @@ if __name__ == '__main__':
         print("", file=sys.stderr)
         print("\t\t\trequest_scheduler", file=sys.stderr)
         print("\t\t\t\tRequest all scheduler entries", file=sys.stderr)
-        print("\t\t\tadd_scheduler <is_active?> <turn_on?> <repeat_on_weekdays> <isodatetime>", file=sys.stderr)
+        print("\t\t\tadd_onetime_scheduler <is_active?> <turn_on?> <isodatetime>", file=sys.stderr)
         print("\t\t\t\tAdd a scheduler entry, i.e. True True Mon,Wed,Sun 2020-01-01T12:00", file=sys.stderr)
-        print("\t\t\tedit_scheduler <slot_id> <is_active?> <turn_on?> <repeat_on_weekdays> <isodatetime>", file=sys.stderr)
+        print("\t\t\tedit_onetime_scheduler <slot_id> <is_active?> <turn_on?> <isodatetime>", file=sys.stderr)
+        print("\t\t\t\tEdit an existing scheduler entry, i.e. 12 True True \"\" 2020-01-01T12:00", file=sys.stderr)
+        print("\t\t\tadd_repeated_scheduler <is_active?> <turn_on?> <repeat_on_weekdays> <isotime>", file=sys.stderr)
+        print("\t\t\t\tAdd a scheduler entry, i.e. True True Mon,Wed,Sun 2020-01-01T12:00", file=sys.stderr)
+        print("\t\t\tedit_repeated_scheduler <slot_id> <is_active?> <turn_on?> <repeat_on_weekdays> <isotime>", file=sys.stderr)
         print("\t\t\t\tEdit an existing scheduler entry, i.e. 12 True True \"\" 2020-01-01T12:00", file=sys.stderr)
         print("\t\t\tremove_scheduler <slot_id>", file=sys.stderr)
         print("\t\t\t\tRemoves a scheduler entry", file=sys.stderr)
@@ -211,21 +215,34 @@ if __name__ == '__main__':
 
                 print("\tTime:\t\t\t" + dt.time().isoformat(timespec='minutes'))
                 print("")
-        elif cmd == 'add_scheduler':
+        elif cmd == 'add_onetime_scheduler':
+            is_active = sys.argv[4]
+            is_action_turn_on = sys.argv[5]
+            isodatetime = sys.argv[6]
+
+            response = sem6000.add_onetime_scheduler(is_active=is_active, is_action_turn_on=is_action_turn_on, isodatetime=isodatetime)
+        elif cmd == 'edit_onetime_scheduler':
+            slot_id = sys.argv[4]
+            is_active = sys.argv[5]
+            is_action_turn_on = sys.argv[6]
+            isodatetime = sys.argv[7]
+
+            response = sem6000.edit_onetime_scheduler(slot_id=slot_id, is_active=is_active, is_action_turn_on=is_action_turn_on, isodatetime=isodatetime)
+        elif cmd == 'add_repeated_scheduler':
             is_active = sys.argv[4]
             is_action_turn_on = sys.argv[5]
             repeat_on_weekdays=sys.argv[6]
-            isodatetime = sys.argv[7]
+            isotime = sys.argv[7]
 
-            response = sem6000.add_scheduler(is_active=is_active, is_action_turn_on=is_action_turn_on, repeat_on_weekdays=repeat_on_weekdays, isodatetime=isodatetime)
-        elif cmd == 'edit_scheduler':
+            response = sem6000.add_repeated_scheduler(is_active=is_active, is_action_turn_on=is_action_turn_on, repeat_on_weekdays=repeat_on_weekdays, isotime=isotime)
+        elif cmd == 'edit_repeated_scheduler':
             slot_id = sys.argv[4]
             is_active = sys.argv[5]
             is_action_turn_on = sys.argv[6]
             repeat_on_weekdays=sys.argv[7]
-            isodatetime = sys.argv[8]
+            isotime = sys.argv[8]
 
-            response = sem6000.edit_scheduler(slot_id=slot_id, is_active=is_active, is_action_turn_on=is_action_turn_on, repeat_on_weekdays=repeat_on_weekdays, isodatetime=isodatetime)
+            response = sem6000.edit_repeated_scheduler(slot_id=slot_id, is_active=is_active, is_action_turn_on=is_action_turn_on, repeat_on_weekdays=repeat_on_weekdays, isotime=isotime)
         elif cmd == 'remove_scheduler':
             slot_id = sys.argv[4]
 

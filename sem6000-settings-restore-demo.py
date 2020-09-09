@@ -9,7 +9,7 @@ from sem6000.message import *
 
 
 if len(sys.argv) <= 1:
-    print("Usage: " + sys.argv[0] + " <bluetooth address> <pin>", file=sys.stderr)
+    print("Usage: " + sys.argv[0] + " <bluetooth address> <pin> <settings backup file>", file=sys.stderr)
 else:
     address = sys.argv[1]
     pin = sys.argv[2]
@@ -49,5 +49,8 @@ else:
     for slot_id in slot_ids:
         scheduler = data["scheduler"]["entries"][slot_id]
 
-        device.add_scheduler(scheduler["is-active"], scheduler["is-action-turn-on"], scheduler["repeat-on-weekdays"], scheduler["isodatetime"])
+        if not "repeat-on-weekdays" in scheduler:
+            device.add_onetime_scheduler(scheduler["is-active"], scheduler["is-action-turn-on"], scheduler["isodatetime"])
+        else:
+            device.add_repeated_scheduler(scheduler["is-active"], scheduler["is-action-turn-on"], scheduler["repeat-on-weekdays"], scheduler["isotime"])
 

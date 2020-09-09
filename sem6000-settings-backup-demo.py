@@ -59,12 +59,21 @@ else:
         for w in scheduler.repeat_on_weekdays:
             weekdays.append(w.value)
 
-        d[entry.slot_id] = {
-            "is-active": scheduler.is_active,
-            "is-action-turn-on": scheduler.is_action_turn_on,
-            "repeat-on-weekdays": weekdays,
-            "isodatetime": scheduler.isodatetime
-        }
+        dt = datetime.datetime.fromisoformat(scheduler.isodatetime)
+
+        if not len(weekdays):
+            d[entry.slot_id] = {
+                "is-active": scheduler.is_active,
+                "is-action-turn-on": scheduler.is_action_turn_on,
+                "isodatetime": scheduler.isodatetime
+            }
+        else:
+            d[entry.slot_id] = {
+                "is-active": scheduler.is_active,
+                "is-action-turn-on": scheduler.is_action_turn_on,
+                "repeat-on-weekdays": weekdays,
+                "isotime": dt.time().isoformat(timespec='minutes')
+            }
 
     json.dump(data, sys.stdout, indent=True)
     print("")

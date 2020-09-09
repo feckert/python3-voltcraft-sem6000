@@ -68,7 +68,17 @@ class MessageParser:
 
         d = datetime.datetime(year, month, day, hour, minute)
 
-        return Scheduler(is_active=is_active, is_action_turn_on=is_action_turn_on, repeat_on_weekdays=repeat_on_weekdays, isodatetime=d.isoformat(timespec='minutes'))
+        if len(repeat_on_weekdays):
+            return RepeatedScheduler(
+                is_active=is_active, 
+                is_action_turn_on=is_action_turn_on, 
+                repeat_on_weekdays=repeat_on_weekdays, 
+                isotime=d.time().isoformat(timespec='minutes'))
+        else:
+            return OneTimeScheduler(
+                is_active=is_active, 
+                is_action_turn_on=is_action_turn_on, 
+                isodatetime=d.isoformat(timespec='minutes'))
 
     def parse(self, data):
         payload = self._parse_payload(data)
