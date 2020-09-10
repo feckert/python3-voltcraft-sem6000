@@ -64,7 +64,7 @@ class MessageEncoder():
             else:
                 return self._encode_message(b'\x03\x00\x00' + b'\x00\x00')
 
-        if isinstance(message, NightmodeSetCommand):
+        if isinstance(message, ChangeNightmodeCommand):
             if message.on:
                 return self._encode_message(b'\x0f\x00\x05\x00' + b'\x00\x00\x00\x00')
             else:
@@ -86,18 +86,18 @@ class MessageEncoder():
         if isinstance(message, RequestSettingsCommand):
             return self._encode_message(b'\x10\x00' + b'\x00\x00')
 
-        if isinstance(message, SetPowerLimitCommand):
+        if isinstance(message, ChangePowerLimitCommand):
             power_limit_in_watt = message.power_limit_in_watt.to_bytes(2, 'big')
 
             return self._encode_message(b'\x05\x00' + power_limit_in_watt + b'\x00\x00')
 
-        if isinstance(message, SetPricesCommand):
+        if isinstance(message, ChangePricesCommand):
             normal_price_in_cent = message.normal_price_in_cent.to_bytes(1, 'big')
             reduced_period_price_in_cent = message.reduced_period_price_in_cent.to_bytes(1, 'big')
 
             return self._encode_message(b'\x0f\x00\x04' + normal_price_in_cent + reduced_period_price_in_cent + b'\x00\x00\x00\x00')
 
-        if isinstance(message, SetReducedPeriodCommand):
+        if isinstance(message, ChangeReducedPeriodCommand):
             is_active = b'\x00'
             if message.is_active:
                 is_active = b'\x01'
@@ -160,7 +160,7 @@ class MessageEncoder():
         if isinstance(message, RequestRandomModeStatusCommand):
             return self._encode_message(b'\x16\x00' + b'\x00\x00')
 
-        if isinstance(message, SetRandomModeCommand):
+        if isinstance(message, ChangeRandomModeCommand):
             is_active = b'\x00'
             if message.is_active:
                 is_active = b'\x01'
@@ -198,7 +198,7 @@ class MessageEncoder():
         if isinstance(message, FactoryResetCommand):
             return self._encode_message(b'\x0f\x00' + b'\x00' + b'\x00\x00\x00\x00\x00')
 
-        if isinstance(message, SetDeviceNameCommand):
+        if isinstance(message, ChangeDeviceNameCommand):
             new_name = message.new_name
             if isinstance(new_name, str):
                 new_name = new_name.encode()
@@ -242,10 +242,10 @@ class MessageEncoder():
 
             return self._encode_message(b'\x03\x00' + was_successful)
 
-        if isinstance(message, NightmodeSetNotification):
+        if isinstance(message, NightmodeChangedNotification):
             return self._encode_message(b'\x0f\x00' + b'\x05\x00')
 
-        if isinstance(message, DateAndTimeSetNotification):
+        if isinstance(message, DateAndTimeChangedNotification):
             was_successful = b'\x01'
             if message.was_successful:
                 was_successful = b'\x00'
@@ -274,13 +274,13 @@ class MessageEncoder():
 
             return self._encode_message(b'\x10\x00' + is_reduced_period + normal_price_in_cent + reduced_period_price_in_cent + reduced_period_start_time_in_minutes + reduced_period_end_time_in_minutes + is_nightmode_active + b'\x00' + power_limit_in_watt)
 
-        if isinstance(message, PowerLimitSetNotification):
+        if isinstance(message, PowerLimitChangedNotification):
             return self._encode_message(b'\x05\x00' + b'\x00')
 
-        if isinstance(message, PricesSetNotification):
+        if isinstance(message, PricesChangedNotification):
             return self._encode_message(b'\x0f\x00\x04' + b'\x00')
 
-        if isinstance(message, ReducedPeriodSetNotification):
+        if isinstance(message, ReducedPeriodChangedNotification):
             return self._encode_message(b'\x0f\x00\x01' + b'\x00')
 
         if isinstance(message, TimerStatusRequestedNotification):
@@ -326,7 +326,7 @@ class MessageEncoder():
 
             return self._encode_message(b'\x14\x00' + number_of_schedulers + schedulers_data)
 
-        if isinstance(message, SchedulerSetNotification):
+        if isinstance(message, SchedulerChangedNotification):
             was_successful = b'\x01'
             if message.was_successful:
                 was_successful = b'\x00'
@@ -353,7 +353,7 @@ class MessageEncoder():
 
             return self._encode_message(b'\x16\x00' + is_active + active_on_weekdays + start_hour + start_minute + end_hour + end_minute + b'\x00\x00')
 
-        if isinstance(message, RandomModeSetNotification):
+        if isinstance(message, RandomModeChangedNotification):
             was_successful = b'\x01'
             if message.was_successful:
                 was_successful = b'\x00'
@@ -408,7 +408,7 @@ class MessageEncoder():
         if isinstance(message, FactoryResetNotification):
             return self._encode_message(b'\x0f\x00' + b'\x00' + b'\x00')
 
-        if isinstance(message, DeviceNameSetNotification):
+        if isinstance(message, DeviceNameChangedNotification):
             return self._encode_message(b'\x02\x00' + b'\x00')
 
         if isinstance(message, DeviceSerialRequestedNotification):

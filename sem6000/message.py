@@ -53,7 +53,7 @@ class PowerSwitchCommand(AbstractSwitchCommand):
     pass
 
 
-class NightmodeSetCommand(AbstractSwitchCommand):
+class ChangeNightmodeCommand(AbstractSwitchCommand):
     pass
 
 
@@ -71,7 +71,7 @@ class RequestSettingsCommand(AbstractCommand):
     pass
 
 
-class SetPowerLimitCommand():
+class ChangePowerLimitCommand():
     def __init__(self, power_limit_in_watt):
         self.power_limit_in_watt = power_limit_in_watt 
 
@@ -80,7 +80,7 @@ class SetPowerLimitCommand():
         return name + "(power_limit_in_watt=" + str(self.power_limit_in_watt) + ")"
 
 
-class SetPricesCommand():
+class ChangePricesCommand():
     def __init__(self, normal_price_in_cent, reduced_period_price_in_cent):
         self.normal_price_in_cent = normal_price_in_cent
         self.reduced_period_price_in_cent = reduced_period_price_in_cent
@@ -90,7 +90,7 @@ class SetPricesCommand():
         return name + "(normal_price_in_cent=" + str(self.normal_price_in_cent) + ", reduced_period_price_in_cent=" + str(self.reduced_period_price_in_cent) + ")"
 
 
-class SetReducedPeriodCommand():
+class ChangeReducedPeriodCommand():
     def __init__(self, is_active, start_isotime, end_isotime):
         self.is_active = is_active
         self.start_isotime = start_isotime
@@ -171,7 +171,7 @@ class RequestRandomModeStatusCommand(AbstractCommand):
     pass 
 
 
-class SetRandomModeCommand:
+class ChangeRandomModeCommand:
     def __init__(self, is_active, active_on_weekdays, start_isotime, end_isotime):
         active_on_weekdays = util._list_values_to_enum(util.Weekday, active_on_weekdays)
 
@@ -216,7 +216,7 @@ class FactoryResetCommand(AbstractCommand):
     pass
 
 
-class SetDeviceNameCommand:
+class ChangeDeviceNameCommand:
         def __init__(self, new_name):
             self.new_name = new_name
 
@@ -245,11 +245,11 @@ class PowerSwitchedNotification(AbstractCommandConfirmationNotification):
     pass
 
 
-class NightmodeSetNotification(AbstractCommandConfirmationNotification):
+class NightmodeChangedNotification(AbstractCommandConfirmationNotification):
     pass
 
 
-class DateAndTimeSetNotification(AbstractCommandConfirmationNotification):
+class DateAndTimeChangedNotification(AbstractCommandConfirmationNotification):
     pass
 
 
@@ -273,15 +273,15 @@ class SettingsRequestedNotification:
         return name + "(is_reduced_period=" + str(self.is_reduced_period) + ", normal_price_in_cent=" + str(self.normal_price_in_cent) + ", reduced_periiod_price_in_cent=" + str(self.reduced_period_price_in_cent) + ", reduced_period_start_isotime=" + str(self.reduced_period_start_isotime) + ", reduced_period_end_isotime=" + str(self.reduced_period_end_isotime) + ", is_nightmode_active=" + str(self.is_nightmode_active) + ", power_limit_in_watt=" + str(self.power_limit_in_watt) + ")"
 
 
-class PowerLimitSetNotification(AbstractCommandConfirmationNotification):
+class PowerLimitChangedNotification(AbstractCommandConfirmationNotification):
     pass
 
 
-class PricesSetNotification(AbstractCommandConfirmationNotification):
+class PricesChangedNotification(AbstractCommandConfirmationNotification):
     pass
 
 
-class ReducedPeriodSetNotification(AbstractCommandConfirmationNotification):
+class ReducedPeriodChangedNotification(AbstractCommandConfirmationNotification):
     pass
 
 
@@ -380,7 +380,7 @@ class SchedulerRequestedNotification:
         return name + "(number_of_schedulers=" + str(self.number_of_schedulers) + ", scheduler_entries=" + scheduler_entries + ")"
 
 
-class SchedulerSetNotification(AbstractCommandConfirmationNotification):
+class SchedulerChangedNotification(AbstractCommandConfirmationNotification):
     pass
 
 
@@ -405,7 +405,7 @@ class RandomModeStatusRequestedNotification:
         return name + "(is_active=" + str(self.is_active) + ", active_on_weekdays=" + active_on_weekdays + ", start_isotime=" + str(self.start_isotime) + ", end_isotime=" + str(self.end_isotime) + ")"
 
 
-class RandomModeSetNotification(AbstractCommandConfirmationNotification):
+class RandomModeChangedNotification(AbstractCommandConfirmationNotification):
     pass
 
 
@@ -458,7 +458,7 @@ class FactoryResetNotification(AbstractCommandConfirmationNotification):
     pass
 
 
-class DeviceNameSetNotification(AbstractCommandConfirmationNotification):
+class DeviceNameChangedNotification(AbstractCommandConfirmationNotification):
     pass
 
 

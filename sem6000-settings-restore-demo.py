@@ -26,21 +26,21 @@ else:
     device = sem6000.SEM6000(address, "0000", debug=True)
     device.change_pin(pin)
 
-    device.set_date_and_time(datetime.datetime.now().isoformat())
-    device.set_device_name(data["device-name"])
+    device.change_date_and_time(datetime.datetime.now().isoformat())
+    device.change_device_name(data["device-name"])
 
-    device.set_prices(data["settings"]["normal-price-in-cent"], data["settings"]["reduced-period"]["price-in-cent"])
-    device.set_reduced_period(data["settings"]["reduced-period"]["is-active"], data["settings"]["reduced-period"]["start-isotime"], data["settings"]["reduced-period"]["end-isotime"])
+    device.change_prices(data["settings"]["normal-price-in-cent"], data["settings"]["reduced-period"]["price-in-cent"])
+    device.change_reduced_period(data["settings"]["reduced-period"]["is-active"], data["settings"]["reduced-period"]["start-isotime"], data["settings"]["reduced-period"]["end-isotime"])
 
     if data["settings"]["is-nightmode-active"]:
         device.nightmode_on()
     else:
         device.nightmode_off()
 
-    device.set_power_limit(data["settings"]["power-limit-in-watt"])
+    device.change_power_limit(data["settings"]["power-limit-in-watt"])
 
     if data["random-mode"]["is-active"]:
-        device.set_random_mode(data["random-mode"]["active-on-weekdays"], data["random-mode"]["start-isotime"], data["random-mode"]["end-isotime"])
+        device.change_random_mode(data["random-mode"]["active-on-weekdays"], data["random-mode"]["start-isotime"], data["random-mode"]["end-isotime"])
     else:
         device.reset_random_mode()
 

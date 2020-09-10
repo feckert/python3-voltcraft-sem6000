@@ -38,18 +38,18 @@ if __name__ == '__main__':
         print("\t\t\tnightmode_off", file=sys.stderr)
         print("\t\t\t\tTurns the LED on when the switch is turned on", file=sys.stderr)
         print("", file=sys.stderr)
-        print("\t\t\tset_date_and_time <isodateandtime>", file=sys.stderr)
+        print("\t\t\tchange_date_and_time <isodateandtime>", file=sys.stderr)
         print("\t\t\t\tSets date and time which must be provided in iso format, i.e. 2020-01-01T12:00:00. Setting date and time also  starts collection of consumption data", file=sys.stderr)
         print("\t\t\tsynchronize_date_and_time", file=sys.stderr)
         print("\t\t\t\tSets date and time of the device to the current system time", file=sys.stderr)
         print("", file=sys.stderr)
         print("\t\t\trequest_settings", file=sys.stderr)
         print("\t\t\t\tRequest current settings for power limit, prices and reduced period times", file=sys.stderr)
-        print("\t\t\tset_power_limit <power_limit_in_watt>", file=sys.stderr)
+        print("\t\t\tchange_power_limit <power_limit_in_watt>", file=sys.stderr)
         print("\t\t\t\tSets the power limit in watt when the switch should be automatically turned off", file=sys.stderr)
-        print("\t\t\tset_prices <price_in_cent> <reduced_period_price_in_cent>", file=sys.stderr)
+        print("\t\t\tchange_prices <price_in_cent> <reduced_period_price_in_cent>", file=sys.stderr)
         print("\t\t\t\tSet prices for normal and reduced period", file=sys.stderr)
-        print("\t\t\tset_reduced_period <is_active> <start_isotime> <end_isotime>", file=sys.stderr)
+        print("\t\t\tchange_reduced_period <is_active> <start_isotime> <end_isotime>", file=sys.stderr)
         print("\t\t\t\tSet begin and end time of the reduced period", file=sys.stderr)
         print("", file=sys.stderr)
         print("\t\t\trequest_timer_status", file=sys.stderr)
@@ -74,7 +74,7 @@ if __name__ == '__main__':
         print("", file=sys.stderr)
         print("\t\t\trequest_random_mode_status", file=sys.stderr)
         print("\t\t\t\tRequests current status of the random mode", file=sys.stderr)
-        print("\t\t\tset_random_mode <active_on_weekdays> <start_isotime> <end_isotime>", file=sys.stderr)
+        print("\t\t\tchange_random_mode <active_on_weekdays> <start_isotime> <end_isotime>", file=sys.stderr)
         print("\t\t\t\tSets random mode, i.e. True Mon,Wed,Sun 22:00 04:00", file=sys.stderr)
         print("\t\t\treset_random_mode", file=sys.stderr)
         print("\t\t\t\tResets random mode", file=sys.stderr)
@@ -93,7 +93,7 @@ if __name__ == '__main__':
         print("", file=sys.stderr)
         print("\t\t\trequest_device_name", file=sys.stderr)
         print("\t\t\t\tRequests the device name", file=sys.stderr)
-        print("\t\t\tset_device_name <new_name>", file=sys.stderr)
+        print("\t\t\tchange_device_name <new_name>", file=sys.stderr)
         print("\t\t\t\tChanges the device name", file=sys.stderr)
         print("\t\t\tfactory_reset", file=sys.stderr)
         print("\t\t\t\tResets the device back to factory defaults", file=sys.stderr)
@@ -121,10 +121,10 @@ if __name__ == '__main__':
             sem6000.nightmode_on()
         elif cmd == 'nightmode_off':
             sem6000.nightmode_off()
-        elif cmd == 'set_date_and_time':
-            sem6000.set_date_and_time(sys.argv[4])
+        elif cmd == 'change_date_and_time':
+            sem6000.change_date_and_time(sys.argv[4])
         elif cmd == 'synchronize_date_and_time':
-            sem6000.set_date_and_time(datetime.datetime.now().isoformat())
+            sem6000.change_date_and_time(datetime.datetime.now().isoformat())
         elif cmd == 'request_settings':
             response = sem6000.request_settings()
             assert isinstance(response, SettingsRequestedNotification)
@@ -147,12 +147,12 @@ if __name__ == '__main__':
                 print("\tNightmode state:\t\tOff")
 
             print("\tPower limit:\t\t\t{} W".format(response.power_limit_in_watt))
-        elif cmd == 'set_power_limit':
-            sem6000.set_power_limit(power_limit_in_watt=sys.argv[4])
-        elif cmd == 'set_prices':
-            sem6000.set_prices(normal_price_in_cent=sys.argv[4], reduced_period_price_in_cent=sys.argv[5])
-        elif cmd == 'set_reduced_period':
-            sem6000.set_reduced_period(is_active=sys.argv[4], start_isotime=sys.argv[5], end_isotime=sys.argv[6])
+        elif cmd == 'change_power_limit':
+            sem6000.change_power_limit(power_limit_in_watt=sys.argv[4])
+        elif cmd == 'change_prices':
+            sem6000.change_prices(normal_price_in_cent=sys.argv[4], reduced_period_price_in_cent=sys.argv[5])
+        elif cmd == 'change_reduced_period':
+            sem6000.change_reduced_period(is_active=sys.argv[4], start_isotime=sys.argv[5], end_isotime=sys.argv[6])
         elif cmd == 'request_timer_status':
             response = sem6000.request_timer_status()
             assert isinstance(response, TimerStatusRequestedNotification)
@@ -266,12 +266,12 @@ if __name__ == '__main__':
             print("\tStart time:\t\t" + str(start_time))
             print("\tEnd time:\t\t" + str(end_time))
             print("")
-        elif cmd == 'set_random_mode':
+        elif cmd == 'change_random_mode':
             active_on_weekdays = sys.argv[4]
             start_isotime = sys.argv[5]
             end_isotime = sys.argv[6]
 
-            sem6000.set_random_mode(active_on_weekdays=active_on_weekdays, start_isotime=start_isotime, end_isotime=end_isotime)
+            sem6000.change_random_mode(active_on_weekdays=active_on_weekdays, start_isotime=start_isotime, end_isotime=end_isotime)
         elif cmd == 'reset_random_mode':
             sem6000.reset_random_mode()
         elif cmd == 'request_measurement':
@@ -343,10 +343,10 @@ if __name__ == '__main__':
             response = sem6000.request_device_name()
 
             print("Device-Name:\t" + response.device_name)
-        elif cmd == 'set_device_name':
+        elif cmd == 'change_device_name':
             new_name = sys.argv[4]
 
-            sem6000.set_device_name(new_name=new_name)
+            sem6000.change_device_name(new_name=new_name)
         elif cmd == 'factory_reset':
             sem6000.factory_reset()
         elif cmd == 'request_device_serial':

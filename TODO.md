@@ -5,7 +5,7 @@
 - [x] cleaner API for returning device name - return notification object as response
 - [ ] introduce set_timer command for explicit target date and time - for restoring settings
 - [x] rename led command to nightmode
-- [ ] cleaner API - use change or set consistently
+- [x] cleaner API - use change or set consistently
 - [x] move pseudo commands from cli demo to sem6000 module (i.e. reset\_timer, reset\_random_mode)
 - [ ] introduce hierarchy in settings response (i.e. reduced-period sub-object)
 - [ ] settings backup / restore cli: beautification of JSON

@@ -303,13 +303,13 @@ class SEM6000():
         """
         Activate nightmode on the remote device.
 
-        Returns a NightmodeSetNotification.
+        Returns a NightmodeChangedNotification.
         """
-        command = NightmodeSetCommand(True)
+        command = ChangeNightmodeCommand(True)
         self._send_command(command)
         notification = self._consume_notification()
         
-        if not isinstance(notification, NightmodeSetNotification) or not notification.was_successful:
+        if not isinstance(notification, NightmodeChangedNotification) or not notification.was_successful:
             raise Exception("Nightmode on failed")
 
         return notification
@@ -318,31 +318,31 @@ class SEM6000():
         """
         Disable nightmode on the remote device.
 
-        Returns a NightmodeSetNotification.
+        Returns a NightmodeChangedNotification.
         """
-        command = NightmodeSetCommand(False)
+        command = ChangeNightmodeCommand(False)
         self._send_command(command)
         notification = self._consume_notification()
         
-        if not isinstance(notification, NightmodeSetNotification) or not notification.was_successful:
+        if not isinstance(notification, NightmodeChangedNotification) or not notification.was_successful:
             raise Exception("Nightmode off failed")
 
         return notification
 
-    def set_date_and_time(self, isodatetime):
+    def change_date_and_time(self, isodatetime):
         """
         Set date and time on the remote device.
 
         Parameters:
             isodatetime - ISO string representing date and time, i.e. '2020-01-01T10:00'
 
-        Returns a DateAndTimeSetNotification.
+        Returns a DateAndTimeChangedNotification.
         """
         command = SynchronizeDateAndTimeCommand(isodatetime)
         self._send_command(command)
         notification = self._consume_notification()
 
-        if not isinstance(notification, DateAndTimeSetNotification) or not notification.was_successful:
+        if not isinstance(notification, DateAndTimeChangedNotification) or not notification.was_successful:
             raise Exception("Set date and time failed")
 
         return notification
@@ -362,22 +362,22 @@ class SEM6000():
 
         return notification
 
-    def set_power_limit(self, power_limit_in_watt):
+    def change_power_limit(self, power_limit_in_watt):
         """
         Set the power limit when the remote device should be automatically turn off.
 
-        Returns a PowerLimitSetNotification.
+        Returns a PowerLimitChangedNotification.
         """
-        command = SetPowerLimitCommand(power_limit_in_watt=int(power_limit_in_watt))
+        command = ChangePowerLimitCommand(power_limit_in_watt=int(power_limit_in_watt))
         self._send_command(command)
         notification = self._consume_notification()
 
-        if not isinstance(notification, PowerLimitSetNotification) or not notification.was_successful:
+        if not isinstance(notification, PowerLimitChangedNotification) or not notification.was_successful:
             raise Exception("Set power limit failed")
 
         return notification
 
-    def set_prices(self, normal_price_in_cent, reduced_period_price_in_cent):
+    def change_prices(self, normal_price_in_cent, reduced_period_price_in_cent):
         """
         Set the power prices.
 
@@ -385,18 +385,18 @@ class SEM6000():
             normal_price_in_cent            - Power price in cents.
             reduced_period_price_in_cent    - Power price in cents during reduced period.
 
-        Returns a PricesSetNotification.
+        Returns a PricesChangedNotification.
         """
-        command = SetPricesCommand(normal_price_in_cent=int(normal_price_in_cent), reduced_period_price_in_cent=int(reduced_period_price_in_cent))
+        command = ChangePricesCommand(normal_price_in_cent=int(normal_price_in_cent), reduced_period_price_in_cent=int(reduced_period_price_in_cent))
         self._send_command(command)
         notification = self._consume_notification()
 
-        if not isinstance(notification, PricesSetNotification) or not notification.was_successful:
+        if not isinstance(notification, PricesChangedNotification) or not notification.was_successful:
             raise Exception("Set prices failed")
 
         return notification
 
-    def set_reduced_period(self, is_active, start_isotime, end_isotime):
+    def change_reduced_period(self, is_active, start_isotime, end_isotime):
         """
         Sets start and end time of the reduced period.
 
@@ -405,9 +405,9 @@ class SEM6000():
             start_isotime   - ISO start time of the reduced period, i.e. '10:00'
             end_isotime     - ISO end time of the reduced period, i.e. '20:00'
 
-        Returns a ReducedPeriodSetNotification.
+        Returns a ReducedPeriodChangedNotification.
         """
-        command = SetReducedPeriodCommand(
+        command = ChangeReducedPeriodCommand(
             is_active=util._parse_boolean(is_active), 
             start_isotime=start_isotime, 
             end_isotime=end_isotime)
@@ -415,7 +415,7 @@ class SEM6000():
         self._send_command(command)
         notification = self._consume_notification()
 
-        if not isinstance(notification, ReducedPeriodSetNotification) or not notification.was_successful:
+        if not isinstance(notification, ReducedPeriodChangedNotification) or not notification.was_successful:
             raise Exception("Set reduced period failed")
 
         return notification
@@ -512,7 +512,7 @@ class SEM6000():
             is_action_turn_on   - True if the power should be turned on, False if the power should be turned off.
             isodatetime         - ISO date and time for when the scheduler entry should be executed, i.e. '2020-01-01T10:00'
 
-        Returns a SchedulerSetNotification.
+        Returns a SchedulerChangedNotification.
         """
         command = AddSchedulerCommand(
             OneTimeScheduler(
@@ -524,7 +524,7 @@ class SEM6000():
         self._send_command(command)
         notification = self._consume_notification()
 
-        if not isinstance(notification, SchedulerSetNotification) or not notification.was_successful:
+        if not isinstance(notification, SchedulerChangedNotification) or not notification.was_successful:
             raise Exception("Add scheduler failed")
 
         return notification
@@ -539,7 +539,7 @@ class SEM6000():
             is_action_turn_on   - True if the power should be turned on, False if the power should be turned off.
             isodatetime         - ISO date and time for when the scheduler entry should be executed, i.e. '2020-01-01T10:00'
 
-        Returns a SchedulerSetNotification.
+        Returns a SchedulerChangedNotification.
         """
         command = EditSchedulerCommand(
             slot_id=int(slot_id), 
@@ -552,7 +552,7 @@ class SEM6000():
         self._send_command(command)
         notification = self._consume_notification()
 
-        if not isinstance(notification, SchedulerSetNotification) or not notification.was_successful:
+        if not isinstance(notification, SchedulerChangedNotification) or not notification.was_successful:
             raise Exception("Edit scheduler failed")
 
         return notification
@@ -567,7 +567,7 @@ class SEM6000():
             repeat_on_weekdays  - Comma separated list of Weekdays the scheduler should be repeated on, i.e. 'Mon,Wed,Fri'
             isotime             - ISO time for when the scheduler entry should be executed, i.e. '10:00'
 
-        Returns a SchedulerSetNotification.
+        Returns a SchedulerChangedNotification.
         """
         command = AddSchedulerCommand(
             RepeatedScheduler(
@@ -580,7 +580,7 @@ class SEM6000():
         self._send_command(command)
         notification = self._consume_notification()
 
-        if not isinstance(notification, SchedulerSetNotification) or not notification.was_successful:
+        if not isinstance(notification, SchedulerChangedNotification) or not notification.was_successful:
             raise Exception("Add scheduler failed")
 
         return notification
@@ -596,7 +596,7 @@ class SEM6000():
             repeat_on_weekdays  - Comma separated list of Weekdays the scheduler should be repeated on, i.e. 'Mon,Wed,Fri'
             isotime             - ISO time for when the scheduler entry should be executed, i.e. '10:00'
 
-        Returns a SchedulerSetNotification.
+        Returns a SchedulerChangedNotification.
         """
         command = EditSchedulerCommand(
             slot_id=int(slot_id), 
@@ -610,7 +610,7 @@ class SEM6000():
         self._send_command(command)
         notification = self._consume_notification()
 
-        if not isinstance(notification, SchedulerSetNotification) or not notification.was_successful:
+        if not isinstance(notification, SchedulerChangedNotification) or not notification.was_successful:
             raise Exception("Edit scheduler failed")
 
         return notification
@@ -622,13 +622,13 @@ class SEM6000():
         Parameters:
             slot_id             - id of the slot where the scheduler entry is currently stored at.
 
-        Returns a SchedulerSetNotification.
+        Returns a SchedulerChangedNotification.
         """
         command = RemoveSchedulerCommand(slot_id=int(slot_id))
         self._send_command(command)
         notification = self._consume_notification()
 
-        if not isinstance(notification, SchedulerSetNotification) or not notification.was_successful:
+        if not isinstance(notification, SchedulerChangedNotification) or not notification.was_successful:
             raise Exception("Remove scheduler failed")
 
         return notification
@@ -648,7 +648,7 @@ class SEM6000():
 
         return notification
 
-    def set_random_mode(self, active_on_weekdays, start_isotime, end_isotime):
+    def change_random_mode(self, active_on_weekdays, start_isotime, end_isotime):
         """
         Activate random mode on the remote device.
 
@@ -657,9 +657,9 @@ class SEM6000():
             start_isotime       - ISO time of when random mode should start, i.e. '10:00'
             end_isotime         - ISO time of when random mode should stop, i.e. '20:00'
 
-        Returns a RandomModeSetNotification.
+        Returns a RandomModeChangedNotification.
         """
-        command = SetRandomModeCommand(
+        command = ChangeRandomModeCommand(
             is_active=True, 
             active_on_weekdays=util._parse_weekdays_list(active_on_weekdays), 
             start_isotime=start_isotime, 
@@ -668,7 +668,7 @@ class SEM6000():
         self._send_command(command)
         notification = self._consume_notification()
 
-        if not isinstance(notification, RandomModeSetNotification) or not notification.was_successful:
+        if not isinstance(notification, RandomModeChangedNotification) or not notification.was_successful:
             raise Exception("Set random mode failed")
 
         return notification
@@ -677,9 +677,9 @@ class SEM6000():
         """
         Disable random mode on the remote device.
 
-        Returns a RandomModeSetNotification.
+        Returns a RandomModeChangedNotification.
         """
-        command = SetRandomModeCommand(
+        command = ChangeRandomModeCommand(
             is_active=False, 
             active_on_weekdays=[], 
             start_isotime="00:00", 
@@ -688,7 +688,7 @@ class SEM6000():
         self._send_command(command)
         notification = self._consume_notification()
 
-        if not isinstance(notification, RandomModeSetNotification) or not notification.was_successful:
+        if not isinstance(notification, RandomModeChangedNotification) or not notification.was_successful:
             raise Exception("Set random mode failed")
 
         return notification
@@ -789,20 +789,20 @@ class SEM6000():
 
         return notification
 
-    def set_device_name(self, new_name):
+    def change_device_name(self, new_name):
         """
         Set the name of the remote device.
 
         Parameters:
             new_name    - Name to be set.
 
-        Returns a DeviceNameSetNotification.
+        Returns a DeviceNameChangedNotification.
         """
-        command = SetDeviceNameCommand(new_name=new_name)
+        command = ChangeDeviceNameCommand(new_name=new_name)
         self._send_command(command)
         notification = self._consume_notification()
 
-        if not isinstance(notification, DeviceNameSetNotification) or not notification.was_successful:
+        if not isinstance(notification, DeviceNameChangedNotification) or not notification.was_successful:
             raise Exception("Set device name failed")
 
         return notification

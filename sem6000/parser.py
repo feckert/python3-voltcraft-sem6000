@@ -125,19 +125,19 @@ class MessageParser:
 
         if payload[0:3] == b'\x0f\x00\x05':
             if len(payload) != 4:
-                raise InvalidPayloadLengthException(message_class=NightmodeSetNotification.__class__, expected_payload_length=4, actual_payload_length=len(payload))
+                raise InvalidPayloadLengthException(message_class=NightmodeChangedNotification.__class__, expected_payload_length=4, actual_payload_length=len(payload))
 
-            return NightmodeSetNotification(was_successful=True)
+            return NightmodeChangedNotification(was_successful=True)
 
         if payload[0:2] == b'\x01\x00':
             if len(payload) != 3:
-                raise InvalidPayloadLengthException(message_class=DateAndTimeSetNotification.__class__, expected_payload_length=3, actual_payload_length=len(payload))
+                raise InvalidPayloadLengthException(message_class=DateAndTimeChangedNotification.__class__, expected_payload_length=3, actual_payload_length=len(payload))
 
             was_successful = False
             if payload[2:3] == b'\x00':
                 was_successful = True
 
-            return DateAndTimeSetNotification(was_successful=was_successful)
+            return DateAndTimeChangedNotification(was_successful=was_successful)
 
         if payload[0:2] == b'\x10\x00':
             if len(payload) != 13:
@@ -165,19 +165,19 @@ class MessageParser:
             return SettingsRequestedNotification(is_reduced_period=is_reduced_period, normal_price_in_cent=normal_price_in_cent, reduced_period_price_in_cent=reduced_period_price_in_cent, reduced_period_start_isotime=reduced_period_start_time.isoformat(timespec='minutes'), reduced_period_end_isotime=reduced_period_end_time.isoformat('minutes'), is_nightmode_active=is_nightmode_active, power_limit_in_watt=power_limit_in_watt)
 
         if payload[0:3] == b'\x05\x00\x00' and len(payload) == 3:
-            return PowerLimitSetNotification(was_successful=True)
+            return PowerLimitChangedNotification(was_successful=True)
 
         if payload[0:3] == b'\x0f\x00\x04':
             if len(payload) != 4:
-                raise InvalidPayloadLengthException(message_class=PricesSetNotification.__class__, expected_payload_length=4, actual_payload_length=len(payload))
+                raise InvalidPayloadLengthException(message_class=PricesChangedNotification.__class__, expected_payload_length=4, actual_payload_length=len(payload))
 
-            return PricesSetNotification(was_successful=True)
+            return PricesChangedNotification(was_successful=True)
 
         if payload[0:3] == b'\x0f\x00\x01':
             if len(payload) != 4:
-                raise InvalidPayloadLengthException(message_class=ReducedPeriodSetNotification.__class__, expected_payload_length=4, actual_payload_length=len(payload))
+                raise InvalidPayloadLengthException(message_class=ReducedPeriodChangedNotification.__class__, expected_payload_length=4, actual_payload_length=len(payload))
 
-            return ReducedPeriodSetNotification(was_successful=True)
+            return ReducedPeriodChangedNotification(was_successful=True)
 
         if payload[0:2] == b'\x09\x00':
             if len(payload) != 13:
@@ -248,7 +248,7 @@ class MessageParser:
             if payload[2:3] == b'\x00':
                 was_successful = True
 
-            return SchedulerSetNotification(was_successful=was_successful)
+            return SchedulerChangedNotification(was_successful=was_successful)
 
         if payload[0:2] == b'\x16\x00':
             is_active = False
@@ -276,7 +276,7 @@ class MessageParser:
             if payload[2:3] == b'\x00':
                 was_successful = True
 
-            return RandomModeSetNotification(was_successful=was_successful)
+            return RandomModeChangedNotification(was_successful=was_successful)
 
         if payload[0:2] == b'\x04\x00':
             is_power_active = False
@@ -325,7 +325,7 @@ class MessageParser:
             return FactoryResetNotification(was_successful=True)
 
         if payload[0:2] == b'\x02\x00':
-            return DeviceNameSetNotification(was_successful=True)
+            return DeviceNameChangedNotification(was_successful=True)
 
         if payload[0:2] == b'\x11\x00':
             serial = payload[2:-2].decode('utf-8')
