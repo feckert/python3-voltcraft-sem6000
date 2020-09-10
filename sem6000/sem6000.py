@@ -435,13 +435,13 @@ class SEM6000():
 
         return notification
 
-    def set_timer(self, is_action_turn_on, delay_isotime):
+    def activate_timer(self, is_action_turn_on, delay_isotime):
         """
         Activate the timer.
 
         Parameters:
             is_action_turn_on   - True if the power should be turned on after the delay has passed, False if the power should be turned off.
-            delay_isotime       - Delay in iso time format, i.e. '00:00::05' for 5 seconds.
+            delay_isotime       - Delay in iso time format, i.e. '00:00:05' for 5 seconds.
 
         Returns a TimerSetNotification.
         """
@@ -453,6 +453,29 @@ class SEM6000():
             is_reset_timer=False, 
             is_action_turn_on=util._parse_boolean(is_action_turn_on), 
             target_isodatetime=dt.isoformat(timespec='seconds'))
+
+        self._send_command(command)
+        notification = self._consume_notification()
+
+        if not isinstance(notification, TimerSetNotification) or not notification.was_successful:
+            raise Exception("Set timer failed")
+
+        return notification
+
+    def activate_timer_at(self, is_action_turn_on, target_isodatetime):
+        """
+        Activate the timer at the specified date and time.
+
+        Parameters:
+            is_action_turn_on   - True if the power should be turned on, False if the power should be turned off.
+            target_isodatetime  - iso date and time format, i.e. '2020-01-01T00:00:05'.
+
+        Returns a TimerSetNotification.
+        """
+        command = SetTimerCommand(
+            is_reset_timer=False, 
+            is_action_turn_on=util._parse_boolean(is_action_turn_on), 
+            target_isodatetime=target_isodatetime)
 
         self._send_command(command)
         notification = self._consume_notification()

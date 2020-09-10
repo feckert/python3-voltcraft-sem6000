@@ -30,7 +30,7 @@ else:
     assert measurement_response.is_power_active
 
     timer_status_response = device.request_timer_status()
-    assert not timer_status_response.is_active
+    assert not timer_status_response.is_active is None
 
     device_serial_response = device.request_device_serial()
     assert len(device_serial_response.serial) > 0

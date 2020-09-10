@@ -33,6 +33,7 @@ main() {
 	echo "" 1>&2
 
 	echo "Running integration test... " 1>&2
+	"$SCRIPTDIR/sem6000-cli-demo.py" "$ADDRESS" "$PIN" change_date_and_time "2000-01-01T00:00"
 	"$SCRIPTDIR/sem6000-settings-restore-demo.py" "$ADDRESS" "$PIN" "$SCRIPTDIR/${SETTINGS_FILE_FOR_TEST}"
 	"$SCRIPTDIR/sem6000-settings-backup-demo.py" "$ADDRESS" "$PIN" > "$TMPFILE"
 	if ! diff "$TMPFILE" "${SETTINGS_FILE_FOR_TEST}"
@@ -52,6 +53,7 @@ main() {
 
 	echo "Restoring original settings from $SCRIPTDIR/${ORIGINAL_SETTINGS_FILE} ..." 1>&2
 	"$SCRIPTDIR/sem6000-settings-restore-demo.py" "$ADDRESS" "$PIN" "$SCRIPTDIR/${ORIGINAL_SETTINGS_FILE}"
+	"$SCRIPTDIR/sem6000-cli-demo.py" "$ADDRESS" "$PIN" synchronize_date_and_time
 	echo "" 1>&2
 
 	if [ "${TEST_FAILED}" == "0" ]

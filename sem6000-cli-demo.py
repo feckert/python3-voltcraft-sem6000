@@ -54,8 +54,10 @@ if __name__ == '__main__':
         print("", file=sys.stderr)
         print("\t\t\trequest_timer_status", file=sys.stderr)
         print("\t\t\t\tRequest the current status of the timer", file=sys.stderr)
-        print("\t\t\tset_timer <turn_on?> <delay_isotime>", file=sys.stderr)
-        print("\t\t\t\tSets the switch action and the timer delay", file=sys.stderr)
+        print("\t\t\tactivate_timer <turn_on?> <delay_isotime>", file=sys.stderr)
+        print("\t\t\t\tActivates the timer to execute the switch action after the specified delay", file=sys.stderr)
+        print("\t\t\tactivate_timer_at <turn_on?> <target_isodatetime>", file=sys.stderr)
+        print("\t\t\t\tActivates the timer to execute the switch action at the specified date and time", file=sys.stderr)
         print("\t\t\treset_timer", file=sys.stderr)
         print("\t\t\t\tResets/stops the timer", file=sys.stderr)
         print("", file=sys.stderr)
@@ -162,7 +164,7 @@ if __name__ == '__main__':
             print("Timer Status:")
             if response.is_active:
                 now = datetime.datetime.now()
-                now = datetime.datetime(now.year % 100, now.month, now.day, now.hour, now.minute, now.second)
+                now = datetime.datetime(now.year, now.month, now.day, now.hour, now.minute, now.second)
 
                 dt = datetime.datetime.fromisoformat(response.target_isodatetime)
                 time_left = (dt - now)
@@ -177,11 +179,16 @@ if __name__ == '__main__':
                 print("\tTimer state:\t\tOff")
 
             print("\tOriginal timer length:\t" + str(original_timer_length))
-        elif cmd == 'set_timer':
+        elif cmd == 'activate_timer':
             is_action_turn_on = sys.argv[4]
             delay_isotime = sys.argv[5]
 
-            sem6000.set_timer(is_action_turn_on=is_action_turn_on, delay_isotime=delay_isotime)
+            sem6000.activate_timer(is_action_turn_on=is_action_turn_on, delay_isotime=delay_isotime)
+        elif cmd == 'activate_timer_at':
+            is_action_turn_on = sys.argv[4]
+            target_isodatetime = sys.argv[5]
+
+            sem6000.activate_timer_at(is_action_turn_on=is_action_turn_on, target_isodatetime=target_isodatetime)
         elif cmd == 'reset_timer':
             sem6000.reset_timer()
         elif cmd == 'request_scheduler':

@@ -17,6 +17,7 @@ else:
     device_name_response = device.request_device_name()
 
     settings_response = device.request_settings()
+    timer_response = device.request_timer_status()
     random_mode_response = device.request_random_mode_status()
     scheduler_response = device.request_scheduler()
 
@@ -44,6 +45,12 @@ else:
         "active-on-weekdays": weekdays,
         "start-isotime": random_mode_response.start_isotime,
         "end-isotime": random_mode_response.end_isotime
+    }
+
+    data["timer"] = {
+        "is-active": timer_response.is_active,
+        "is-action-turn-on": timer_response.is_action_turn_on,
+        "isodatetime": timer_response.target_isodatetime
     }
 
     data["scheduler"] = {

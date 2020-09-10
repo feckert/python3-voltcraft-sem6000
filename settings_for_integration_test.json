@@ -25,6 +25,11 @@
   "start-isotime": "08:00",
   "end-isotime": "16:00"
  },
+ "timer": {
+  "is-active": true,
+  "is-action-turn-on": false,
+  "isodatetime": "2000-01-01T12:34:56"
+ },
  "scheduler": {
   "number-of-schedulers": 4,
   "entries": {
@@ -59,12 +64,12 @@
    "11": {
     "is-active": true,
     "is-action-turn-on": true,
-    "isodatetime": "2020-01-01T15:00"
+    "isodatetime": "2000-01-01T15:00"
    },
    "12": {
     "is-active": true,
     "is-action-turn-on": false,
-    "isodatetime": "2020-01-01T16:00"
+    "isodatetime": "2000-01-01T16:00"
    }
   }
  }

@@ -26,7 +26,6 @@ else:
     device = sem6000.SEM6000(address, "0000", debug=True)
     device.change_pin(pin)
 
-    device.change_date_and_time(datetime.datetime.now().isoformat())
     device.change_device_name(data["device-name"])
 
     device.change_prices(data["settings"]["normal-price-in-cent"], data["settings"]["reduced-period"]["price-in-cent"])
@@ -44,6 +43,9 @@ else:
     else:
         device.reset_random_mode()
 
+    if data["timer"]["is-active"]:
+        device.activate_timer_at(data["timer"]["is-action-turn-on"], data["timer"]["isodatetime"])
+
     slot_ids = list(data["scheduler"]["entries"].keys())
     slot_ids.reverse()
     for slot_id in slot_ids:
@@ -53,4 +55,3 @@ else:
             device.add_onetime_scheduler(scheduler["is-active"], scheduler["is-action-turn-on"], scheduler["isodatetime"])
         else:
             device.add_repeated_scheduler(scheduler["is-active"], scheduler["is-action-turn-on"], scheduler["repeat-on-weekdays"], scheduler["isotime"])
-
