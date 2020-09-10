@@ -34,15 +34,15 @@ class MessagesTest(unittest.TestCase):
 
         self.assertEqual(True, parsed_message.was_successful, 'was_successful value differs')
 
-    def test_NightmodeSetNotification(self):
-        message = NightmodeSetNotification(was_successful=True)
+    def test_NightmodeChangedNotification(self):
+        message = NightmodeChangedNotification(was_successful=True)
         encoded_message = MessageEncoder().encode(message)
         parsed_message = MessageParser().parse(encoded_message)
 
         self.assertEqual(True, parsed_message.was_successful, 'was_successful value differs')
 
     def test_SynchroizeDateAndTimeNotification(self):
-        message = DateAndTimeSetNotification(was_successful=True)
+        message = DateAndTimeChangedNotification(was_successful=True)
         encoded_message = MessageEncoder().encode(message)
         parsed_message = MessageParser().parse(encoded_message)
 
@@ -61,22 +61,22 @@ class MessagesTest(unittest.TestCase):
         self.assertEqual(True, parsed_message.is_nightmode_active, 'is_nightmode_active value differs')
         self.assertEqual(500, parsed_message.power_limit_in_watt, 'power_limit_in_watt value differs')
 
-    def test_PowerLimitSetNotification(self):
-        message = PowerLimitSetNotification(was_successful=True)
+    def test_PowerLimitChangedNotification(self):
+        message = PowerLimitChangedNotification(was_successful=True)
         encoded_message = MessageEncoder().encode(message)
         parsed_message = MessageParser().parse(encoded_message)
 
         self.assertEqual(True, parsed_message.was_successful, 'was_successful value differs')
 
-    def test_PricesSetNotification(self):
-        message = PricesSetNotification(was_successful=True)
+    def test_PricesChangedNotification(self):
+        message = PricesChangedNotification(was_successful=True)
         encoded_message = MessageEncoder().encode(message)
         parsed_message = MessageParser().parse(encoded_message)
 
         self.assertEqual(True, parsed_message.was_successful, 'was_successful value differs')
 
-    def test_ReducedPeriodSetNotification(self):
-        message = ReducedPeriodSetNotification(was_successful=True)
+    def test_ReducedPeriodChangedNotification(self):
+        message = ReducedPeriodChangedNotification(was_successful=True)
         encoded_message = MessageEncoder().encode(message)
         parsed_message = MessageParser().parse(encoded_message)
 
@@ -103,16 +103,20 @@ class MessagesTest(unittest.TestCase):
     def test_SchedulerRequestedNotification(self):
         scheduler_entries=[]
         for i in range(12):
-            repeat_on_weekdays = []
-            repeat_on_weekdays.append(util.Weekday.SUNDAY)
-            repeat_on_weekdays.append(util.Weekday.MONDAY)
-            repeat_on_weekdays.append(util.Weekday.TUESDAY)
-            repeat_on_weekdays.append(util.Weekday.WEDNESDAY)
-            repeat_on_weekdays.append(util.Weekday.THURSDAY)
-            repeat_on_weekdays.append(util.Weekday.FRIDAY)
-            repeat_on_weekdays.append(util.Weekday.SATURDAY)
+            if i <= 6:
+                repeat_on_weekdays = []
+                repeat_on_weekdays.append(util.Weekday.SUNDAY)
+                repeat_on_weekdays.append(util.Weekday.MONDAY)
+                repeat_on_weekdays.append(util.Weekday.TUESDAY)
+                repeat_on_weekdays.append(util.Weekday.WEDNESDAY)
+                repeat_on_weekdays.append(util.Weekday.THURSDAY)
+                repeat_on_weekdays.append(util.Weekday.FRIDAY)
+                repeat_on_weekdays.append(util.Weekday.SATURDAY)
 
-            scheduler = Scheduler(is_active=True, is_action_turn_on=True, repeat_on_weekdays=repeat_on_weekdays, isodatetime="2020-12-03T12:34")
+                scheduler = RepeatedScheduler(is_active=True, is_action_turn_on=True, repeat_on_weekdays=repeat_on_weekdays, isotime="12:34")
+            else:
+                scheduler = OneTimeScheduler(is_active=True, is_action_turn_on=True, isodatetime="2020-12-03T12:34")
+
             scheduler_entries.append(SchedulerEntry(slot_id=i, scheduler=scheduler))
 
         message = SchedulerRequestedNotification(number_of_schedulers=12, scheduler_entries=scheduler_entries)
@@ -124,22 +128,29 @@ class MessagesTest(unittest.TestCase):
         self.assertEqual(12, len(parsed_message.scheduler_entries))
         for i in range(12):
             repeat_on_weekday_expected = []
-            repeat_on_weekday_expected.append(util.Weekday.SUNDAY)
-            repeat_on_weekday_expected.append(util.Weekday.MONDAY)
-            repeat_on_weekday_expected.append(util.Weekday.TUESDAY)
-            repeat_on_weekday_expected.append(util.Weekday.WEDNESDAY)
-            repeat_on_weekday_expected.append(util.Weekday.THURSDAY)
-            repeat_on_weekday_expected.append(util.Weekday.FRIDAY)
-            repeat_on_weekday_expected.append(util.Weekday.SATURDAY)
+
+            if i <= 6:
+                repeat_on_weekday_expected.append(util.Weekday.SUNDAY)
+                repeat_on_weekday_expected.append(util.Weekday.MONDAY)
+                repeat_on_weekday_expected.append(util.Weekday.TUESDAY)
+                repeat_on_weekday_expected.append(util.Weekday.WEDNESDAY)
+                repeat_on_weekday_expected.append(util.Weekday.THURSDAY)
+                repeat_on_weekday_expected.append(util.Weekday.FRIDAY)
+                repeat_on_weekday_expected.append(util.Weekday.SATURDAY)
 
             self.assertEqual(i, parsed_message.scheduler_entries[i].slot_id, 'slot_id value differs on scheduler ' + str(i))
             self.assertEqual(True, parsed_message.scheduler_entries[i].scheduler.is_active, 'is_active value differs on scheduler ' + str(i))
             self.assertEqual(True, parsed_message.scheduler_entries[i].scheduler.is_action_turn_on, 'is_action_turn_on value differs on scheduler ' + str(i))
             self.assertEqual(repeat_on_weekday_expected, parsed_message.scheduler_entries[i].scheduler.repeat_on_weekdays, 'repeat_on_weekdays value differs on scheduler ' + str(i))
-            self.assertEqual("2020-12-03T12:34", parsed_message.scheduler_entries[i].scheduler.isodatetime, 'isodatetime value differs on scheduler ' + str(i))
 
-    def test_SchedulerSetNotification(self):
-        message = SchedulerSetNotification(was_successful=True)
+            if i <= 6:
+                isotime = datetime.datetime.fromisoformat(parsed_message.scheduler_entries[i].scheduler.isodatetime).time().isoformat(timespec='minutes')
+                self.assertEqual("12:34", isotime, 'isotime value differs on scheduler ' + str(i))
+            else:
+                self.assertEqual("2020-12-03T12:34", parsed_message.scheduler_entries[i].scheduler.isodatetime, 'isodatetime value differs on scheduler ' + str(i))
+
+    def test_SchedulerChangedNotification(self):
+        message = SchedulerChangedNotification(was_successful=True)
         encoded_message = MessageEncoder().encode(message)
         parsed_message = MessageParser().parse(encoded_message)
 
@@ -173,8 +184,8 @@ class MessagesTest(unittest.TestCase):
         self.assertEqual("10:30", parsed_message.start_isotime, 'start_isotime value differs')
         self.assertEqual("18:45", parsed_message.end_isotime, 'end_isotime value differs')
 
-    def test_RandomModeSetNotification(self):
-        message = RandomModeSetNotification(was_successful=True)
+    def test_RandomModeChangedNotification(self):
+        message = RandomModeChangedNotification(was_successful=True)
         encoded_message = MessageEncoder().encode(message)
         parsed_message = MessageParser().parse(encoded_message)
 
@@ -230,8 +241,8 @@ class MessagesTest(unittest.TestCase):
 
         self.assertEqual(True, parsed_message.was_successful, 'was_successful value differs')
 
-    def test_DeviceNameSetNotification(self):
-        message = DeviceNameSetNotification(was_successful=True)
+    def test_DeviceNameChangedNotification(self):
+        message = DeviceNameChangedNotification(was_successful=True)
         encoded_message = MessageEncoder().encode(message)
         parsed_message = MessageParser().parse(encoded_message)
 
