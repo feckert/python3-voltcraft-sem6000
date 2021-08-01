@@ -16,7 +16,7 @@ if __name__ == '__main__':
     elif len(sys.argv) < 2:
         scriptname = sys.argv[0]
         print("Usage:" , file=sys.stderr)
-        print("\t" + scriptname + "[<address> <pin>] <command> [...]" , file=sys.stderr)
+        print("\t" + scriptname + " [<address> <pin>] <command> [...]" , file=sys.stderr)
         print("\t\taddress:\tAddress of the bluetooth device to connect to, i.e. 00:11:22:33:44:55" , file=sys.stderr)
         print("\t\tpin:\t\t4-digit PIN of the device, i.e. 0000" , file=sys.stderr)
         print("\t\tcommand:\tOne of the following commands to execute on the device", file=sys.stderr)
