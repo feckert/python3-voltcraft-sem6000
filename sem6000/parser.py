@@ -14,9 +14,11 @@ class InvalidPayloadLengthException(Exception):
         return "message has invalid payload length for " + self.message_class.__name__ +  " (expected: " + str(self.expected_payload_length) + ", actual=" + str(self.actual_payload_length) + ")"
 
 class MessageParser:
-    def __init__(self, year_diff=None):
+    def __init__(self, hardware_version=None, year_diff=None):
         # the device only operates with two digit years
         # determine or set the difference to the current 4 digit year
+        self.hardware_version = hardware_version
+
         if year_diff is None:
             self.year_diff = (datetime.datetime.now().year % 100) * 100
         else:
@@ -29,6 +31,9 @@ class MessageParser:
         length_of_payload = data[1]
 
         payload = data[2:2+length_of_payload-1]
+        if (data[-2:len(data)] != bytes.fromhex("ffff")) and self.hardware_version == 3:
+            length_of_payload += 2
+        
         checksum_received = data[2+length_of_payload-1]
 
         checksum = (1+sum(payload)) & 0xff

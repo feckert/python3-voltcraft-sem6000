@@ -10,14 +10,15 @@ from . import util
 
 
 class SEM6000Delegate():
-    def __init__(self, debug=False):
+    def __init__(self, debug=False, hardware_version=None):
         self.debug = False
         if debug:
             self.debug = True
 
+        self.hardware_version = hardware_version
         self._raw_notifications = []
 
-        self._parser = parser.MessageParser()
+        self._parser = parser.MessageParser(hardware_version=self.hardware_version)
 
     def __call__(self, characteristic_uuid, data):
         self._handle_notification(characteristic_uuid, data)
@@ -76,6 +77,7 @@ class SEM6000():
     CHARACTERISTIC_UUID_NAME='00002a00-0000-1000-8000-00805f9b34fb'
     CHARACTERISTIC_UUID_CONTROL='0000fff3-0000-1000-8000-00805f9b34fb'
     CHARACTERISTIC_UUID_RESPONSE='0000fff4-0000-1000-8000-00805f9b34fb'
+    CHARACTERISTIC_UUID_VERSION='0000fff1-0000-1000-8000-00805f9b34fb'
 
     def __init__(self, deviceAddr=None, pin=None, bluetooth_device='hci0', timeout=3, debug=False):
         """ Create a new SEM6000() instance
@@ -89,6 +91,7 @@ class SEM6000():
         """
         self.timeout = timeout
         self.debug = debug
+        self.hardware_version = None
 
         self.connection_settings = {}
 
@@ -96,9 +99,7 @@ class SEM6000():
 
         self._encoder = encoder.MessageEncoder()
 
-        self._delegate = SEM6000Delegate(self.debug)
         self._bluetooth_lowenergy_interface = BluePyBtLeInterface(bluetooth_device=bluetooth_device)
-        self._bluetooth_lowenergy_interface.add_notification_handler(self._delegate._handle_notification)
 
         if not deviceAddr is None:
             self.connect(deviceAddr)
@@ -123,7 +124,13 @@ class SEM6000():
             self._disconnect()
             raise e
 
-        self._bluetooth_lowenergy_interface.enable_notifications()
+        #get hardware version  
+        device_info = self._bluetooth_lowenergy_interface.read_from_characteristic(self.CHARACTERISTIC_UUID_VERSION)
+        self.hardware_version = int(device_info[13])
+        if self.hardware_version < 3:
+            self._bluetooth_lowenergy_interface.enable_notifications()
+        else:
+            self._bluetooth_lowenergy_interface._peripheral.setMTU(260)
 
         if self.pin:
             try:
@@ -175,7 +182,12 @@ class SEM6000():
         """
         self.connection_settings["device_address"] = device_address
 
-        return self._reconnect()
+        res = self._reconnect()
+        self._delegate = SEM6000Delegate(self.debug, hardware_version = self.hardware_version)
+        self._bluetooth_lowenergy_interface.add_notification_handler(self._delegate._handle_notification)
+        return res
+
+
 
     def disconnect(self):
         """
